@@ -3,7 +3,13 @@
 
 > *No mercy in the Rift.*
 
-A self-hosted, competitive LoL tournament bracket system built by Stephen Crittenden and Ryan Cole. Inspired by the 1988 film and the Halo 3 TrueSkill ranking system.
+A self-hosted, competitive LoL tournament platform built by Stephen Crittenden and Ryan Cole. Inspired by the 1988 film and the Halo 3 TrueSkill ranking system.
+
+**Three things make Bloodsport different from every other LoL tournament:**
+
+1. **Your team is chosen by the data.** Statistical profiles built from 50 ranked games determine team chemistry. You do not choose your teammates. The algorithm does.
+2. **Your skill is measured honestly.** A six-component rating system (BSR) sees individual performance, build intelligence, creative expression, and consistency — not just wins and losses.
+3. **Everything is transparent.** Every rating component, every dollar of entry fees, every bracket result is public. Nothing is hidden.
 
 ---
 
@@ -16,7 +22,8 @@ A self-hosted, competitive LoL tournament bracket system built by Stephen Critte
 | Real-time | SignalR |
 | Database | PostgreSQL + Entity Framework Core 8 |
 | Auth | OpenIddict (self-hosted OpenID Connect) |
-| Rating | TrueSkill (moserware/Skills) |
+| Rating | BSR — six-component system (moserware/Skills TrueSkill core) |
+| Player Data | Riot API v5 + op.gg match history |
 | Tournament | Riot Tournament API v5 |
 | Deploy | Docker Compose |
 
@@ -51,7 +58,17 @@ Open: http://localhost:5001
 ```
 bloodsport/
 ├── src/
-│   ├── Bloodsport.Core/         # Domain models, TrueSkill, tournament logic, TDL parser
+│   ├── Bloodsport.Core/
+│   │   ├── Models/              # Player, Tournament, Match domain models
+│   │   ├── Rating/              # BSR six-component rating system
+│   │   │   ├── BloodsportRatingService.cs   # All six components
+│   │   │   ├── BloodsportRating.cs          # Full rating model
+│   │   │   └── MatchPerformance.cs          # Per-match data + role benchmarks
+│   │   ├── Teams/               # Statistical team formation
+│   │   │   ├── TeamFormationService.cs      # Chemistry-guided team algorithm
+│   │   │   ├── PlayerProfile.cs             # Statistical player model
+│   │   │   └── OpggDataService.cs           # Riot API + op.gg data fetcher
+│   │   └── Tdl/                 # Tournament Definition Language (YAML)
 │   ├── Bloodsport.Data/         # EF Core DbContext, PostgreSQL migrations
 │   ├── Bloodsport.Api/          # ASP.NET Core API, SignalR hub, Riot webhook
 │   └── Bloodsport.Client/       # Blazor WebAssembly frontend
@@ -80,6 +97,80 @@ riot:
   region: NA1
   pick_type: TOURNAMENT_DRAFT
 ```
+
+---
+
+## Team Formation — Statistically-Guided Random Teams
+
+**The most important thing to understand about Bloodsport teams: they are random, but they are not arbitrary.**
+
+No other LoL tournament does this. Teams are formed by a statistical algorithm that analyzes every registered player's match history and forms groups that the data predicts will have genuine internal chemistry.
+
+---
+
+### How It Works
+
+**Step 1 — Build player profiles from real match data**
+
+When a player registers, the system pulls their last 50 ranked games from the Riot API and op.gg. It builds a `PlayerProfile` with 15 statistical dimensions:
+
+| Dimension | What It Measures | Source |
+|-----------|-----------------|--------|
+| Role proficiency (per role) | Games played + win rate per role | Riot API match history |
+| Aggression index | KDA patterns, early skirmish rate | Riot API |
+| Utility index | Assist share, vision behavior | Riot API |
+| Carry capacity | Damage share, scaling champion usage | Riot API |
+| Objective focus | Dragon/baron participation rate | Riot API |
+| Consistency rating | Performance variance across games | Calculated |
+| Engage potential | Initiator champions in pool | Champion tags |
+| Peel potential | Protector champions in pool | Champion tags |
+| Poke potential | Range/zone champions in pool | Champion tags |
+| Split push potential | 1v1 champions in pool | Champion tags |
+| Teamfight potential | AoE champions in pool | Champion tags |
+
+**Step 2 — Form teams by chemistry, not rank**
+
+The `TeamFormationService` runs 500 candidate team assignments. Each candidate is scored on the **Team Chemistry Score (TCS)**:
+
+| Sub-Score | Weight | What It Measures |
+|-----------|--------|-----------------|
+| Role coverage | 30% | How well assigned roles match each player's proficiency |
+| Playstyle balance | 25% | Is aggression balanced with utility and support? |
+| Champion pool depth | 20% | How many viable team compositions can they run? |
+| Win condition diversity | 15% | Can they win through engage, poke, split, or teamfight? |
+| Skill variance | 10% | How even is the BSR spread within the team? |
+
+Inter-team balance is also enforced — the algorithm penalizes assignments where BSR variance between teams is high. Every team competes on a level playing field.
+
+**Step 3 — Reveal**
+
+Teams receive names from the Bloodsport world — Iron Serpent, Ghost Blade, Shadow Crane, Blood Lotus. The reveal shows each team's chemistry breakdown alongside their roster.
+
+You will not know your teammates before the reveal. You will not choose them. You will not trade them.
+
+The data chose them. Your job is to play.
+
+---
+
+### The Philosophy
+
+Frank Dux did not choose who he fought alongside. The bracket decided. Bloodsport applies that same principle to team format. Removing player agency over team selection eliminates one of the most corrosive dynamics in competitive gaming — the ability to stack teams with friends, dodge unfavorable compositions, or blame teammates for your result.
+
+You are placed with people the data says you should play well with. If the team loses, every player contributed to that outcome. No excuses available.
+
+---
+
+### Implementation
+
+All team logic lives in `src/Bloodsport.Core/Teams/`:
+
+| File | Purpose |
+|------|---------|
+| `TeamFormationService.cs` | 500-iteration optimization, TCS scoring, inter-team balance |
+| `PlayerProfile.cs` | Statistical player model — 15 dimensions, role proficiency, playstyle vector, champion tags |
+| `OpggDataService.cs` | Riot API integration — 50-game match history analysis, role normalization, playstyle derivation |
+
+**Beta mode:** `TeamFormationService.GenerateMockProfile()` generates realistic statistical profiles for testing. Wire `OpggDataService.FetchProfileAsync()` when the Riot API key arrives — the interface is already defined, no structural changes needed.
 
 ---
 
@@ -256,8 +347,11 @@ Self-hosted OpenID Connect via **OpenIddict**. No Auth0, no Keycloak, no third p
 | POST | `/api/tournament/{id}/start` | Seed bracket + generate Riot codes (Admin) |
 | POST | `/api/tournament/{id}/matches/{matchId}/result` | Record match winner |
 | POST | `/api/tournament/riot/callback` | Riot match result webhook |
-| GET | `/api/players` | Leaderboard (ranked players) |
-| GET | `/api/players/{id}` | Player profile |
+| GET | `/api/players` | Leaderboard — ranked by BSR |
+| GET | `/api/players/{id}` | Full player profile — all six BSR components |
+| POST | `/api/players/{id}/profile/refresh` | Rebuild statistical profile from Riot API |
+| POST | `/api/tournament/{id}/teams/form` | Run team formation algorithm (Admin) |
+| GET | `/api/tournament/{id}/teams` | Get formed teams + chemistry scores |
 
 ---
 
@@ -274,4 +368,20 @@ All services run in Docker. PostgreSQL data is persisted in a named volume.
 
 ---
 
+---
+
+## What Makes Bloodsport Different
+
+| Feature | Other Tournaments | Bloodsport |
+|---------|-----------------|------------|
+| Team selection | Players choose teammates | Data-driven chemistry algorithm |
+| Skill rating | Win/loss only | Six-component BSR — performance, consistency, build intelligence, expression, honor |
+| Individual expression | Not measured | Expression Index rewards off-meta creativity that wins |
+| Financial transparency | Opaque | Full ledger published after every tournament |
+| Data source | Self-reported rank | 50-game statistical profile from Riot API + op.gg |
+| Sportsmanship | Suggested | Enforced — disqualification for code violations |
+
+---
+
 *Built with Claude Code — May 2026*
+*Stephen Crittenden & Ryan Cole*
