@@ -335,16 +335,16 @@ Three pages needed. Patterns already established in `Index.razor` and `Leaderboa
 
 ---
 
-### 7. Build: Subscription / Payment (Stripe — 4–5 hours)
+### 7. Build: Entry Fee / Payment (Stripe — 3–4 hours)
 
-Bloodsport is a **$11/month recurring subscription**. Active subscribers get access to all tournaments. No per-tournament fees.
+Every player pays **$5 per tournament entry**. Stripe Checkout handles the payment. On successful payment the player is registered to the tournament.
 
 **Setup in Stripe Dashboard before writing code:**
-1. Create a Product: "Bloodsport Membership"
-2. Create a recurring Price on that product: $11.00 / month
-3. Copy the Price ID (looks like `price_1ABC...`) — goes in `appsettings.json`
-4. Set up a webhook endpoint pointing to `POST /api/payment/webhook`
-5. Subscribe to these events: `checkout.session.completed`, `customer.subscription.deleted`, `invoice.payment_failed`
+1. Create a Product: "Bloodsport Tournament Entry"
+2. Create a one-time Price: $5.00
+3. Copy the Price ID — goes in `appsettings.json`
+4. Set up a webhook endpoint: `POST /api/payment/webhook`
+5. Subscribe to: `checkout.session.completed`
 
 Add to `Bloodsport.Api.csproj`:
 ```xml
@@ -361,29 +361,8 @@ Add to `appsettings.json`:
 "Stripe": {
   "SecretKey": "sk_live_YOUR_KEY",
   "WebhookSecret": "whsec_YOUR_SECRET",
-  "MembershipPriceId": "price_YOUR_PRICE_ID"
+  "EntryPriceId": "price_YOUR_PRICE_ID"
 }
-```
-
-**Add subscription fields to `ApplicationUser`** in `BloodsportDbContext.cs`:
-```csharp
-public class ApplicationUser : Microsoft.AspNetCore.Identity.IdentityUser<Guid>
-{
-    public Guid? PlayerId { get; set; }
-    public Player? Player { get; set; }
-
-    // Stripe subscription tracking
-    public string? StripeCustomerId { get; set; }
-    public string? StripeSubscriptionId { get; set; }
-    public bool IsSubscribed { get; set; } = false;
-    public DateTime? SubscriptionExpiresAt { get; set; }
-}
-```
-
-Run a new migration after adding these fields:
-```bash
-dotnet ef migrations add AddSubscriptionFields --startup-project ../Bloodsport.Api
-dotnet ef database update --startup-project ../Bloodsport.Api
 ```
 
 Create `Controllers/PaymentController.cs`:
@@ -404,48 +383,55 @@ public class PaymentController : ControllerBase
         _userManager = um;
     }
 
-    // Step 1: Create a Stripe Checkout session for the $11/month subscription
-    [HttpPost("subscribe")]
+    // Creates a Stripe Checkout session for a $5 tournament entry
+    [HttpPost("entry/{tournamentId}")]
     [Authorize]
-    public async Task<IActionResult> Subscribe()
+    public async Task<IActionResult> CreateEntrySession(Guid tournamentId)
     {
+        var tournament = await _db.Tournaments.FindAsync(tournamentId);
+        if (tournament == null) return NotFound();
+
         var userId = User.FindFirst(OpenIddictConstants.Claims.Subject)?.Value;
         var user = await _userManager.FindByIdAsync(userId!);
         if (user == null) return Unauthorized();
 
-        // Create or retrieve Stripe customer
-        if (string.IsNullOrEmpty(user.StripeCustomerId))
-        {
-            var customerService = new Stripe.CustomerService();
-            var customer = await customerService.CreateAsync(new Stripe.CustomerCreateOptions
-            {
-                Email = user.Email,
-                Metadata = new Dictionary<string, string> { ["userId"] = user.Id.ToString() }
-            });
-            user.StripeCustomerId = customer.Id;
-            await _userManager.UpdateAsync(user);
-        }
-
         var options = new Stripe.Checkout.SessionCreateOptions
         {
-            Customer = user.StripeCustomerId,
             PaymentMethodTypes = new List<string> { "card" },
             LineItems = new List<Stripe.Checkout.SessionLineItemOptions>
             {
-                new() { Price = _config["Stripe:MembershipPriceId"], Quantity = 1 }
+                new()
+                {
+                    PriceData = new Stripe.Checkout.SessionLineItemPriceDataOptions
+                    {
+                        UnitAmount = 500, // $5.00 in cents
+                        Currency = "usd",
+                        ProductData = new Stripe.Checkout.SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = $"Bloodsport — {tournament.Name}",
+                            Description = "Tournament entry. No smurfs. True honor."
+                        }
+                    },
+                    Quantity = 1
+                }
             },
-            Mode = "subscription",
-            SuccessUrl = $"{_config["ClientUrl"]}/subscribed",
+            Mode = "payment",
+            SuccessUrl = $"{_config["ClientUrl"]}/entry-confirmed?tournamentId={tournamentId}",
             CancelUrl = $"{_config["ClientUrl"]}/",
-            Metadata = new Dictionary<string, string> { ["userId"] = user.Id.ToString() }
+            Metadata = new Dictionary<string, string>
+            {
+                ["tournamentId"] = tournamentId.ToString(),
+                ["userId"] = user.Id.ToString(),
+                ["playerId"] = user.PlayerId?.ToString() ?? string.Empty
+            }
         };
 
-        var sessionService = new Stripe.Checkout.SessionService();
-        var session = await sessionService.CreateAsync(options);
+        var service = new Stripe.Checkout.SessionService();
+        var session = await service.CreateAsync(options);
         return Ok(new { url = session.Url });
     }
 
-    // Step 2: Stripe calls this after every subscription event
+    // Stripe calls this after payment is confirmed
     [HttpPost("webhook")]
     [AllowAnonymous]
     public async Task<IActionResult> Webhook()
@@ -456,66 +442,56 @@ public class PaymentController : ControllerBase
             Request.Headers["Stripe-Signature"],
             _config["Stripe:WebhookSecret"]);
 
-        switch (stripeEvent.Type)
+        if (stripeEvent.Type == Stripe.Events.CheckoutSessionCompleted)
         {
-            case Stripe.Events.CheckoutSessionCompleted:
+            var session = (Stripe.Checkout.Session)stripeEvent.Data.Object;
+            if (session.PaymentStatus != "paid") return Ok();
+
+            var tournamentId = Guid.Parse(session.Metadata["tournamentId"]);
+            var playerId = Guid.Parse(session.Metadata["playerId"]);
+
+            var player = await _db.Players.FindAsync(playerId);
+            var tournament = await _db.Tournaments.FindAsync(tournamentId);
+            if (player == null || tournament == null) return Ok();
+
+            // Register player to tournament
+            var alreadyEntered = await _db.TournamentPlayers
+                .AnyAsync(tp => tp.TournamentId == tournamentId && tp.PlayerId == playerId);
+
+            if (!alreadyEntered)
             {
-                var session = (Stripe.Checkout.Session)stripeEvent.Data.Object;
-                if (session.Mode != "subscription") break;
+                _db.TournamentPlayers.Add(new TournamentPlayer
+                {
+                    Id = Guid.NewGuid(),
+                    TournamentId = tournamentId,
+                    PlayerId = playerId,
+                    MuAtRegistration = player.TrueSkillMu,
+                    SigmaAtRegistration = player.TrueSkillSigma
+                });
 
-                var userId = session.Metadata["userId"];
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null) break;
+                // Record the payment allocation
+                _db.FundLedgerEntries.Add(new FundLedgerEntry
+                {
+                    Id = Guid.NewGuid(),
+                    TournamentId = tournamentId,
+                    PlayerId = playerId,
+                    TotalCollected = 5.00m,
+                    PrizePool = 1.75m,       // 35%
+                    CommunityEvents = 1.25m,  // 25%
+                    Platform = 1.00m,         // 20%
+                    Grassroots = 0.50m,       // 10%
+                    Coaching = 0.50m,         // 10%
+                    StripeSessionId = session.Id,
+                    CreatedAt = DateTime.UtcNow
+                });
 
-                user.StripeSubscriptionId = session.SubscriptionId;
-                user.IsSubscribed = true;
-                user.SubscriptionExpiresAt = DateTime.UtcNow.AddMonths(1);
-                await _userManager.UpdateAsync(user);
-                break;
-            }
-
-            case Stripe.Events.CustomerSubscriptionDeleted:
-            case "invoice.payment_failed":
-            {
-                var subscription = (Stripe.Subscription)stripeEvent.Data.Object;
-                var user = await _db.Users
-                    .FirstOrDefaultAsync(u => u.StripeSubscriptionId == subscription.Id);
-                if (user == null) break;
-
-                user.IsSubscribed = false;
                 await _db.SaveChangesAsync();
-                break;
             }
         }
 
         return Ok();
     }
-
-    // Cancel subscription
-    [HttpDelete("subscribe")]
-    [Authorize]
-    public async Task<IActionResult> Cancel()
-    {
-        var userId = User.FindFirst(OpenIddictConstants.Claims.Subject)?.Value;
-        var user = await _userManager.FindByIdAsync(userId!);
-        if (user?.StripeSubscriptionId == null) return NotFound();
-
-        var service = new Stripe.SubscriptionService();
-        await service.CancelAsync(user.StripeSubscriptionId);
-
-        user.IsSubscribed = false;
-        await _userManager.UpdateAsync(user);
-        return Ok();
-    }
 }
-```
-
-**Guard tournament registration on subscription status.** In `TournamentController.cs`, add this check to the `AddPlayer` endpoint:
-```csharp
-// Verify player's account user is an active subscriber
-var appUser = await _db.Users.FirstOrDefaultAsync(u => u.PlayerId == request.PlayerId);
-if (appUser == null || !appUser.IsSubscribed)
-    return BadRequest("Active Bloodsport membership required to enter a tournament.");
 ```
 
 ---
@@ -577,56 +553,39 @@ dotnet ef database update --startup-project ../Bloodsport.Api
 
 ---
 
-## Fund Allocation — $11/Month Subscription Breakdown
+## Fund Allocation — $5 Entry Fee Breakdown
 
-Every subscriber pays $11/month. The breakdown is public and published on the first of every month.
+Every entry is $5. Split at the moment of payment, recorded per entry, published after every tournament closes.
 
-| Allocation | % | Per Subscriber | Purpose |
-|------------|---|----------------|---------|
-| Prize pool | 35% | $3.85 | Accumulated monthly, paid out after each tournament. 25% champion / 7% runner-up / 3% semi-finalists |
-| Community events | 25% | $2.75 | LAN parties, local meetups, watch parties |
-| Platform infrastructure | 20% | $2.20 | Hosting, database, Riot API, development |
-| Grassroots tournament fund | 10% | $1.10 | Future brackets + community tournaments under the same honor code |
-| Coaching & education | 10% | $1.10 | Accessible coaching resources |
+| Allocation | % | Per Entry | Purpose |
+|------------|---|-----------|---------|
+| Prize pool | 35% | $1.75 | 25% champion / 7% runner-up / 3% semi-finalists |
+| Community events | 25% | $1.25 | LAN parties, local meetups, watch parties |
+| Platform infrastructure | 20% | $1.00 | Hosting, database, Riot API, development |
+| Grassroots tournament fund | 10% | $0.50 | Future brackets + community tournaments |
+| Coaching & education | 10% | $0.50 | Accessible coaching resources |
 
-**FundLedger table** — add this model to `Bloodsport.Core/Models/`:
+**FundLedgerEntry model** — add to `Bloodsport.Core/Models/FundLedger.cs`:
 ```csharp
-public class FundLedger
+public class FundLedgerEntry
 {
     public Guid Id { get; set; }
-    public DateTime Month { get; set; }           // First of the month
-    public int ActiveSubscribers { get; set; }
-    public decimal TotalRevenue { get; set; }
-    public decimal PrizePoolAmount { get; set; }
-    public decimal CommunityEventsAmount { get; set; }
-    public decimal PlatformAmount { get; set; }
-    public decimal GrassrootsAmount { get; set; }
-    public decimal CoachingAmount { get; set; }
-    public string? Notes { get; set; }
+    public Guid TournamentId { get; set; }
+    public Guid PlayerId { get; set; }
+    public decimal TotalCollected { get; set; }  // Always $5.00
+    public decimal PrizePool { get; set; }        // $1.75
+    public decimal CommunityEvents { get; set; }  // $1.25
+    public decimal Platform { get; set; }         // $1.00
+    public decimal Grassroots { get; set; }       // $0.50
+    public decimal Coaching { get; set; }         // $0.50
+    public string StripeSessionId { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 ```
 
-Run the ledger calculation on the first of each month (a simple background job or manual admin action):
-```csharp
-public FundLedger CalculateLedger(int activeSubscribers)
-{
-    var revenue = activeSubscribers * 11m;
-    return new FundLedger
-    {
-        Month = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1),
-        ActiveSubscribers = activeSubscribers,
-        TotalRevenue = revenue,
-        PrizePoolAmount = revenue * 0.35m,
-        CommunityEventsAmount = revenue * 0.25m,
-        PlatformAmount = revenue * 0.20m,
-        GrassrootsAmount = revenue * 0.10m,
-        CoachingAmount = revenue * 0.10m
-    };
-}
-```
+Add `DbSet<FundLedgerEntry> FundLedgerEntries` to `BloodsportDbContext`. Run migration.
 
-The admin page surfaces this table. It is the public ledger.
+The admin page queries totals per tournament — sum of each column grouped by `TournamentId`. That is the public ledger. Simple aggregate query, no background jobs needed.
 
 ---
 
@@ -661,14 +620,14 @@ Players are shown as "Unranked" in the UI until `GamesPlayed >= 5`. The `IsRanke
 - [ ] Add `POST /api/tournament/{id}/players`
 - [ ] Build `Register.razor`, `Login.razor`, `Admin.razor`
 - [ ] End-to-end test: register player → create tournament → add players → start → record result → verify bracket advances + ratings update + SignalR fires
-- [ ] Add `StripeCustomerId`, `StripeSubscriptionId`, `IsSubscribed`, `SubscriptionExpiresAt` to `ApplicationUser`
-- [ ] Run migration for subscription fields
-- [ ] Create Stripe Product + recurring $11/month Price in Stripe Dashboard — copy Price ID to config
-- [ ] Build `PaymentController` — subscribe, webhook, cancel
-- [ ] Guard `AddPlayer` endpoint — require `IsSubscribed == true`
-- [ ] Build `Subscribe.razor` Blazor page — calls `/api/payment/subscribe`, redirects to Stripe Checkout
-- [ ] Add `FundLedger` model + table + admin totals view
-- [ ] Legal check: Texas recurring subscription + prize pool law before first charge
+- [ ] Add `FundLedgerEntry` model to `Bloodsport.Core/Models/`
+- [ ] Add `DbSet<FundLedgerEntry>` to `BloodsportDbContext`
+- [ ] Run migration for `FundLedgerEntries` table
+- [ ] Create Stripe Product + one-time $5 Price in Stripe Dashboard — copy Price ID to config
+- [ ] Build `PaymentController` — entry session + webhook
+- [ ] Build `EntryConfirmed.razor` Blazor page — success landing after Stripe redirect
+- [ ] Add fund totals view to Admin page
+- [ ] Legal check: Texas paid contest law before accepting first $5
 
 ---
 
