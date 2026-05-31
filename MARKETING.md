@@ -4,145 +4,137 @@
 
 ---
 
-## The Pitch In One Line
+## What This Is
 
-> **"No smurfs. No excuses. Just skill. Prove you belong."**
+In 1988, Jean-Claude Van Damme played Frank Dux in a film called Bloodsport. The film was based on a real underground martial arts tournament called the Kumite — the best fighters in the world, one bracket, no politics, no excuses. You either win or you go home.
 
-That's Rocky. That's Scarface. That's the Godfather shaking your hand and saying *come correct or don't come at all.*
+That is this tournament.
+
+Not Rocky. Not Scarface. Not the Godfather. Those are great films. This is Bloodsport — and Bloodsport already has its own identity. Frank Dux was an outsider. He earned his seed. He fought with discipline, took punishment, and won with honor. When he lost his vision in the final match, he finished it anyway — from memory, from training, from will.
+
+That is the player we are building this for.
+
+The Kumite had a code. You competed clean or you did not compete. You respected the fighter across from you whether you liked them or not. You left everything on the mat. The tournament did not care about your reputation coming in. It only cared what you did inside the bracket.
+
+Summoner's Rift has a code too. Most players never get to compete somewhere it is actually enforced.
+
+Bloodsport enforces it.
 
 ---
 
-## The Core Identity
+## The Honest Version of What We Are Offering
 
-Bloodsport is not a casual bracket. It is a **test of real skill** — ranked by a system that cannot be bought, gamed, or smurfed. TrueSkill tracks everything. The truth comes out. Every match is on record.
+A League of Legends tournament where:
 
-The three films tell us exactly who we're talking to and how:
+- You register with your main account. No smurfs.
+- Your seed is determined by TrueSkill — a transparent Bayesian rating system. The math is public. Nothing is hidden.
+- Every match result is recorded and visible.
+- You win with honor or you are removed. Flaming, intentional feeding, and disrespect are disqualifications — not warnings.
+- The champion is the champion because the bracket said so. Period.
 
-| Film | What It Gives Us |
-|------|-----------------|
-| **Rocky** | The underdog grind. You might not win. You show up anyway. You earn respect just by stepping in. |
-| **Scarface** | Ambition without apology. You want to be the best. Say it. Own it. |
-| **The Godfather** | The code. Honor above all. You win with dignity or you don't deserve the win. |
-
-These aren't references — they're the *three types of players* we're marketing to. The grinder, the hungry, and the honorable.
+We are not offering prize money we do not have. We are not promising celebrity appearances we have not confirmed. We are offering a clean bracket and a real test. If that is not enough for someone, Bloodsport is not for them.
 
 ---
 
 ## Target Audience
 
-### Primary — The Competitor (18–26)
-- Watches Tyler1, Dantes, thebausffs, DaveyX3
-- Actually plays ranked. Cares about MMR. Has opinions on meta.
-- Despises smurfs — has lost games to them, has probably been called one
-- Wants to know where they *actually* stand
-- **Message:** "You've been climbing in a broken system. Here it's clean. Come find out."
+### The Competitor (18–26)
+Watches Tyler1, Dantes, thebausffs, DaveyX3. Plays ranked seriously. Has lost games to smurfs. Wants to know where they actually stand against players at their level on a level playing field.
 
-### Secondary — The Culture Watcher (16–24)
-- Watches Kai Cenat, Adin Ross, Trainwreckz
-- May not play LoL seriously but follows competitive gaming as entertainment
-- Drawn to drama, moments, underdog stories, trash talk that ends in respect
-- **Message:** "This is the Rift's version of a fight card. Watch the best find out who's best."
+This player does not need to be sold anything. They need to be told the truth about what Bloodsport is and shown that it is real.
 
-### Tertiary — The Purist (any age)
-- Remembers when ranked meant something
-- Honors the code of the rift — doesn't flame, doesn't int, plays through adversity
-- Would rather lose a clean game than win a dirty one
-- **Message:** "This tournament was built for you."
+### The Culture Watcher (16–24)
+Watches Kai Cenat, Adin Ross, Trainwreckz. Follows competitive gaming as entertainment. May not play ranked seriously but understands and respects competition. Drawn to moments, upsets, and the story of someone nobody expected going deep in a bracket.
+
+This player needs to see something happen — one clip, one result, one underdog run — before they care.
+
+### The Purist (any age)
+Remembers when ranked meant something. Has Honor 5 and takes it seriously. Would rather lose a hard-fought game than win a dirty one. Has never smurfed and has contempt for players who do.
+
+This player has been waiting for something like Bloodsport. They do not need much convincing. They need to know it exists.
 
 ---
 
 ## The NEACE Dedication
 
-**NEACE** — real name Christopher Doyle — is the most respected League coach in the game's history. 150M+ YouTube views. Built his reputation on one premise: *skill is learnable, but only if you're honest about where you are.*
+NEACE spent years building the most honest coaching community in League of Legends history. 150 million YouTube views. His entire premise was simple: your rank reflects your actual decisions. Stop blaming teammates. Get better or stay where you are.
 
 That is the soul of Bloodsport.
 
-We dedicate this tournament to NEACE because:
-1. He spent years telling players the truth when no one else would
-2. His entire philosophy is anti-cope, anti-excuse — exactly what a no-smurf tournament stands for
-3. He stepped back. This is a reason to come back.
+We are dedicating this tournament to NEACE because he told the truth when the community did not want to hear it, and because the platform he built is exactly the philosophy we are trying to honor here. No flattery in that. It is just accurate.
 
-**Note:** NEACE went quiet in late 2023. His site shows "coming soon" as of early 2026. That makes the invitation *more* meaningful, not less. He's been away. Bloodsport gives him something worth returning for.
+NEACE stepped back from content in late 2023. His site currently shows coming soon. We are not pretending that complication does not exist. We are extending an honest invitation anyway.
 
-### The Collaboration Invitation (send this or a version of it)
+### The Invitation
 
-> *NEACE — you spent years building the most honest coaching community in League. You told people the truth about their rank when they didn't want to hear it. Bloodsport was built on that same principle. No smurfs. TrueSkill rating. Transparent standings. Real honor. We'd like to invite you to participate, cast, or simply put your name on something that carries what you built forward. The Rift misses you. Come back for the right reason.*
+The message below is what we will send. It says what it means.
 
-Send via Twitter/X DM, YouTube comment, or any contact available on neace.gg.
+---
+
+*NEACE — you spent years building something honest in a community that runs from honesty. You told players the truth about their rank when coaches and streamers were telling them what they wanted to hear. Bloodsport is a League of Legends tournament built on that same principle. No smurfs. TrueSkill rating. Transparent standings. Real honor. We are not asking you to endorse a product. We are asking if you want to be part of something that carries what you built forward. Compete, cast, advise, or simply say you know it exists. No pressure. Open door.*
+
+---
+
+Send via Twitter/X DM and YouTube. Keep it short. Do not follow up more than once.
 
 ---
 
 ## Streamer Strategy
 
-Do **not** lead with sponsorship pitches. Lead with authentic product. Let them discover it or put it in front of them as players first.
+Do not lead with sponsorship pitches. Do not send branded decks. Do not offer payment before the product has proven itself.
 
-### Tier 1 — Natural Partners (LoL community, care about competitive integrity)
+Lead with an invitation to play.
 
-| Streamer | Platform | Angle |
-|----------|----------|-------|
-| **Tyler1** | Twitch | Reformed legend. The face of LoL. He hates smurfs, hates excuses. Bloodsport is his philosophy turned into a platform. |
-| **thebausffs** | Twitch | Zero tolerance for fake competitive play. His community would *love* a ranking system they can respect. |
-| **Dantes** | Twitch | Educational, serious about the game. A tournament with TrueSkill ratings is content for his audience. |
-| **DaveyX3** | Twitch | Grassroots, technical, challenger-level. He could compete *and* cast. |
+### Tier 1 — LoL Community (natural fit)
 
-**Approach:** Don't pitch them as sponsors. Invite them to *play*. If Tyler1 enters Bloodsport, that's the marketing. One tweet from him is worth more than any ad spend.
+| Streamer | Platform | Why They Matter |
+|----------|----------|-----------------|
+| **Tyler1** | Twitch | The face of LoL streaming. Has been vocal about competitive integrity for years. Bloodsport is not a pitch to Tyler1 — it is something he would actually respect if it is real. |
+| **thebausffs** | Twitch | Built an audience around irreverent honesty and genuine competitive play. His community would respond to a no-smurfs bracket. |
+| **Dantes** | Twitch | Educational, technically serious. A tournament with public TrueSkill ratings is genuinely interesting content for his audience. |
+| **DaveyX3** | Twitch | Challenger-level, grassroots credibility. Could compete and cast. A real participant, not a sponsor. |
 
-### Tier 2 — Crossover Reach (culture, not LoL-specific)
+If Tyler1 enters the bracket and tweets about it, that is the campaign. One real participant at that level is worth more than any amount of paid promotion.
 
-| Streamer | Platform | Angle |
-|----------|----------|-------|
-| **Kai Cenat** | Twitch | Mainstream Gen Z. Has done LoL streams before. A Bloodsport appearance makes it a cultural moment, not just a gaming event. |
-| **Adin Ross** | Kick | High energy, loves competition, has hosted event-style streams. The bracket reveal could be a Kick stream segment. |
-| **Trainwreckz** | Kick | Kick credibility. If Bloodsport broadcasts on Kick as well as Twitch, his audience follows. |
+### Tier 2 — Culture Crossover
 
-**Approach:** These are moment-creators. You need one clip — one match, one result, one champion reveal — that they react to or host.
+| Streamer | Platform | Why They Matter |
+|----------|----------|-----------------|
+| **Kai Cenat** | Twitch | Mainstream Gen Z reach. Has streamed LoL before. One appearance or reaction clip from him makes Bloodsport a cultural moment instead of just a gaming event. |
+| **Adin Ross** | Kick | High-energy, event-style content. The bracket reveal format works on his stream. |
+| **Trainwreckz** | Kick | Credibility with Kick's audience. If Bloodsport streams on Kick alongside Twitch, his community follows. |
 
----
-
-## Messaging Pillars
-
-### 1. The Test
-*"Are you actually as good as you think you are?"*
-
-Not provocative — honest. The LoL community is full of players who blame teammates, blame smurfs, blame everything. Bloodsport removes every excuse. Your rating is public. Your wins and losses are on record. The bracket doesn't care what you tell yourself at 2am.
-
-### 2. The Code
-*"Win with honor or don't bother."*
-
-Sportsmanship isn't soft — it's the hardest thing. The Godfather didn't need to be cruel in every room. Scarface had a code before he broke it. Rocky shook hands before and after every fight. Bloodsport players honor the rift or they don't compete.
-
-This maps directly to LoL's existing Honor system. We're not creating a new value — we're enforcing one that already exists but rarely gets respected.
-
-### 3. No Smurfs. No Mercy.
-*"Your real account. Your real rank. Period."*
-
-Riot's 2026 anti-smurf crackdown is live. Bloodsport is ahead of the curve. Smurf accounts = disqualification. You compete on your main or you don't compete. The system tracks real skill. You can't hide.
+These are moment-creators. One clip — one match, one upset, one champion reveal — is what you need from this tier.
 
 ---
 
-## Content Strategy
+## Content That Is Honest
+
+### What to Post
+
+- Match results. Plain. Who won, who lost, what the TrueSkill delta was.
+- Bracket updates as they happen.
+- The champion reveal when it is earned — not hyped in advance.
+- When an unknown player beats a seeded one, post that. Let the bracket tell the story.
+- A plain explanation of how TrueSkill works. Players who care about competition will read it.
+
+### What Not to Post
+
+- Fake hype before you have a real product
+- Quotes and taglines that were written in a marketing document and do not come from anyone real
+- Prize announcements for prizes that do not exist yet
+- Anything that makes Bloodsport sound bigger than it currently is
+
+The brand is earned through what the tournament actually does, not through what the social media account says about it.
 
 ### Short Form (TikTok / YouTube Shorts / Clips)
-- **Match highlight clips** — 30–60 seconds. Winner and loser. No commentary needed, let the plays speak.
-- **Bracket reveals** — film it like a fight card. Dramatic. Bebas Neue titles. Blood red.
-- **"Who IS this person?"** — when an unranked player starts beating seeded players, the algorithm does the work.
-- **TrueSkill explainer** — 60-second reel: "This is how we rank you. This is why smurfs don't work here."
-
-### Long Form (Twitch / Kick / YouTube)
-- **Live bracket streams** — tournament day as a broadcast event
-- **Pre-tournament trash talk** — structured, honorable, players on camera before they play
-- **Post-match interviews** — winner and loser both speak. Rocky shook hands. So do Bloodsport players.
+Match highlights. Bracket reveals styled like a fight card — Bebas Neue titles, blood red. The TrueSkill explainer. When something genuinely surprising happens in the bracket, that clip will do the work on its own.
 
 ### Twitter / X
-- Seeding announcements (post each player's TrueSkill rating when they enter)
-- Live match result threads
-- Quote the losers respectfully — "took their loss like a champion"
-- Tag streamers in brackets they'd care about
+Seeding announcements with actual ratings. Live match result threads. Post losses respectfully — the player competed and lost clean and that means something.
 
 ### Discord
-- Community home base
-- Match announcements, lobby codes, live results
-- A `#hall-of-honor` channel for exceptional sportsmanship moments
+Community home. Match announcements, lobby codes, live results. A `#hall-of-honor` channel for sportsmanship that deserves recognition.
 
 ---
 
@@ -150,38 +142,34 @@ Riot's 2026 anti-smurf crackdown is live. Bloodsport is ahead of the curve. Smur
 
 | Phase | Action | Timeline |
 |-------|--------|----------|
-| **0 — Build** | Get the platform running. Ryan finishes scaffold. | Week 1–2 |
-| **1 — Seed** | Post the concept publicly. One tweet, no fluff: "Building a LoL tournament where your real rank is all that matters. No smurfs. TrueSkill ratings. Live bracket. Drop your summoner name." | Week 2 |
-| **2 — Invite** | Direct outreach to DaveyX3 and Dantes first — they're LoL-focused, more accessible than Tyler1 at launch. Get one recognized player in the bracket. | Week 2–3 |
-| **3 — NEACE** | Send the collaboration message. No pressure, open door. Even a retweet from him is a signal. | Week 3 |
-| **4 — First Tournament** | Run the first bracket. Stream it. Clip every match. | Week 4–5 |
-| **5 — Amplify** | Post the champion reveal clip everywhere. "Meet the first Bloodsport champion." Tag everyone in the bracket. | Week 5 |
-| **6 — Tyler1 / Kai** | By this point you have a real product with real results. Now you approach the bigger names — not with a pitch, with a link. | Week 6+ |
+| **0 — Build** | Platform running. Ryan finishes scaffold. First end-to-end test completed. | Week 1–2 |
+| **1 — Announce** | One post. No fluff. "Building a LoL tournament where your main account is all that matters. No smurfs. TrueSkill ratings. Public standings. Drop your summoner name if you want in." | Week 2 |
+| **2 — First invites** | Reach out to DaveyX3 and Dantes directly. They are LoL-focused and accessible. Get one recognized player in the first bracket. | Week 2–3 |
+| **3 — NEACE** | Send the invitation above. Once. No follow-up pressure. | Week 3 |
+| **4 — First tournament** | Run it. Stream it. Clip every match. Post results in real time. | Week 4–5 |
+| **5 — Champion reveal** | Post it straight. Who won. What their rating is. How they got there. | Week 5 |
+| **6 — Bigger names** | You now have a real product with real results. Approach Tyler1 and Kai with a link, not a pitch. | Week 6+ |
 
 ---
 
-## The Tagline Options
+## Tagline
 
-Pick one. Stay with it.
+One option. Not five.
 
-1. **"Prove it."** — simplest, hardest
-2. **"No smurfs. No excuses. Just skill."** — explains itself
-3. **"Honor the rift."** — for the purist
-4. **"Find out."** — provocative, open-ended
-5. **"Who's next?"** — fight card energy, Rocky-coded
+**"Prove it."**
 
-Recommendation: **"Prove it."** — two words that mean everything to a competitive player. And nothing to someone who's scared.
+It is honest. It asks something real of the player. It does not promise anything we have not built yet. And it means exactly what Bloodsport means — step into the bracket on your real account with your real rank and find out where you stand.
 
 ---
 
-## What We're Not Doing
+## What We Are Not Doing
 
-- No generic "epic gaming tournament" language
-- No corporate sponsorship feel
-- No prize pools we can't deliver
-- No hype that outpaces the product
-- No disrespecting any player who loses — the code is the code
+- No manufactured quotes presented as the brand voice
+- No film references borrowed to make the pitch sound bigger
+- No prize pools that do not exist
+- No hype that runs ahead of the product
+- No disrespect to any player who loses — they competed clean and that is the code
 
 ---
 
-*Bloodsport. The rift finds out.*
+*Bloodsport. The Kumite was real. This is too.*
