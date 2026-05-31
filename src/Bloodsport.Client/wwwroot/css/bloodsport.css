@@ -1,37 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+/* ─────────────────────────────────────────────────────
+   BLOODSPORT — Bane / Mesrine aesthetic
+   Oppressive weight. Criminal elegance. No mercy.
+   Bebas Neue: brutal condensed headlines (Bane)
+   IM Fell English: worn European body text (Mesrine)
+───────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IM+Fell+English:ital@0;1&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --blood:    #8b0000;
-  --blood-bright: #cc0000;
-  --steel:    #1a1a2e;
-  --steel-mid: #16213e;
-  --steel-light: #0f3460;
-  --gold:     #c9a84c;
-  --gold-dim: #8a6e2f;
-  --bone:     #f5f0e8;
-  --ash:      #9a9a9a;
-  --dark:     #0a0a0f;
+  /* Palette — stripped down. Black, white, blood. Nothing else. */
+  --void:       #080808;
+  --pit:        #111111;
+  --cell:       #1a1818;
+  --iron:       #2c2826;
+  --smoke:      #4a4440;
+  --ash:        #7a726e;
+  --bone:       #d4cfc8;
+  --white:      #f0ece6;
+  --blood:      #9b1a1a;
+  --blood-hot:  #c41e1e;
+  --blood-dim:  #5c1010;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--dark);
+  background: var(--void);
   color: var(--bone);
-  font-family: 'Rajdhani', sans-serif;
+  font-family: 'IM Fell English', serif;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
   min-height: 100vh;
+  /* Subtle noise overlay — gives the worn/weathered feel */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
 /* ── Header ── */
 .site-header {
-  background: var(--steel);
-  border-bottom: 2px solid var(--blood);
-  padding: 0 2rem;
+  background: var(--void);
+  border-bottom: 1px solid var(--blood-dim);
+  padding: 0 2.5rem;
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+/* Thin blood-red line above header — like a wound */
+.site-header::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--blood-hot);
 }
 
 .header-inner {
@@ -40,53 +60,76 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 68px;
 }
 
 .logo {
-  font-family: 'Cinzel', serif;
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: 0.05em;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.12em;
   text-decoration: none;
+  line-height: 1;
 }
-.logo-blood { color: var(--blood-bright); }
-.logo-sport { color: var(--gold); }
+/* BLOOD in white — SPORT in blood red. Mesrine's duality. */
+.logo-blood { color: var(--white); }
+.logo-sport { color: var(--blood-hot); }
 
 nav a {
   color: var(--ash);
   text-decoration: none;
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.1em;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-left: 2rem;
-  transition: color 0.2s;
+  margin-left: 2.5rem;
+  transition: color 0.15s;
+  position: relative;
 }
-nav a:hover { color: var(--gold); }
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 1px;
+  background: var(--blood-hot);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+nav a:hover { color: var(--white); }
+nav a:hover::after { transform: scaleX(1); }
 
 /* ── Main ── */
 .main-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2.5rem 2rem;
 }
 
 /* ── Bracket ── */
 .bracket-title {
-  font-family: 'Cinzel', serif;
-  font-size: 2rem;
-  color: var(--gold);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: var(--white);
   text-align: center;
-  letter-spacing: 0.15em;
-  margin-bottom: 2.5rem;
-  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+/* Thin red rule under title */
+.bracket-title + * { position: relative; }
+.bracket-container::before {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  background: var(--blood-hot);
+  margin: 0 auto 2.5rem;
 }
 
 .bracket {
   display: flex;
-  gap: 2rem;
+  gap: 0;
   align-items: center;
   overflow-x: auto;
   padding: 1rem 0 2rem;
@@ -96,246 +139,358 @@ nav a:hover { color: var(--gold); }
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  min-width: 220px;
+  min-width: 230px;
   flex-shrink: 0;
+  padding: 0 1rem;
+  /* Vertical divider between rounds */
+  border-right: 1px solid var(--iron);
 }
+.bracket-round:last-child { border-right: none; }
 
 .round-label {
-  font-family: 'Cinzel', serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  color: var(--gold-dim);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+  color: var(--blood-dim);
   text-transform: uppercase;
   text-align: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Active round label glows red */
+.bracket-round:has(.match.live) .round-label {
+  color: var(--blood-hot);
 }
 
 .match {
-  background: var(--steel);
-  border: 1px solid #2a2a4a;
-  border-left: 3px solid var(--steel-light);
-  padding: 0.75rem;
-  transition: border-color 0.2s;
+  background: var(--pit);
+  border: 1px solid var(--iron);
+  border-left: 3px solid var(--smoke);
+  padding: 0.85rem 0.9rem;
+  transition: border-left-color 0.2s, background 0.2s;
+  position: relative;
 }
 
-.match.completed { border-left-color: var(--gold-dim); }
+.match:hover { background: var(--cell); }
+.match.completed { border-left-color: var(--ash); }
 .match.live {
-  border-left-color: var(--blood-bright);
-  animation: pulse-border 1.5s ease-in-out infinite;
+  border-left-color: var(--blood-hot);
+  background: #150a0a;
+  animation: pulse-border 2s ease-in-out infinite;
 }
 
 @keyframes pulse-border {
-  0%, 100% { border-left-color: var(--blood-bright); }
-  50% { border-left-color: var(--blood); }
+  0%, 100% { border-left-color: var(--blood-hot); }
+  50%       { border-left-color: var(--blood-dim); }
 }
+
+/* Live dot indicator */
+.match.live::after {
+  content: '●';
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  font-size: 0.45rem;
+  color: var(--blood-hot);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
 
 .match-player {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0.35rem 0;
-  font-weight: 600;
-  font-size: 0.95rem;
+  align-items: baseline;
+  padding: 0.3rem 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
   color: var(--ash);
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
 .match-player.winner {
-  color: var(--gold);
+  color: var(--white);
+  font-weight: 700;
+}
+
+/* Strike through the loser */
+.match.completed .match-player:not(.winner) {
+  text-decoration: line-through;
+  text-decoration-color: var(--blood-dim);
+  color: var(--smoke);
 }
 
 .player-rating {
-  font-size: 0.8rem;
-  color: var(--gold-dim);
-  font-family: 'Cinzel', serif;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--smoke);
 }
+.match-player.winner .player-rating { color: var(--ash); }
 
 .match-vs {
   text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
   font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  color: var(--blood);
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  padding: 0.1rem 0;
+  letter-spacing: 0.3em;
+  color: var(--blood-dim);
+  padding: 0.05rem 0;
 }
 
 .lobby-code {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #2a2a4a;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--iron);
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
 }
 
 .code-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  color: var(--ash);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--smoke);
 }
 
 .code-value {
-  font-family: 'Cinzel', serif;
-  font-size: 0.85rem;
-  color: var(--gold);
-  letter-spacing: 0.1em;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  color: var(--bone);
 }
 
 /* ── Champion Reveal ── */
+/* Mesrine entering a room. Everyone looks. */
 .champion-reveal {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  min-height: 70vh;
   text-align: center;
-  animation: champion-entrance 1s ease-out;
+  animation: champion-entrance 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes champion-entrance {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  0%   { opacity: 0; letter-spacing: 0.5em; }
+  100% { opacity: 1; }
 }
 
 .champion-title {
-  font-family: 'Cinzel', serif;
-  font-size: 1rem;
-  letter-spacing: 0.4em;
-  color: var(--blood-bright);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 300;
+  letter-spacing: 0.55em;
+  color: var(--blood-hot);
   text-transform: uppercase;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Thin line above champion name — like a crown made of scars */
+.champion-title::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--blood-hot);
+  margin: 0 auto 1.5rem;
 }
 
 .champion-name {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 900;
-  color: var(--gold);
-  letter-spacing: 0.1em;
-  text-shadow: 0 0 40px rgba(201, 168, 76, 0.4);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  color: var(--white);
+  letter-spacing: 0.15em;
+  line-height: 1;
+  /* Ghost shadow — like a sentence */
+  text-shadow:
+    2px 2px 0 var(--blood-dim),
+    0 0 60px rgba(196, 30, 30, 0.15);
 }
 
 .champion-rating {
-  font-family: 'Cinzel', serif;
-  font-size: 1.5rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
   color: var(--ash);
-  margin-top: 0.5rem;
+  margin-top: 1.25rem;
 }
 
 /* ── Leaderboard ── */
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--iron);
+  position: relative;
+}
+
+/* Red underline accent */
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 2px;
+  background: var(--blood-hot);
 }
 
 .page-header h1 {
-  font-family: 'Cinzel', serif;
-  font-size: 2rem;
-  color: var(--gold);
-  letter-spacing: 0.2em;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  color: var(--white);
+  letter-spacing: 0.25em;
+  line-height: 1;
 }
 
 .subtitle {
-  color: var(--ash);
+  color: var(--smoke);
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
   font-size: 0.9rem;
-  margin-top: 0.4rem;
-  letter-spacing: 0.05em;
+  margin-top: 0.6rem;
 }
 
 .rankings-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: 'Rajdhani', sans-serif;
 }
 
 .rankings-table th {
-  font-family: 'Cinzel', serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  color: var(--gold-dim);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--blood);
-  padding: 0.5rem 1rem;
+  color: var(--smoke);
+  border-bottom: 1px solid var(--blood-dim);
+  padding: 0.6rem 1rem;
   text-align: left;
 }
 
 .rankings-table td {
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid #1a1a2e;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--iron);
   color: var(--bone);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
 }
 
-.rankings-table tr:hover td { background: var(--steel); }
+.rankings-table tr:hover td {
+  background: var(--pit);
+  cursor: default;
+}
 
-.rankings-table .top-three td { color: var(--gold); }
+/* Top 3 — slightly brighter */
+.rankings-table .top-three td { color: var(--white); }
 
 .rank-num {
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--blood-bright) !important;
-  width: 40px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.05em;
+  color: var(--blood-hot) !important;
+  width: 48px;
+}
+
+.summoner-name {
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
 .display-rating {
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  color: var(--white) !important;
 }
 
 .confidence-bar {
-  width: 100px;
-  height: 6px;
-  background: #2a2a4a;
-  border-radius: 3px;
+  width: 90px;
+  height: 3px;
+  background: var(--iron);
   overflow: hidden;
 }
 
 .confidence-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--blood), var(--gold));
-  border-radius: 3px;
-  transition: width 0.5s ease;
+  background: linear-gradient(90deg, var(--blood-dim), var(--blood-hot));
+  transition: width 0.6s ease;
 }
+
+.games-played { color: var(--smoke) !important; }
 
 /* ── Rating Explainer ── */
 .rating-explainer {
   margin-top: 3rem;
-  padding: 1.5rem;
-  border: 1px solid #2a2a4a;
-  border-left: 3px solid var(--gold-dim);
-  background: var(--steel);
+  padding: 1.75rem 2rem;
+  border: 1px solid var(--iron);
+  border-left: 2px solid var(--blood-dim);
+  background: var(--pit);
+  position: relative;
 }
 
 .rating-explainer h3 {
-  font-family: 'Cinzel', serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.2em;
-  color: var(--gold);
-  margin-bottom: 0.75rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  color: var(--ash);
+  margin-bottom: 0.85rem;
 }
 
 .rating-explainer p {
-  color: var(--ash);
+  color: var(--smoke);
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
   font-size: 0.95rem;
-  line-height: 1.7;
+  line-height: 1.8;
 }
+
+.rating-explainer strong { color: var(--bone); font-style: normal; }
 
 /* ── Footer ── */
 .site-footer {
   text-align: center;
   padding: 2rem;
-  border-top: 1px solid var(--blood);
-  color: var(--ash);
-  font-family: 'Cinzel', serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  margin-top: 4rem;
+  border-top: 1px solid var(--iron);
+  color: var(--smoke);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 5rem;
 }
 
 /* ── Utility ── */
-.loading, .empty { text-align: center; color: var(--ash); padding: 3rem; letter-spacing: 0.1em; }
-.not-found { text-align: center; padding: 4rem; }
-.not-found h1 { font-family: 'Cinzel', serif; color: var(--blood-bright); font-size: 2rem; letter-spacing: 0.2em; }
-.not-found p { color: var(--ash); margin: 1rem 0; }
-.not-found a { color: var(--gold); }
+.loading, .empty {
+  text-align: center;
+  color: var(--smoke);
+  padding: 4rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.not-found { text-align: center; padding: 5rem; }
+.not-found h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  color: var(--blood-hot);
+  font-size: 3rem;
+  letter-spacing: 0.25em;
+}
+.not-found p { color: var(--smoke); font-style: italic; margin: 1rem 0; }
+.not-found a { color: var(--ash); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── Scrollbar — keep it in character ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: var(--blood-dim); }
+::-webkit-scrollbar-thumb:hover { background: var(--blood-hot); }
