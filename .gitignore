@@ -20,3 +20,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Confidential — never commit
+emails.html
+MARKETING.md
+DEVELOPER.md
