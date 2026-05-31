@@ -153,58 +153,63 @@ The bracket tells the story. Let it.
 
 ---
 
-## The Entry Fee — $5 and Where It Goes
+## The Subscription — $11 Per Month
 
-Every player who enters Bloodsport pays a $5 entry fee. The breakdown of every dollar collected is published publicly before registration opens and updated after every tournament closes. This is not optional transparency — it is part of the code.
+Bloodsport is a membership. Eleven dollars a month. No per-tournament fees. No bracket buy-ins. One subscription gives you access to every tournament, every bracket, every month, for as long as you are a member.
 
-The community is funding the community. Every player who enters is not just competing. They are contributing to something larger than their own bracket result.
+The breakdown of every dollar collected is published publicly and updated monthly. This is not optional transparency — it is part of the code.
+
+The community funds the community. Every subscriber is not just paying for access. They are contributing to something that grows with every person who joins.
 
 ---
 
 ### The Breakdown
 
-| Allocation | Percentage | What It Funds |
-|------------|------------|---------------|
-| **Champion Prize Pool** | 35% | Paid out to the top finishers. Distributed: 25% first place, 7% second place, 3% semi-finalists split. Real money for real results. |
-| **Community Events** | 25% | LAN parties, local meetups, watch parties, grassroots gatherings tied to the Bloodsport brand and the broader LoL competitive community. |
-| **Platform & Infrastructure** | 20% | Server hosting, database, Riot API costs, and continued development. This tournament runs on real infrastructure. This is what keeps it running. |
-| **Grassroots Tournament Fund** | 10% | Seeding money for future Bloodsport brackets and supporting independent community tournaments that operate under the same honor code. |
-| **Coaching & Education** | 10% | Accessible coaching resources for players who want to improve. Dedicated to the philosophy NEACE built — the truth about your rank is available to everyone, not just players who can afford private sessions. |
+| Allocation | Percentage | Per Subscriber / Month | What It Funds |
+|------------|------------|------------------------|---------------|
+| **Prize Pool** | 35% | $3.85 | Accumulated monthly, paid out to top finishers after each tournament closes. 25% to champion, 7% to runner-up, 3% split between semi-finalists. |
+| **Community Events** | 25% | $2.75 | LAN parties, local meetups, watch parties, grassroots gatherings. The physical presence of this community. |
+| **Platform & Infrastructure** | 20% | $2.20 | Server hosting, database, Riot API costs, continued development. This is what keeps the lights on. |
+| **Grassroots Tournament Fund** | 10% | $1.10 | Supporting future Bloodsport brackets and independent community tournaments that operate under the same honor code. |
+| **Coaching & Education** | 10% | $1.10 | Accessible coaching resources. Dedicated to the philosophy NEACE built — the truth about your rank should be available to everyone. |
 
 ---
 
-### What a Tournament Looks Like at Different Sizes
+### How the Prize Pool Grows
 
-| Players | Entry Total | Prize Pool (35%) | Community Events (25%) | Platform (20%) | Grassroots Fund (10%) | Coaching Fund (10%) |
-|---------|------------|-----------------|----------------------|----------------|----------------------|-------------------|
-| 8 | $40 | $14 | $10 | $8 | $4 | $4 |
-| 16 | $80 | $28 | $20 | $16 | $8 | $8 |
-| 32 | $160 | $56 | $40 | $32 | $16 | $16 |
-| 64 | $320 | $112 | $80 | $64 | $32 | $32 |
-| 128 | $640 | $224 | $160 | $128 | $64 | $64 |
+The prize pool is not fixed. It grows every month with the subscriber base. This means the community that shows up and competes is directly building the stakes they are competing for.
 
-The prize pool grows with the bracket. The community grows with the bracket. Both happen at the same time because they are the same thing.
+| Active Subscribers | Monthly Revenue | Prize Pool That Month | Community Events | Platform | Grassroots | Coaching |
+|-------------------|----------------|----------------------|-----------------|----------|------------|---------|
+| 25 | $275 | $96 | $69 | $55 | $28 | $28 |
+| 50 | $550 | $193 | $138 | $110 | $55 | $55 |
+| 100 | $1,100 | $385 | $275 | $220 | $110 | $110 |
+| 250 | $2,750 | $963 | $688 | $550 | $275 | $275 |
+| 500 | $5,500 | $1,925 | $1,375 | $1,100 | $550 | $550 |
+
+At 100 subscribers the champion of a monthly tournament takes home $385. At 500 subscribers that is nearly $2,000. The prize pool is built by the people who believe in what Bloodsport is. That is the right way for it to work.
 
 ---
 
 ### The Transparency Commitment
 
-After every tournament closes, Bloodsport publishes:
+On the first of every month Bloodsport publishes:
 
-- Total entry fees collected
-- Exact dollar amounts distributed to each allocation
-- Name and platform of every community event funded
-- Coaching resources purchased or made available
+- Total active subscribers
+- Total revenue collected
+- Exact dollar amounts in each allocation bucket
+- Name and location of every community event the events fund supported
+- Coaching resources made available that month
 
-This is not marketing. This is the ledger. Public. Every tournament. No exceptions.
+This is the ledger. Public. Every month. No exceptions.
 
-A player who enters Bloodsport and loses in round one still contributed to a LAN party happening in their region, to coaching resources for someone trying to climb, to the next bracket being possible. That is what the $5 is. It is not a buy-in. It is a stake in something.
+A subscriber who never wins a bracket still contributed to a LAN party in their region, to a player getting access to coaching they could not otherwise afford, to the next tournament being possible. The $11 is not a subscription to a platform. It is a stake in a community.
 
 ---
 
 ### A Note on Legal Compliance
 
-A paid entry fee with a prize pool is a paid contest. Before Bloodsport accepts its first $5, Stephen and Ryan need to confirm that the structure complies with Texas state law governing skill-based competitions and prize contests. This is not complicated but it is not optional. One conversation with a lawyer who handles gaming or contest law resolves it. Do not skip this step.
+A recurring subscription with a prize pool paid out from collected revenue requires legal review before the first charge is processed. In Texas this likely falls under skill-based contest law. One conversation with a lawyer who handles gaming or subscription commerce resolves it. Do not skip this step.
 
 ---
 
