@@ -153,6 +153,61 @@ The bracket tells the story. Let it.
 
 ---
 
+## The Entry Fee — $5 and Where It Goes
+
+Every player who enters Bloodsport pays a $5 entry fee. The breakdown of every dollar collected is published publicly before registration opens and updated after every tournament closes. This is not optional transparency — it is part of the code.
+
+The community is funding the community. Every player who enters is not just competing. They are contributing to something larger than their own bracket result.
+
+---
+
+### The Breakdown
+
+| Allocation | Percentage | What It Funds |
+|------------|------------|---------------|
+| **Champion Prize Pool** | 35% | Paid out to the top finishers. Distributed: 25% first place, 7% second place, 3% semi-finalists split. Real money for real results. |
+| **Community Events** | 25% | LAN parties, local meetups, watch parties, grassroots gatherings tied to the Bloodsport brand and the broader LoL competitive community. |
+| **Platform & Infrastructure** | 20% | Server hosting, database, Riot API costs, and continued development. This tournament runs on real infrastructure. This is what keeps it running. |
+| **Grassroots Tournament Fund** | 10% | Seeding money for future Bloodsport brackets and supporting independent community tournaments that operate under the same honor code. |
+| **Coaching & Education** | 10% | Accessible coaching resources for players who want to improve. Dedicated to the philosophy NEACE built — the truth about your rank is available to everyone, not just players who can afford private sessions. |
+
+---
+
+### What a Tournament Looks Like at Different Sizes
+
+| Players | Entry Total | Prize Pool (35%) | Community Events (25%) | Platform (20%) | Grassroots Fund (10%) | Coaching Fund (10%) |
+|---------|------------|-----------------|----------------------|----------------|----------------------|-------------------|
+| 8 | $40 | $14 | $10 | $8 | $4 | $4 |
+| 16 | $80 | $28 | $20 | $16 | $8 | $8 |
+| 32 | $160 | $56 | $40 | $32 | $16 | $16 |
+| 64 | $320 | $112 | $80 | $64 | $32 | $32 |
+| 128 | $640 | $224 | $160 | $128 | $64 | $64 |
+
+The prize pool grows with the bracket. The community grows with the bracket. Both happen at the same time because they are the same thing.
+
+---
+
+### The Transparency Commitment
+
+After every tournament closes, Bloodsport publishes:
+
+- Total entry fees collected
+- Exact dollar amounts distributed to each allocation
+- Name and platform of every community event funded
+- Coaching resources purchased or made available
+
+This is not marketing. This is the ledger. Public. Every tournament. No exceptions.
+
+A player who enters Bloodsport and loses in round one still contributed to a LAN party happening in their region, to coaching resources for someone trying to climb, to the next bracket being possible. That is what the $5 is. It is not a buy-in. It is a stake in something.
+
+---
+
+### A Note on Legal Compliance
+
+A paid entry fee with a prize pool is a paid contest. Before Bloodsport accepts its first $5, Stephen and Ryan need to confirm that the structure complies with Texas state law governing skill-based competitions and prize contests. This is not complicated but it is not optional. One conversation with a lawyer who handles gaming or contest law resolves it. Do not skip this step.
+
+---
+
 ## The Tagline
 
 **"True honor. Prove it."**
@@ -162,7 +217,7 @@ The bracket tells the story. Let it.
 ## What We Are Not Doing
 
 - No manufactured quotes
-- No prize pools that do not exist
+- No prize pools that do not exist — the prize pool is built from entry fees, published in advance, and paid out after the bracket closes
 - No hype that runs ahead of the product
 - No disrespect to any player who loses
 
