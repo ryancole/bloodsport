@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bloodsport
+      POSTGRES_USER: bloodsport
+      POSTGRES_PASSWORD: bloodsport
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Bloodsport.Api/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=bloodsport;Username=bloodsport;Password=bloodsport
+      - ClientUrl=http://localhost:5001
+      - Riot__ApiKey=${RIOT_API_KEY}
+      - Riot__CallbackUrl=${RIOT_CALLBACK_URL}
+    depends_on:
+      - postgres
+
+  client:
+    build:
+      context: .
+      dockerfile: src/Bloodsport.Client/Dockerfile
+    ports:
+      - "5001:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

@@ -1,0 +1,119 @@
+@page "/"
+@inject HttpClient Http
+@using Bloodsport.Core.Models
+@using Microsoft.AspNetCore.SignalR.Client
+
+<PageTitle>BLOODSPORT — Tournament Bracket</PageTitle>
+
+<div class="bracket-page">
+    @if (_tournament == null)
+    {
+        <div class="loading">
+            <p>LOADING THE ARENA...</p>
+        </div>
+    }
+    else if (_tournament.Status == TournamentStatus.Draft)
+    {
+        <div class="tournament-draft">
+            <h1>@_tournament.Name</h1>
+            <p class="status-label">REGISTRATION OPEN</p>
+            <p>@_tournament.Players.Count fighters registered.</p>
+        </div>
+    }
+    else if (_tournament.Status == TournamentStatus.Completed && _tournament.Champion != null)
+    {
+        <div class="champion-reveal">
+            <div class="champion-title">CHAMPION</div>
+            <div class="champion-name">@_tournament.Champion.SummonerName</div>
+            <div class="champion-rating">@_tournament.Champion.DisplayRating.ToString("F1")</div>
+        </div>
+    }
+    else
+    {
+        <div class="bracket-container">
+            <h1 class="bracket-title">@_tournament.Name</h1>
+            @{
+                var rounds = _tournament.Matches.GroupBy(m => m.Round).OrderBy(g => g.Key).ToList();
+                int totalRounds = rounds.Count;
+            }
+            <div class="bracket" style="--total-rounds: @totalRounds">
+                @foreach (var round in rounds)
+                {
+                    <div class="bracket-round" data-round="@round.Key">
+                        <div class="round-label">
+                            @RoundLabel(round.Key, totalRounds)
+                        </div>
+                        @foreach (var match in round.OrderBy(m => m.MatchNumber))
+                        {
+                            <div class="match @(match.Status == MatchStatus.Completed ? "completed" : "") @(match.Status == MatchStatus.InProgress ? "live" : "")">
+                                <div class="match-player @(match.WinnerId == match.Player1Id && match.WinnerId != null ? "winner" : "")">
+                                    <span class="player-name">@(match.Player1?.SummonerName ?? "TBD")</span>
+                                    @if (match.Player1?.IsRanked == true)
+                                    {
+                                        <span class="player-rating">@match.Player1.DisplayRating.ToString("F0")</span>
+                                    }
+                                </div>
+                                <div class="match-vs">VS</div>
+                                <div class="match-player @(match.WinnerId == match.Player2Id && match.WinnerId != null ? "winner" : "")">
+                                    <span class="player-name">@(match.Player2?.SummonerName ?? "TBD")</span>
+                                    @if (match.Player2?.IsRanked == true)
+                                    {
+                                        <span class="player-rating">@match.Player2.DisplayRating.ToString("F0")</span>
+                                    }
+                                </div>
+                                @if (match.RiotTournamentCode != null && match.Status != MatchStatus.Completed)
+                                {
+                                    <div class="lobby-code">
+                                        <span class="code-label">LOBBY CODE</span>
+                                        <span class="code-value">@match.RiotTournamentCode</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private Core.Models.Tournament? _tournament;
+    private HubConnection? _hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tournament = await Http.GetFromJsonAsync<Core.Models.Tournament>("api/tournament/active");
+
+        if (_tournament != null)
+        {
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(Http.BaseAddress + $"hubs/bracket")
+                .WithAutomaticReconnect()
+                .Build();
+
+            _hubConnection.On<Core.Models.Tournament>("BracketUpdated", updated =>
+            {
+                _tournament = updated;
+                InvokeAsync(StateHasChanged);
+            });
+
+            await _hubConnection.StartAsync();
+            await _hubConnection.SendAsync("JoinTournament", _tournament.Id.ToString());
+        }
+    }
+
+    private static string RoundLabel(int round, int total) => round switch
+    {
+        _ when round == total => "GRAND FINAL",
+        _ when round == total - 1 => "SEMI-FINALS",
+        _ when round == total - 2 => "QUARTER-FINALS",
+        _ => $"ROUND {round}"
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection != null)
+            await _hubConnection.DisposeAsync();
+    }
+}

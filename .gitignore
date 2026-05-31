@@ -1,0 +1,22 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+*.suo
+*.ncrunchproject
+
+# Secrets — never commit
+appsettings.Development.json
+appsettings.Production.json
+.env
+*.pfx
+*.p12
+
+# Build output
+publish/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db

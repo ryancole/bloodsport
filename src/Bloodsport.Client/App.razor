@@ -1,0 +1,16 @@
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <div class="not-found">
+                <h1>FIGHTER NOT FOUND</h1>
+                <p>This challenger has left the arena.</p>
+                <a href="/">Return to the Tournament</a>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

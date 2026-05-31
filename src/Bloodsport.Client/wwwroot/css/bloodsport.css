@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --blood:    #8b0000;
+  --blood-bright: #cc0000;
+  --steel:    #1a1a2e;
+  --steel-mid: #16213e;
+  --steel-light: #0f3460;
+  --gold:     #c9a84c;
+  --gold-dim: #8a6e2f;
+  --bone:     #f5f0e8;
+  --ash:      #9a9a9a;
+  --dark:     #0a0a0f;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--dark);
+  color: var(--bone);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.site-header {
+  background: var(--steel);
+  border-bottom: 2px solid var(--blood);
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+.logo-blood { color: var(--blood-bright); }
+.logo-sport { color: var(--gold); }
+
+nav a {
+  color: var(--ash);
+  text-decoration: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-left: 2rem;
+  transition: color 0.2s;
+}
+nav a:hover { color: var(--gold); }
+
+/* ── Main ── */
+.main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ── Bracket ── */
+.bracket-title {
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 0.15em;
+  margin-bottom: 2.5rem;
+  text-transform: uppercase;
+}
+
+.bracket {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  overflow-x: auto;
+  padding: 1rem 0 2rem;
+}
+
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 220px;
+  flex-shrink: 0;
+}
+
+.round-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.match {
+  background: var(--steel);
+  border: 1px solid #2a2a4a;
+  border-left: 3px solid var(--steel-light);
+  padding: 0.75rem;
+  transition: border-color 0.2s;
+}
+
+.match.completed { border-left-color: var(--gold-dim); }
+.match.live {
+  border-left-color: var(--blood-bright);
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-left-color: var(--blood-bright); }
+  50% { border-left-color: var(--blood); }
+}
+
+.match-player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ash);
+  transition: color 0.2s;
+}
+
+.match-player.winner {
+  color: var(--gold);
+}
+
+.player-rating {
+  font-size: 0.8rem;
+  color: var(--gold-dim);
+  font-family: 'Cinzel', serif;
+}
+
+.match-vs {
+  text-align: center;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--blood);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  padding: 0.1rem 0;
+}
+
+.lobby-code {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #2a2a4a;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.code-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--ash);
+}
+
+.code-value {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+}
+
+/* ── Champion Reveal ── */
+.champion-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  animation: champion-entrance 1s ease-out;
+}
+
+@keyframes champion-entrance {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.champion-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  letter-spacing: 0.4em;
+  color: var(--blood-bright);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.champion-name {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.4);
+}
+
+.champion-rating {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  color: var(--ash);
+  margin-top: 0.5rem;
+}
+
+/* ── Leaderboard ── */
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+}
+
+.subtitle {
+  color: var(--ash);
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+.rankings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.rankings-table th {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--blood);
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+
+.rankings-table td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #1a1a2e;
+  color: var(--bone);
+}
+
+.rankings-table tr:hover td { background: var(--steel); }
+
+.rankings-table .top-three td { color: var(--gold); }
+
+.rank-num {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--blood-bright) !important;
+  width: 40px;
+}
+
+.display-rating {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+}
+
+.confidence-bar {
+  width: 100px;
+  height: 6px;
+  background: #2a2a4a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blood), var(--gold));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* ── Rating Explainer ── */
+.rating-explainer {
+  margin-top: 3rem;
+  padding: 1.5rem;
+  border: 1px solid #2a2a4a;
+  border-left: 3px solid var(--gold-dim);
+  background: var(--steel);
+}
+
+.rating-explainer h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+
+.rating-explainer p {
+  color: var(--ash);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* ── Footer ── */
+.site-footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--blood);
+  color: var(--ash);
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  margin-top: 4rem;
+}
+
+/* ── Utility ── */
+.loading, .empty { text-align: center; color: var(--ash); padding: 3rem; letter-spacing: 0.1em; }
+.not-found { text-align: center; padding: 4rem; }
+.not-found h1 { font-family: 'Cinzel', serif; color: var(--blood-bright); font-size: 2rem; letter-spacing: 0.2em; }
+.not-found p { color: var(--ash); margin: 1rem 0; }
+.not-found a { color: var(--gold); }

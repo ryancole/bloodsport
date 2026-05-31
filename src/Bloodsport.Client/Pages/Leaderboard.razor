@@ -1,0 +1,70 @@
+@page "/leaderboard"
+@inject HttpClient Http
+@using Bloodsport.Core.Models
+
+<PageTitle>BLOODSPORT — Fighter Rankings</PageTitle>
+
+<div class="leaderboard-page">
+    <div class="page-header">
+        <h1>FIGHTER RANKINGS</h1>
+        <p class="subtitle">Ranked by TrueSkill — Conservative Display Rating (μ − 3σ)</p>
+    </div>
+
+    @if (_players == null)
+    {
+        <p class="loading">LOADING RANKINGS...</p>
+    }
+    else if (!_players.Any())
+    {
+        <p class="empty">No ranked fighters yet. Play 5 matches to earn your rank.</p>
+    }
+    else
+    {
+        <table class="rankings-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Fighter</th>
+                    <th>Rating</th>
+                    <th>Confidence</th>
+                    <th>Games</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{int rank = 1;}
+                @foreach (var player in _players)
+                {
+                    <tr class="@(rank <= 3 ? "top-three" : "")">
+                        <td class="rank-num">@rank</td>
+                        <td class="summoner-name">@player.SummonerName</td>
+                        <td class="display-rating">@player.DisplayRating.ToString("F1")</td>
+                        <td class="confidence">
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: @(Math.Max(0, 100 - player.TrueSkillSigma * 10).ToString("F0"))%"></div>
+                            </div>
+                        </td>
+                        <td class="games-played">@player.GamesPlayed</td>
+                    </tr>
+                    rank++;
+                }
+            </tbody>
+        </table>
+
+        <div class="rating-explainer">
+            <h3>HOW RATINGS WORK</h3>
+            <p>
+                Rating = μ − 3σ. Your <strong>μ (mu)</strong> is estimated skill.
+                Your <strong>σ (sigma)</strong> is uncertainty — it drops as you play more games.
+                New players are Unranked for their first 5 games. Beat better players, gain more rating.
+                Lose to weaker players, lose more. Transparent. No hidden formula.
+            </p>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Player>? _players;
+
+    protected override async Task OnInitializedAsync() =>
+        _players = await Http.GetFromJsonAsync<List<Player>>("api/players");
+}
