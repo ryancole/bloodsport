@@ -365,117 +365,22 @@ Richardson, TX</div>
     </div>
     <button class="copy-btn" onclick="copyEmail('ryan-body', this)">Copy Email</button>
   </div>
-  <div class="email-subject">Subject: <span>Bloodsport — three day beta plan, everything you need</span></div>
+  <div class="email-subject">Subject: <span>Bloodsport — we're ready when you are</span></div>
   <div class="email-body" id="ryan-body">Ryan,
 
-We are launching the Bloodsport beta in three days. Everything is built and waiting for you. This email is the full plan — timeline, goals, and what is already done so you know exactly where to start.
+Everything is built and sitting on GitHub waiting for you. No rush, no pressure — whenever you are ready to jump in.
 
-Pull the repo, open DEVELOPER.md, and work the checklist in order. The code for every missing piece is already written in that document — paste, wire, run.
+Pull the repo and open DEVELOPER.md. Every piece that still needs to be built has the code already written in there. You just wire it in. Should be a smooth three days if the timing works for you.
 
----
+Day 1 is all backend — auth, migrations, a couple of missing endpoints. Day 2 is the Blazor pages. Day 3 we run a full bracket and see where we are.
 
-THE REPO
+Stripe and the Riot API key are off the table for now. Beta runs clean and simple first.
 
-https://github.com/ryancole/bloodsport
+I also want you to know — I mentioned your history in the emails we sent out. Doublelift, Leena, Greeley at Riot, Rozelle, Caedrel. Nothing more than what feels right to share. Your mother's name I left out entirely. That is yours.
 
-Open it. Everything we have built together is there. The scaffold is complete. Four projects, all connected, all ready for dotnet restore.
+This has been a long time coming. No pressure on when. Just know everything is ready.
 
----
-
-WHAT IS ALREADY BUILT
-
-- Full solution structure — Core, Data, Api, Client
-- Domain models — Player, Tournament, Match, TrueSkill rating
-- TrueSkill service — same Bayesian system as Halo 3, tuned for LoL
-- Bracket generator — standard seed ordering, auto-advances on result
-- Tournament Definition Language — YAML config in tournaments/*.yml
-- EF Core DbContext — all tables modeled, OpenIddict wired
-- Program.cs — OpenIddict fully configured, SignalR, CORS, everything
-- SignalR BracketHub — live bracket updates on every result
-- Riot Tournament API service — provider registration, code generation, webhook
-- Tournament and Players controllers
-- Blazor client — live bracket page, leaderboard, Bane/Mesrine aesthetic
-- docker-compose.yml — Postgres spins up in one command
-- DEVELOPER.md — every missing piece with working C# to paste
-
----
-
-DAY 1 — BACKEND COMPLETE
-
-Morning (3 hours):
-
-1. dotnet restore
-2. docker-compose up postgres -d
-3. Register Riot HttpClient in Program.cs — one line, in DEVELOPER.md
-4. Build DbInitializer — seed admin user and roles, in DEVELOPER.md
-5. Add credentials to appsettings.Development.json
-
-   dotnet ef migrations add Initial --startup-project ../Bloodsport.Api
-   dotnet ef database update --startup-project ../Bloodsport.Api
-
-Afternoon (3 hours):
-
-6. Build AuthController — register + password flow, full code in DEVELOPER.md
-7. Add GET /api/tournament/active — 20 minutes, in DEVELOPER.md
-8. Add POST /api/tournament/{id}/players — 30 minutes, in DEVELOPER.md
-
-End of Day 1 checkpoint:
-Open Postman. Register a user. Get a JWT. Create a tournament. Add two players. Start the bracket. Record a result. Verify the bracket advances, TrueSkill ratings update, SignalR fires. If all of that works, Day 1 is done.
-
----
-
-DAY 2 — FRONTEND COMPLETE
-
-Morning (3 hours):
-
-1. Login.razor — form, calls /connect/token, stores JWT in localStorage
-2. Register.razor — form, calls /api/auth/register then /api/players
-
-Afternoon (3 hours):
-
-3. Admin.razor — create tournament, add players, start bracket, record results
-
-End of Day 2 checkpoint:
-Open a browser. Register two accounts. Log in as admin. Create a tournament, add both players, start it, record a result. Watch the bracket page update live. Check the leaderboard — ratings changed. If all of that works without touching Postman, Day 2 is done.
-
----
-
-DAY 3 — FULL RUN AND HONEST EVALUATION
-
-Morning:
-Run a complete bracket with 8 players start to finish. Every match recorded, champion crowned, leaderboard updated, ratings correct. Verify SignalR fires on every result. Verify the Bane/Mesrine aesthetic holds up in the browser.
-
-Afternoon:
-Note every rough edge — not to fix today, to log as GitHub issues for week 2. Then ask one honest question: does the core loop work? Player registers, pays entry, gets seeded, competes, loses or wins, rating updates, bracket advances, champion is revealed.
-
-If yes — we have a beta.
-
----
-
-WHAT WE ARE NOT BUILDING IN THREE DAYS
-
-Stripe payments — players enter free for the beta. Add payments in week 2.
-Real Riot API lobby codes — mock them for now. The key requires a production application that takes time. One line change when it arrives.
-PKCE auth flow — password flow is sufficient for beta testing.
-
----
-
-RIOT API
-
-We have sent emails to Chris Greeley (Global Head of LoL Esports) and Whalen Rozelle (COO of Esports) at Riot. I mentioned your history with the company and with the game. If you have a contact inside Riot from your time there — even someone you knew peripherally — reach out to them this week. A warm internal connection shortens the API key timeline significantly.
-
----
-
-THE BIGGER PICTURE
-
-We have also sent outreach to Doublelift, Leena Xu, and Caedrel. NEACE is on the list. The marketing strategy, the community funding model, the full brand identity — it is all in MARKETING.md in the repo.
-
-The emails went out with you copied. Your story is in them — one of the first 100 players, your time at Riot, and what you gave up to be there for your mother. I kept her name out of it. That is yours to share if you choose to. But I wanted the people reading those emails to know who you are and why this platform exists.
-
-This has been a long time coming, Ryan. Three days. Let's go.
-
-Stephen
-info@crittendencompany.com</div>
+Stephen</div>
 </div>
 
 </body>
