@@ -1,0 +1,86 @@
+@page "/seasons/{id:long}"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.EntityFrameworkCore
+@inject SqlDbContext Db
+
+<PageTitle>@(season?.Name ?? "Season")</PageTitle>
+
+@if (notFound)
+{
+    <p class="text-muted">Season not found.</p>
+}
+else if (season is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">@season.Name</h1>
+        <span class="badge bg-secondary fs-6">@season.Status</span>
+    </div>
+
+    <dl class="row mb-4">
+        <dt class="col-sm-2">Start</dt>
+        <dd class="col-sm-10">@season.StartDate.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+
+        <dt class="col-sm-2">End</dt>
+        <dd class="col-sm-10">@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+    </dl>
+
+    <h2>Registered Teams</h2>
+
+    @if (season.Registrations.Count == 0)
+    {
+        <p class="text-muted">No teams registered yet.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Manager</th>
+                    <th>Members</th>
+                    <th>Registered</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reg in season.Registrations)
+                {
+                    <tr>
+                        <td><a href="/teams/@reg.Team.Id">@reg.Team.Name</a></td>
+                        <td><a href="/users/@reg.Team.Manager.Id">@reg.Team.Manager.DisplayName</a></td>
+                        <td>@reg.Team.TeamMemberships.Count</td>
+                        <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <a href="/seasons" class="btn btn-outline-secondary btn-sm mt-2">Back to Seasons</a>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private Season? season;
+    private bool notFound;
+
+    protected override async Task OnInitializedAsync()
+    {
+        season = await Db.Seasons
+            .Include(s => s.Registrations)
+                .ThenInclude(r => r.Team)
+                    .ThenInclude(t => t.Manager)
+            .Include(s => s.Registrations)
+                .ThenInclude(r => r.Team)
+                    .ThenInclude(t => t.TeamMemberships)
+            .FirstOrDefaultAsync(s => s.Id == Id);
+
+        if (season is null)
+            notFound = true;
+    }
+}

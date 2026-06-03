@@ -1,0 +1,56 @@
+@page "/seasons"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.EntityFrameworkCore
+@inject SqlDbContext Db
+
+<PageTitle>Seasons</PageTitle>
+
+<h1 class="mb-3">Seasons</h1>
+
+@if (seasons is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (seasons.Count == 0)
+{
+    <p class="text-muted">No seasons yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Teams</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var season in seasons)
+            {
+                <tr>
+                    <td><a href="/seasons/@season.Id">@season.Name</a></td>
+                    <td>@season.Status</td>
+                    <td>@season.StartDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>@season.Registrations.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Season>? seasons;
+
+    protected override async Task OnInitializedAsync()
+    {
+        seasons = await Db.Seasons
+            .Include(s => s.Registrations)
+            .OrderByDescending(s => s.DateCreated)
+            .ToListAsync();
+    }
+}
