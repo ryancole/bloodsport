@@ -2,19 +2,19 @@ using System;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace BloodsportFunctions;
+namespace BloodsportFunctions.Functions;
 
-public class Function1
+public class StartSeason
 {
     private readonly ILogger _logger;
 
-    public Function1(ILoggerFactory loggerFactory)
+    public StartSeason(ILoggerFactory loggerFactory)
     {
-        _logger = loggerFactory.CreateLogger<Function1>();
+        _logger = loggerFactory.CreateLogger<StartSeason>();
     }
 
-    [Function("Function1")]
-    public void Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer)
+    [Function("StartSeason")]
+    public void Run([TimerTrigger("0 0 0 * * *", RunOnStartup = true)] TimerInfo myTimer)
     {
         _logger.LogInformation("C# Timer trigger function executed at: {executionTime}", DateTime.Now);
         
