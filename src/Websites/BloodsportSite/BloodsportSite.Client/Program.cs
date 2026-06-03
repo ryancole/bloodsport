@@ -1,0 +1,16 @@
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
+namespace BloodsportSite.Client
+{
+    internal class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+            builder.Services.AddAuthenticationStateDeserialization();
+
+            await builder.Build().RunAsync();
+        }
+    }
+}

@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Libraries/">
+    <Project Path="Libraries/Bloodsport.Data.Sql/Bloodsport.Data.Sql.csproj" Id="64b507d9-71b4-4204-a442-5b2336523afa" />
+    <Project Path="Libraries/Bloodsport.Entity/Bloodsport.Entity.csproj" Id="604f64f6-1213-4bc1-99b9-40bed22a7816" />
+  </Folder>
+  <Folder Name="/Websites/">
+    <Project Path="Websites/BloodsportSite/BloodsportSite.Client/BloodsportSite.Client.csproj" Id="3c54ec1e-aca5-436b-81dc-406a37f16de5" />
+    <Project Path="Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj" Id="fa5296ac-99b7-4120-9a92-c1018be848ea" />
+  </Folder>
+</Solution>

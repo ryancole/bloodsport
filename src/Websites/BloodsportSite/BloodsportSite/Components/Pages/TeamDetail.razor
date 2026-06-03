@@ -1,0 +1,183 @@
+@page "/teams/{id:long}"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.EntityFrameworkCore
+@inject SqlDbContext Db
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(team?.Name ?? "Team")</PageTitle>
+
+@if (notFound)
+{
+    <p class="text-muted">Team not found.</p>
+}
+else if (team is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">@team.Name</h1>
+        @if (isManager)
+        {
+            <div class="d-flex gap-2">
+                <a href="/teams/@team.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <form method="post" action="/api/teams/@team.Id/delete">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </div>
+        }
+    </div>
+
+    <dl class="row mb-4">
+        <dt class="col-sm-2">Manager</dt>
+        <dd class="col-sm-10"><a href="/users/@team.Manager.Id">@team.Manager.DisplayName</a></dd>
+
+        <dt class="col-sm-2">Created</dt>
+        <dd class="col-sm-10">@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+    </dl>
+
+    <h2>Members</h2>
+
+    @if (team.TeamMemberships.Count == 0)
+    {
+        <p class="text-muted">No members yet.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Riot ID</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var membership in team.TeamMemberships)
+                {
+                    <tr>
+                        <td><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></td>
+                        <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (isManager)
+    {
+        <h2 class="mt-4">Invite Member</h2>
+
+        @if (inviteError is not null)
+        {
+            <div class="alert alert-danger py-1 px-2 small mb-2">@inviteError</div>
+        }
+        @if (inviteSent)
+        {
+            <div class="alert alert-success py-1 px-2 small mb-2">Invite sent successfully.</div>
+        }
+
+        <form method="post" action="/api/teams/@team.Id/invite" class="mb-4">
+            <div class="d-flex gap-2 align-items-end">
+                <div>
+                    <label class="form-label small mb-1">Game Name</label>
+                    <input type="text" name="gameName" class="form-control form-control-sm" placeholder="HideOnBush" required />
+                </div>
+                <div>
+                    <label class="form-label small mb-1">Tag</label>
+                    <input type="text" name="tagLine" class="form-control form-control-sm" placeholder="NA1" required />
+                </div>
+                <button type="submit" class="btn btn-sm btn-outline-primary">Send Invite</button>
+            </div>
+        </form>
+
+        @if (pendingInvites.Count > 0)
+        {
+            <h3 class="h5">Pending Invites</h3>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Riot ID</th>
+                        <th>Sent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invite in pendingInvites)
+                    {
+                        <tr>
+                            <td><strong>@invite.RiotAccount.GameName#@invite.RiotAccount.TagLine</strong></td>
+                            <td>@invite.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+
+    <a href="/teams" class="btn btn-outline-secondary btn-sm mt-2">Back to Teams</a>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private Bloodsport.Entity.Database.Team? team;
+    private List<TeamInvite> pendingInvites = [];
+    private bool notFound;
+    private bool isManager;
+    private string? inviteError;
+    private bool inviteSent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("invite_sent", out _))
+            inviteSent = true;
+
+        if (query.TryGetValue("invite_error", out var errorCode))
+        {
+            inviteError = (string?)errorCode switch
+            {
+                "invalid_input"    => "Please enter both a Game Name and Tag.",
+                "account_not_found" => "No linked Riot account found with that Game Name and Tag.",
+                "already_member"   => "That Riot account is already a member of this team.",
+                "already_invited"  => "That Riot account already has a pending invite.",
+                _                  => "An unknown error occurred. Please try again.",
+            };
+        }
+
+        team = await Db.Teams
+            .Include(t => t.Manager)
+            .Include(t => t.TeamMemberships)
+                .ThenInclude(m => m.RiotAccount)
+            .FirstOrDefaultAsync(t => t.Id == Id);
+
+        if (team is null)
+        {
+            notFound = true;
+            return;
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is not null)
+        {
+            isManager = team.Manager.EntraObjectId == oid;
+
+            if (isManager)
+            {
+                pendingInvites = await Db.TeamInvites
+                    .Include(i => i.RiotAccount)
+                    .Where(i => i.TeamId == Id && i.Status == TeamInviteStatus.Pending)
+                    .OrderByDescending(i => i.DateCreated)
+                    .ToListAsync();
+            }
+        }
+    }
+}

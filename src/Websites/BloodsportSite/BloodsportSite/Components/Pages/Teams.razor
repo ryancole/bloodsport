@@ -1,0 +1,61 @@
+@page "/teams"
+@using Bloodsport.Data.Sql
+@using Microsoft.EntityFrameworkCore
+@inject SqlDbContext Db
+
+<PageTitle>Teams</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Teams</h1>
+    <AuthorizeView>
+        <Authorized>
+            <a href="/teams/create" class="btn btn-sm btn-primary">Create Team</a>
+        </Authorized>
+    </AuthorizeView>
+</div>
+
+@if (teams is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (teams.Count == 0)
+{
+    <p class="text-muted">No teams yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Manager</th>
+                <th>Members</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var team in teams)
+            {
+                <tr>
+                    <td><a href="/teams/@team.Id">@team.Name</a></td>
+                    <td><a href="/users/@team.Manager.Id">@team.Manager.DisplayName</a></td>
+                    <td>@team.TeamMemberships.Count</td>
+                    <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Bloodsport.Entity.Database.Team>? teams;
+
+    protected override async Task OnInitializedAsync()
+    {
+        teams = await Db.Teams
+            .Include(t => t.Manager)
+            .Include(t => t.TeamMemberships)
+            .OrderBy(t => t.Name)
+            .ToListAsync();
+    }
+}

@@ -1,0 +1,86 @@
+@page "/teams/{id:long}/edit"
+@attribute [Authorize]
+@using Bloodsport.Data.Sql
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.EntityFrameworkCore
+@inject SqlDbContext Db
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Team</PageTitle>
+
+<h1>Edit Team</h1>
+
+@if (notFound)
+{
+    <p class="text-muted">Team not found.</p>
+}
+else if (team is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (error is not null)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <form method="post" action="/api/teams/@team.Id/edit" class="mt-3">
+        <div class="mb-3" style="max-width: 400px;">
+            <label class="form-label">Team Name</label>
+            <input type="text" name="name" class="form-control" value="@team.Name" required autofocus />
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="/teams" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private Bloodsport.Entity.Database.Team? team;
+    private bool notFound;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("error", out var errorCode))
+        {
+            error = (string?)errorCode switch
+            {
+                "invalid_name" => "Please enter a team name.",
+                _ => "An unknown error occurred. Please try again.",
+            };
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is null)
+        {
+            NavigationManager.NavigateTo("/teams");
+            return;
+        }
+
+        var user = await Db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+
+        if (user is null)
+        {
+            NavigationManager.NavigateTo("/teams");
+            return;
+        }
+
+        team = await Db.Teams.FirstOrDefaultAsync(t => t.Id == Id && t.ManagerId == user.Id);
+
+        if (team is null)
+            notFound = true;
+    }
+}

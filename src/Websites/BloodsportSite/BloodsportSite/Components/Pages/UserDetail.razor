@@ -1,0 +1,103 @@
+@page "/users/{id:long}"
+@using Bloodsport.Data.Sql
+@using Microsoft.EntityFrameworkCore
+@inject SqlDbContext Db
+
+<PageTitle>@(user?.DisplayName ?? "User")</PageTitle>
+
+@if (notFound)
+{
+    <p class="text-muted">User not found.</p>
+}
+else if (user is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1 class="mb-4">@user.DisplayName</h1>
+
+    <dl class="row mb-4">
+        <dt class="col-sm-3">Member Since</dt>
+        <dd class="col-sm-9">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+    </dl>
+
+    <h2>Managed Teams</h2>
+
+    @if (user.ManagedTeams.Count == 0)
+    {
+        <p class="text-muted">No managed teams.</p>
+    }
+    else
+    {
+        <div class="d-flex flex-wrap gap-3 mb-4">
+            @foreach (var team in user.ManagedTeams.OrderBy(t => t.Name))
+            {
+                <a href="/teams/@team.Id" class="text-decoration-none">
+                    <div class="card" style="min-width: 160px;">
+                        <div class="card-body py-2 px-3">
+                            <div class="fw-semibold">@team.Name</div>
+                            <div class="text-muted small">@team.TeamMemberships.Count member@(team.TeamMemberships.Count == 1 ? "" : "s")</div>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+
+    <h2>Team Memberships</h2>
+
+    @if (memberships.Count == 0)
+    {
+        <p class="text-muted">No team memberships.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Riot ID</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var membership in memberships.OrderBy(m => m.Team.Name))
+                {
+                    <tr>
+                        <td><a href="/teams/@membership.Team.Id">@membership.Team.Name</a></td>
+                        <td><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></td>
+                        <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private Bloodsport.Entity.Database.User? user;
+    private List<Bloodsport.Entity.Database.TeamMembership> memberships = [];
+    private bool notFound;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await Db.Users
+            .Include(u => u.ManagedTeams)
+                .ThenInclude(t => t.TeamMemberships)
+            .Include(u => u.RiotAccounts)
+                .ThenInclude(a => a.TeamMemberships)
+                    .ThenInclude(m => m.Team)
+            .FirstOrDefaultAsync(u => u.Id == Id);
+
+        if (user is null)
+        {
+            notFound = true;
+            return;
+        }
+
+        memberships = user.RiotAccounts.SelectMany(a => a.TeamMemberships).ToList();
+    }
+}
