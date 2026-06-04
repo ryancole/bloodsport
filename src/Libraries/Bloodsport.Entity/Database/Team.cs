@@ -18,9 +18,11 @@
 
         public required virtual User Manager { get; set; }
 
+        public virtual ICollection<TeamInvite> TeamInvites { get; set; } = [];
+
         public virtual ICollection<TeamMembership> TeamMemberships { get; set; } = [];
 
-        public virtual ICollection<TeamInvite> TeamInvites { get; set; } = [];
+        public virtual ICollection<SeasonRegistration> SeasonRegistrations { get; set;} = [];
 
         #endregion
     }

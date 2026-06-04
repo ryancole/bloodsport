@@ -22,9 +22,9 @@ namespace Bloodsport.Entity.Database
 
         #region Navigation Properties
 
-        public virtual ICollection<SeasonRegistration> Registrations { get; set; } = [];
-
         public virtual ICollection<Match> Matches { get; set; } = [];
+
+        public virtual ICollection<SeasonRegistration> SeasonRegistrations { get; set; } = [];
 
         #endregion
     }

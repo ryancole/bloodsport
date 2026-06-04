@@ -50,7 +50,7 @@ else
                     </td>
                     <td>@season.StartDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     <td>@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    <td>@season.Registrations.Count</td>
+                    <td>@season.SeasonRegistrations.Count</td>
                 </tr>
             }
         </tbody>
@@ -63,7 +63,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         seasons = await Db.Seasons
-            .Include(s => s.Registrations)
+            .Include(s => s.SeasonRegistrations)
             .OrderByDescending(s => s.DateCreated)
             .ToListAsync();
     }

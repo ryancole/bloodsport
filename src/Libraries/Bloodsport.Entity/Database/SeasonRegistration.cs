@@ -6,9 +6,9 @@ namespace Bloodsport.Entity.Database
 
         public long Id { get; private set; }
 
-        public long SeasonId { get; set; }
-
         public long TeamId { get; set; }
+
+        public long SeasonId { get; set; }
 
         public DateTime DateCreated { get; private set; }
 
@@ -16,9 +16,9 @@ namespace Bloodsport.Entity.Database
 
         #region Navigation Properties
 
-        public required virtual Season Season { get; set; }
-
         public required virtual Team Team { get; set; }
+
+        public required virtual Season Season { get; set; }
 
         #endregion
     }

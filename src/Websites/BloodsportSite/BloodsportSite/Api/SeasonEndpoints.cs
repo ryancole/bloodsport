@@ -139,7 +139,7 @@ namespace BloodsportSite.Api
                 return Results.Forbid();
 
             var season = await db.Seasons
-                .Include(s => s.Registrations)
+                .Include(s => s.SeasonRegistrations)
                     .ThenInclude(r => r.Team)
                 .Include(s => s.Matches)
                 .FirstOrDefaultAsync(s => s.Id == id);
@@ -150,7 +150,7 @@ namespace BloodsportSite.Api
             if (season.Matches.Count > 0)
                 return Results.BadRequest("Matches have already been generated for this season.");
 
-            var teams = season.Registrations.Select(r => r.Team).ToList();
+            var teams = season.SeasonRegistrations.Select(r => r.Team).ToList();
 
             if (teams.Count < 2)
                 return Results.BadRequest("At least 2 teams must be registered.");

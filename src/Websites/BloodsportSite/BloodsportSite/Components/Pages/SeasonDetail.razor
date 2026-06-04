@@ -88,7 +88,7 @@ else
 
     <h2>Registered Teams</h2>
 
-    @if (season.Registrations.Count == 0)
+    @if (season.SeasonRegistrations.Count == 0)
     {
         <p class="text-muted">No teams registered yet.</p>
     }
@@ -104,7 +104,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var reg in season.Registrations)
+                @foreach (var reg in season.SeasonRegistrations)
                 {
                     <tr>
                         <td><a href="/teams/@reg.Team.Id">@reg.Team.Name</a></td>
@@ -131,10 +131,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         season = await Db.Seasons
-            .Include(s => s.Registrations)
+            .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.Manager)
-            .Include(s => s.Registrations)
+            .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.TeamMemberships)
             .FirstOrDefaultAsync(s => s.Id == Id);
@@ -161,7 +161,7 @@ else
             .Where(t => t.ManagerId == user.Id)
             .ToListAsync();
 
-        var registeredTeamIds = season.Registrations.Select(r => r.TeamId).ToHashSet();
+        var registeredTeamIds = season.SeasonRegistrations.Select(r => r.TeamId).ToHashSet();
 
         alreadyRegisteredTeams = managedTeams.Where(t => registeredTeamIds.Contains(t.Id)).ToList();
         eligibleTeams = managedTeams.Where(t => !registeredTeamIds.Contains(t.Id)).ToList();

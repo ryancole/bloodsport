@@ -71,7 +71,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("WinnerTeamId");
 
-                    b.ToTable("Matches");
+                    b.ToTable("Matches", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccount", b =>
@@ -112,7 +112,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RiotAccounts");
+                    b.ToTable("RiotAccounts", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.Season", b =>
@@ -148,7 +148,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Seasons");
+                    b.ToTable("Seasons", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.SeasonRegistration", b =>
@@ -177,7 +177,7 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.HasIndex("SeasonId", "TeamId")
                         .IsUnique();
 
-                    b.ToTable("SeasonRegistrations");
+                    b.ToTable("SeasonRegistrations", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.Team", b =>
@@ -204,7 +204,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("Teams");
+                    b.ToTable("Teams", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.TeamInvite", b =>
@@ -235,7 +235,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("TeamInvites");
+                    b.ToTable("TeamInvites", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.TeamMembership", b =>
@@ -263,7 +263,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("TeamMemberships");
+                    b.ToTable("TeamMemberships", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.User", b =>
@@ -292,7 +292,7 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.HasIndex("EntraObjectId")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.Match", b =>

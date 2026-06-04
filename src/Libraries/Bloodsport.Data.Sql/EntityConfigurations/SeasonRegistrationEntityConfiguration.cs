@@ -20,13 +20,13 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
 
             builder
                 .HasOne(r => r.Season)
-                .WithMany(s => s.Registrations)
+                .WithMany(s => s.SeasonRegistrations)
                 .HasForeignKey(r => r.SeasonId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .HasOne(r => r.Team)
-                .WithMany()
+                .WithMany(m => m.SeasonRegistrations)
                 .HasForeignKey(r => r.TeamId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
