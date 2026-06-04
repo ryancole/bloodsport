@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    [Migration("20260604053624_RemoveMatch")]
+    [Migration("20260604053855_RemoveMatch")]
     partial class RemoveMatch
     {
         /// <inheritdoc />
