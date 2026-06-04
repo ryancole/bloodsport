@@ -63,20 +63,29 @@ public class BuildRegularSeason
             return;
         }
 
+        var weeks = BuildWeeks(season, teamCount);
+
+        db.SeasonWeeks.AddRange(weeks);
+        await db.SaveChangesAsync();
+
+        _logger.LogInformation("Built {weekCount} weeks for season {seasonId} across {teamCount} teams.", WeekCount, seasonId, teamCount);
+
+        await messageActions.CompleteMessageAsync(message);
+    }
+
+    private static List<SeasonWeek> BuildWeeks(Season season, int teamCount)
+    {
         var totalDuration = season.EndDate - season.StartDate;
         var weekDuration = TimeSpan.FromTicks(totalDuration.Ticks / WeekCount);
 
-        // Distribute teams across weeks as evenly as possible
         int baseTeamsPerWeek = teamCount / WeekCount;
         int remainder = teamCount % WeekCount;
 
         var weeks = new List<SeasonWeek>();
-        int teamIndex = 0;
 
         for (int i = 0; i < WeekCount; i++)
         {
             int teamsThisWeek = baseTeamsPerWeek + (i < remainder ? 1 : 0);
-            teamIndex += teamsThisWeek;
 
             var weekStart = season.StartDate + TimeSpan.FromTicks(weekDuration.Ticks * i);
             var weekEnd = i == WeekCount - 1 ? season.EndDate : season.StartDate + TimeSpan.FromTicks(weekDuration.Ticks * (i + 1));
@@ -92,11 +101,6 @@ public class BuildRegularSeason
             });
         }
 
-        db.SeasonWeeks.AddRange(weeks);
-        await db.SaveChangesAsync();
-
-        _logger.LogInformation("Built {weekCount} weeks for season {seasonId} across {teamCount} teams.", WeekCount, seasonId, teamCount);
-
-        await messageActions.CompleteMessageAsync(message);
+        return weeks;
     }
 }
