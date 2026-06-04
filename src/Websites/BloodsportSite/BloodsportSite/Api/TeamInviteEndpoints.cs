@@ -25,7 +25,7 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> InviteAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long teamId,
             [Microsoft.AspNetCore.Mvc.FromForm] string gameName,
             [Microsoft.AspNetCore.Mvc.FromForm] string tagLine)
@@ -36,6 +36,7 @@ namespace BloodsportSite.Api
             if (string.IsNullOrEmpty(gameName) || string.IsNullOrEmpty(tagLine))
                 return Results.Redirect($"/teams/{teamId}?invite_error=invalid_input");
 
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
             if (user is null)
                 return Results.Redirect($"/teams/{teamId}?invite_error=not_authenticated");
@@ -77,9 +78,10 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> AcceptAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id)
         {
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
             if (user is null)
                 return Results.Redirect("/profile");
@@ -109,9 +111,10 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> DeclineAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id)
         {
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
             if (user is null)
                 return Results.Redirect("/profile");

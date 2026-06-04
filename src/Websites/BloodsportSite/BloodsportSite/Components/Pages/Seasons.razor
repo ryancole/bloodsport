@@ -1,0 +1,71 @@
+@page "/seasons"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
+
+<PageTitle>Seasons</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Seasons</h1>
+    <AuthorizeView Roles="Bloodsport.Admin">
+        <Authorized>
+            <a href="/seasons/create" class="btn btn-sm btn-primary">Create Season</a>
+        </Authorized>
+    </AuthorizeView>
+</div>
+
+@if (seasons is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (seasons.Count == 0)
+{
+    <p class="text-muted">No seasons yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Teams</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var season in seasons)
+            {
+                <tr>
+                    <td><a href="/seasons/@season.Id">@season.Name</a></td>
+                    <td>
+                        @season.Status
+                        @if (season.RegistrationOpen)
+                        {
+                            <span class="badge bg-success ms-2">Registration Open</span>
+                        }
+                    </td>
+                    <td>@season.StartDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>@season.SeasonRegistrations.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Season>? seasons;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        seasons = await db.Seasons
+            .Include(s => s.SeasonRegistrations)
+            .OrderByDescending(s => s.DateCreated)
+            .ToListAsync();
+    }
+}

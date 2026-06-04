@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore
-@inject SqlDbContext Db
+@inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
@@ -70,7 +70,9 @@ else
             return;
         }
 
-        var user = await Db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
 
         if (user is null)
         {
@@ -78,7 +80,7 @@ else
             return;
         }
 
-        team = await Db.Teams.FirstOrDefaultAsync(t => t.Id == Id && t.ManagerId == user.Id);
+        team = await db.Teams.FirstOrDefaultAsync(t => t.Id == Id && t.ManagerId == user.Id);
 
         if (team is null)
             notFound = true;

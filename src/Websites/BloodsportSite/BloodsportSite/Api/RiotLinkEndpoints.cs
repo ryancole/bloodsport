@@ -25,7 +25,7 @@ namespace BloodsportSite.Api
             HttpContext context,
             IConfiguration config,
             IHttpClientFactory httpClientFactory,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string gameName,
             [Microsoft.AspNetCore.Mvc.FromForm] string tagLine)
         {
@@ -40,6 +40,8 @@ namespace BloodsportSite.Api
 
             if (oid is null)
                 return Results.Redirect("/profile?riot_error=not_authenticated");
+
+            await using var db = dbFactory.CreateDbContext();
 
             var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
 
@@ -88,7 +90,7 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> UnlinkAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] long riotAccountId)
         {
             var oid = context.User.FindFirst("oid")?.Value
@@ -96,6 +98,8 @@ namespace BloodsportSite.Api
 
             if (oid is null)
                 return Results.Redirect("/profile?riot_error=not_authenticated");
+
+            await using var db = dbFactory.CreateDbContext();
 
             var account = await db.RiotAccounts
                 .Include(r => r.User)

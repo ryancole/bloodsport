@@ -17,7 +17,7 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> UpdateDisplayNameAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string displayName)
         {
             displayName = displayName.Trim();
@@ -25,6 +25,7 @@ namespace BloodsportSite.Api
             if (string.IsNullOrEmpty(displayName))
                 return Results.Redirect("/profile?display_name_error=invalid");
 
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
             if (user is null)

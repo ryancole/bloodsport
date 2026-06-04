@@ -63,3 +63,28 @@ dotnet ef database update --project src/Libraries/Bloodsport.Data.Sql --startup-
 ```bash
 dotnet run --project src/Websites/BloodsportSite/BloodsportSite
 ```
+
+## Admin roles
+
+Admin access is controlled via an **Entra ID App Role** (`Bloodsport.Admin`) defined on the BloodsportSite app registration. The portal UI does not support assigning roles to users on external tenants — use the Azure CLI instead.
+
+### Assigning the Bloodsport.Admin role to a user
+
+```powershell
+# Log into the external tenant first (no subscriptions is expected)
+az login --tenant "<external-tenant-id>" --allow-no-subscriptions
+
+# Assign the role
+az rest --method POST `
+  --uri "https://graph.microsoft.com/v1.0/servicePrincipals/<service-principal-object-id>/appRoleAssignedTo" `
+  --body '{\"principalId\": \"<user-object-id>\", \"resourceId\": \"<service-principal-object-id>\", \"appRoleId\": \"<app-role-id>\"}'
+```
+
+| Value | Where to find it |
+|---|---|
+| `external-tenant-id` | Entra → Overview → Tenant ID |
+| `service-principal-object-id` | Enterprise applications → BloodsportSite → Overview → Object ID |
+| `user-object-id` | Entra → Users → click user → Object ID |
+| `app-role-id` | App registrations → BloodsportSite → App roles → Bloodsport Admin → ID |
+
+After assigning, the user must sign out and back in for the `roles` claim to appear in their token.

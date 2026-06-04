@@ -4,6 +4,7 @@ using Bloodsport.Data.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    partial class SqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260604032218_SeasonRegistrationOpen")]
+    partial class SeasonRegistrationOpen
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,7 +74,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("WinnerTeamId");
 
-                    b.ToTable("Matches", (string)null);
+                    b.ToTable("Matches");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccount", b =>
@@ -112,7 +115,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RiotAccounts", (string)null);
+                    b.ToTable("RiotAccounts");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.Season", b =>
@@ -148,7 +151,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Seasons", (string)null);
+                    b.ToTable("Seasons");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.SeasonRegistration", b =>
@@ -177,7 +180,7 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.HasIndex("SeasonId", "TeamId")
                         .IsUnique();
 
-                    b.ToTable("SeasonRegistrations", (string)null);
+                    b.ToTable("SeasonRegistrations");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.Team", b =>
@@ -204,7 +207,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.TeamInvite", b =>
@@ -235,7 +238,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("TeamInvites", (string)null);
+                    b.ToTable("TeamInvites");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.TeamMembership", b =>
@@ -263,7 +266,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("TeamMemberships", (string)null);
+                    b.ToTable("TeamMemberships");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.User", b =>
@@ -292,7 +295,7 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.HasIndex("EntraObjectId")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.Match", b =>

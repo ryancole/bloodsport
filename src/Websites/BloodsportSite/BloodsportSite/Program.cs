@@ -41,7 +41,7 @@ namespace BloodsportSite
 
             builder
                 .Services
-                .AddDbContext<SqlDbContext>(ConfigureSqlDbContext);
+                .AddDbContextFactory<SqlDbContext>(ConfigureSqlDbContext);
 
             var app = builder.Build();
 
@@ -74,6 +74,8 @@ namespace BloodsportSite
             app.MapGroup("/api").MapTeams();
             app.MapGroup("/api").MapTeamInvites();
             app.MapGroup("/api").MapUsers();
+            app.MapGroup("/api").MapSeasons();
+            app.MapGroup("/api").MapMatches();
 
             app.Run();
         }
@@ -130,7 +132,8 @@ namespace BloodsportSite
                     return;
                 }
 
-                var db = context.HttpContext.RequestServices.GetRequiredService<SqlDbContext>();
+                var dbFactory = context.HttpContext.RequestServices.GetRequiredService<IDbContextFactory<SqlDbContext>>();
+                await using var db = dbFactory.CreateDbContext();
 
                 var exists = await db.Users.AnyAsync(u => u.EntraObjectId == oid);
 
