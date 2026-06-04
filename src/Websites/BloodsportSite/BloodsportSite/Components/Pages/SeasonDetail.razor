@@ -31,16 +31,6 @@ else
             <AuthorizeView Roles="Bloodsport.Admin">
                 <Authorized>
                     <a href="/seasons/@season.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <button class="btn btn-sm btn-primary" @onclick="BuildBracket" disabled="@buildingBracket">
-                        @if (buildingBracket)
-                        {
-                            <span>Building...</span>
-                        }
-                        else
-                        {
-                            <span>Build Bracket</span>
-                        }
-                    </button>
                 </Authorized>
             </AuthorizeView>
         </div>
@@ -134,7 +124,6 @@ else
 
     private Season? season;
     private bool notFound;
-    private bool buildingBracket;
     private List<Team> eligibleTeams = [];
     private List<Team> alreadyRegisteredTeams = [];
 
@@ -179,12 +168,4 @@ else
         eligibleTeams = managedTeams.Where(t => !registeredTeamIds.Contains(t.Id)).ToList();
     }
 
-    private async Task BuildBracket()
-    {
-        buildingBracket = true;
-
-        // TODO: dispatch service bus message to Function App
-
-        buildingBracket = false;
-    }
 }
