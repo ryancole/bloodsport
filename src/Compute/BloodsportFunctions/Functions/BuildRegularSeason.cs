@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,12 +28,27 @@ namespace BloodsportFunctions.Functions
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
-        if (!long.TryParse(message.Body.ToString(), out var seasonId))
+        BuildRegularSeasonMessage? payload;
+
+        try
         {
-            _logger.LogError("Invalid season ID in message body: {body}", message.Body);
-            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InvalidPayload", deadLetterErrorDescription: "Message body must be a season ID (long).");
+            payload = JsonSerializer.Deserialize<BuildRegularSeasonMessage>(message.Body.ToString());
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize message body: {body}", message.Body);
+            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InvalidPayload", deadLetterErrorDescription: "Message body could not be deserialized as BuildRegularSeasonMessage.");
             return;
         }
+
+        if (payload is null)
+        {
+            _logger.LogError("Deserialized message payload was null.");
+            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InvalidPayload", deadLetterErrorDescription: "Message body deserialized to null.");
+            return;
+        }
+
+        var seasonId = payload.SeasonId;
 
         await using var db = await _dbFactory.CreateDbContextAsync();
 

@@ -1,6 +1,7 @@
 using Bloodsport.Data.Sql;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -13,6 +14,9 @@ public class Program
         var builder = FunctionsApplication.CreateBuilder(args);
 
         builder.ConfigureFunctionsWebApplication();
+
+        if (builder.Environment.IsDevelopment())
+            builder.Configuration.AddUserSecrets<Program>();
 
         builder
             .Services
