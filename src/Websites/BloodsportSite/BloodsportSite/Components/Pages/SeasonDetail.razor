@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @inject SqlDbContext Db
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@(season?.Name ?? "Season")</PageTitle>
 
@@ -40,6 +41,50 @@ else
         <dt class="col-sm-2">End</dt>
         <dd class="col-sm-10">@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
+
+    @if (season.RegistrationOpen)
+    {
+        <div class="mb-4">
+            @if (alreadyRegisteredTeams.Count > 0)
+            {
+                <div class="alert alert-success py-2">
+                    @if (alreadyRegisteredTeams.Count == 1)
+                    {
+                        <span><strong>@alreadyRegisteredTeams[0].Name</strong> is registered for this season.</span>
+                    }
+                    else
+                    {
+                        <span>Your teams <strong>@string.Join(", ", alreadyRegisteredTeams.Select(t => t.Name))</strong> are registered for this season.</span>
+                    }
+                </div>
+            }
+
+            @if (eligibleTeams.Count > 0)
+            {
+                <form method="post" action="/api/seasons/@season.Id/register">
+                    <div class="d-flex gap-2 align-items-center">
+                        @if (eligibleTeams.Count == 1)
+                        {
+                            <input type="hidden" name="teamId" value="@eligibleTeams[0].Id" />
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Register @eligibleTeams[0].Name
+                            </button>
+                        }
+                        else
+                        {
+                            <select name="teamId" class="form-select form-select-sm" style="max-width: 250px;">
+                                @foreach (var team in eligibleTeams)
+                                {
+                                    <option value="@team.Id">@team.Name</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-success btn-sm">Register</button>
+                        }
+                    </div>
+                </form>
+            }
+        </div>
+    }
 
     <h2>Registered Teams</h2>
 
@@ -80,6 +125,8 @@ else
 
     private Season? season;
     private bool notFound;
+    private List<Team> eligibleTeams = [];
+    private List<Team> alreadyRegisteredTeams = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,6 +140,30 @@ else
             .FirstOrDefaultAsync(s => s.Id == Id);
 
         if (season is null)
+        {
             notFound = true;
+            return;
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is null)
+            return;
+
+        var user = await Db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+
+        if (user is null)
+            return;
+
+        var managedTeams = await Db.Teams
+            .Where(t => t.ManagerId == user.Id)
+            .ToListAsync();
+
+        var registeredTeamIds = season.Registrations.Select(r => r.TeamId).ToHashSet();
+
+        alreadyRegisteredTeams = managedTeams.Where(t => registeredTeamIds.Contains(t.Id)).ToList();
+        eligibleTeams = managedTeams.Where(t => !registeredTeamIds.Contains(t.Id)).ToList();
     }
 }
