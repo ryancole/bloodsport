@@ -3,7 +3,7 @@
 @using Bloodsport.Entity.Database
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
-@inject SqlDbContext Db
+@inject IDbContextFactory<SqlDbContext> DbFactory
 
 <PageTitle>Seasons</PageTitle>
 
@@ -62,7 +62,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        seasons = await Db.Seasons
+        await using var db = await DbFactory.CreateDbContextAsync();
+        seasons = await db.Seasons
             .Include(s => s.SeasonRegistrations)
             .OrderByDescending(s => s.DateCreated)
             .ToListAsync();

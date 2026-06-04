@@ -4,7 +4,7 @@
 @using Bloodsport.Entity.Database
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
-@inject SqlDbContext Db
+@inject IDbContextFactory<SqlDbContext> DbFactory
 
 <PageTitle>Edit Season</PageTitle>
 
@@ -61,7 +61,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        season = await Db.Seasons.FirstOrDefaultAsync(s => s.Id == Id);
+        await using var db = await DbFactory.CreateDbContextAsync();
+        season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == Id);
 
         if (season is null)
             notFound = true;

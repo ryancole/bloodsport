@@ -1,7 +1,7 @@
 @page "/teams"
 @using Bloodsport.Data.Sql
 @using Microsoft.EntityFrameworkCore
-@inject SqlDbContext Db
+@inject IDbContextFactory<SqlDbContext> DbFactory
 
 <PageTitle>Teams</PageTitle>
 
@@ -52,7 +52,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        teams = await Db.Teams
+        await using var db = await DbFactory.CreateDbContextAsync();
+        teams = await db.Teams
             .Include(t => t.Manager)
             .Include(t => t.TeamMemberships)
             .OrderBy(t => t.Name)

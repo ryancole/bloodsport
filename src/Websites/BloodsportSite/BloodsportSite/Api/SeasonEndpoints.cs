@@ -33,7 +33,7 @@ namespace BloodsportSite.Api
         // Admin: create a season
         private static async Task<IResult> CreateAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string name,
             [Microsoft.AspNetCore.Mvc.FromForm] DateTime startDate,
             [Microsoft.AspNetCore.Mvc.FromForm] DateTime endDate)
@@ -48,6 +48,8 @@ namespace BloodsportSite.Api
 
             if (endDate <= startDate)
                 return Results.Redirect("/seasons/create?error=invalid_dates");
+
+            await using var db = dbFactory.CreateDbContext();
 
             db.Seasons.Add(new Season
             {
@@ -64,7 +66,7 @@ namespace BloodsportSite.Api
         // Admin: edit a season
         private static async Task<IResult> EditAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id,
             [Microsoft.AspNetCore.Mvc.FromForm] SeasonStatus status,
             [Microsoft.AspNetCore.Mvc.FromForm] bool? registrationOpen = null)
@@ -72,6 +74,7 @@ namespace BloodsportSite.Api
             if (!context.User.IsInRole("Bloodsport.Admin"))
                 return Results.Forbid();
 
+            await using var db = dbFactory.CreateDbContext();
             var season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == id);
 
             if (season is null)
@@ -88,10 +91,11 @@ namespace BloodsportSite.Api
         // Captain: register their team for a season
         private static async Task<IResult> RegisterAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id,
             [Microsoft.AspNetCore.Mvc.FromForm] long teamId)
         {
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
             if (user is null)
@@ -102,7 +106,7 @@ namespace BloodsportSite.Api
             if (season is null)
                 return Results.Redirect("/seasons?error=season_not_found");
 
-            if (season.Status != SeasonStatus.Upcoming)
+            if (!season.RegistrationOpen)
                 return Results.Redirect($"/seasons/{id}?error=registration_closed");
 
             var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == teamId && t.ManagerId == user.Id);
@@ -132,11 +136,13 @@ namespace BloodsportSite.Api
         // Admin: generate round-robin match schedule for a season
         private static async Task<IResult> GenerateMatchesAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id)
         {
             if (!context.User.IsInRole("Bloodsport.Admin"))
                 return Results.Forbid();
+
+            await using var db = dbFactory.CreateDbContext();
 
             var season = await db.Seasons
                 .Include(s => s.SeasonRegistrations)
@@ -208,9 +214,10 @@ namespace BloodsportSite.Api
 
         // Get standings for a season
         private static async Task<IResult> GetStandingsAsync(
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id)
         {
+            await using var db = dbFactory.CreateDbContext();
             var season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == id);
 
             if (season is null)

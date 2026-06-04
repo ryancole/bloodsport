@@ -1,7 +1,7 @@
 @page "/users"
 @using Bloodsport.Data.Sql
 @using Microsoft.EntityFrameworkCore
-@inject SqlDbContext Db
+@inject IDbContextFactory<SqlDbContext> DbFactory
 
 <PageTitle>Users</PageTitle>
 
@@ -58,7 +58,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        users = await Db.Users
+        await using var db = await DbFactory.CreateDbContextAsync();
+        users = await db.Users
             .Include(u => u.RiotAccounts)
                 .ThenInclude(a => a.TeamMemberships)
                     .ThenInclude(m => m.Team)

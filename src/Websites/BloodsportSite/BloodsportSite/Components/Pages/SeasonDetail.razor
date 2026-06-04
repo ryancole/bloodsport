@@ -3,7 +3,7 @@
 @using Bloodsport.Entity.Database
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
-@inject SqlDbContext Db
+@inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@(season?.Name ?? "Season")</PageTitle>
@@ -130,7 +130,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        season = await Db.Seasons
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        season = await db.Seasons
             .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.Manager)
@@ -152,12 +154,12 @@ else
         if (oid is null)
             return;
 
-        var user = await Db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+        var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
 
         if (user is null)
             return;
 
-        var managedTeams = await Db.Teams
+        var managedTeams = await db.Teams
             .Where(t => t.ManagerId == user.Id)
             .ToListAsync();
 

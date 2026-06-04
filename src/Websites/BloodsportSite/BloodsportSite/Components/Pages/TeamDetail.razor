@@ -3,7 +3,7 @@
 @using Bloodsport.Entity.Database
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore
-@inject SqlDbContext Db
+@inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
@@ -185,7 +185,9 @@ else
             };
         }
 
-        team = await Db.Teams
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        team = await db.Teams
             .Include(t => t.Manager)
             .Include(t => t.TeamMemberships)
                 .ThenInclude(m => m.RiotAccount)
@@ -209,7 +211,7 @@ else
 
             if (isManager)
             {
-                pendingInvites = await Db.TeamInvites
+                pendingInvites = await db.TeamInvites
                     .Include(i => i.RiotAccount)
                     .Where(i => i.TeamId == Id && i.Status == TeamInviteStatus.Pending)
                     .OrderByDescending(i => i.DateCreated)

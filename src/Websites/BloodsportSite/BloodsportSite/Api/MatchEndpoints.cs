@@ -18,7 +18,7 @@ namespace BloodsportSite.Api
         // Captain: report match result by submitting the Riot match ID
         private static async Task<IResult> ReportAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id,
             [Microsoft.AspNetCore.Mvc.FromForm] string riotMatchId,
             [Microsoft.AspNetCore.Mvc.FromForm] long winnerTeamId)
@@ -28,6 +28,7 @@ namespace BloodsportSite.Api
             if (string.IsNullOrEmpty(riotMatchId))
                 return Results.BadRequest("Riot match ID is required.");
 
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
             if (user is null)

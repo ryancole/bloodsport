@@ -25,7 +25,7 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> CreateAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string name)
         {
             name = name.Trim();
@@ -33,6 +33,7 @@ namespace BloodsportSite.Api
             if (string.IsNullOrEmpty(name))
                 return Results.Redirect("/teams/create?error=invalid_name");
 
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
             if (user is null)
@@ -52,7 +53,7 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> EditAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id,
             [Microsoft.AspNetCore.Mvc.FromForm] string name)
         {
@@ -61,6 +62,7 @@ namespace BloodsportSite.Api
             if (string.IsNullOrEmpty(name))
                 return Results.Redirect($"/teams/{id}/edit?error=invalid_name");
 
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
             if (user is null)
@@ -79,9 +81,10 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> DeleteAsync(
             HttpContext context,
-            SqlDbContext db,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id)
         {
+            await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
             if (user is null)
