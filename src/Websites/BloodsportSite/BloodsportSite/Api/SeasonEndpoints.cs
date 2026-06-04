@@ -34,6 +34,9 @@ namespace BloodsportSite.Api
             [Microsoft.AspNetCore.Mvc.FromForm] DateTime startDate,
             [Microsoft.AspNetCore.Mvc.FromForm] DateTime endDate)
         {
+            if (!context.User.IsInRole("Bloodsport.Admin"))
+                return Results.Forbid();
+
             name = name.Trim();
 
             if (string.IsNullOrEmpty(name))
@@ -104,6 +107,9 @@ namespace BloodsportSite.Api
             SqlDbContext db,
             long id)
         {
+            if (!context.User.IsInRole("Bloodsport.Admin"))
+                return Results.Forbid();
+
             var season = await db.Seasons
                 .Include(s => s.Registrations)
                     .ThenInclude(r => r.Team)
