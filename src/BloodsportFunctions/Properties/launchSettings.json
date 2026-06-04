@@ -2,7 +2,7 @@
   "profiles": {
     "BloodsportFunctions": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7262",
+      "commandLineArgs": "--port 7098",
       "launchBrowser": false
     }
   }

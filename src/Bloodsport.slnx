@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/Compute/">
-    <Project Path="Compute/BloodsportFunctions/BloodsportFunctions.csproj" Id="a4a79c27-8d1e-488f-a8ac-e944e9249e23" />
+    <Project Path="BloodsportFunctions/BloodsportFunctions.csproj" Id="eb833b78-11d7-4dfa-96bb-3642e97d9097" />
   </Folder>
   <Folder Name="/Libraries/">
     <Project Path="Libraries/Bloodsport.Data.Sql/Bloodsport.Data.Sql.csproj" Id="64b507d9-71b4-4204-a442-5b2336523afa" />
