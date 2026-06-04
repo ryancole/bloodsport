@@ -22,6 +22,8 @@ namespace Bloodsport.Entity.Database
 
         #region Navigation Properties
 
+        public virtual ICollection<SeasonWeek> SeasonWeeks { get; set; } = [];
+
         public virtual ICollection<SeasonRegistration> SeasonRegistrations { get; set; } = [];
 
         #endregion
