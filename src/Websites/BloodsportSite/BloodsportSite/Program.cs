@@ -41,7 +41,8 @@ namespace BloodsportSite
 
             builder
                 .Services
-                .AddDbContext<SqlDbContext>(ConfigureSqlDbContext);
+                .AddDbContext<SqlDbContext>(ConfigureSqlDbContext)
+                .AddDbContextFactory<SqlDbContext>(ConfigureSqlDbContext, ServiceLifetime.Scoped);
 
             var app = builder.Build();
 
