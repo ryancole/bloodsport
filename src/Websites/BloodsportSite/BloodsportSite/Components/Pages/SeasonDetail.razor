@@ -1,6 +1,7 @@
 @page "/seasons/{id:long}"
 @using Bloodsport.Data.Sql
 @using Bloodsport.Entity.Database
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @inject SqlDbContext Db
 
@@ -18,7 +19,18 @@ else
 {
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">@season.Name</h1>
-        <span class="badge bg-secondary fs-6">@season.Status</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-secondary fs-6">@season.Status</span>
+            @if (season.RegistrationOpen)
+            {
+                <span class="badge bg-success fs-6">Registration Open</span>
+            }
+            <AuthorizeView Roles="Bloodsport.Admin">
+                <Authorized>
+                    <a href="/seasons/@season.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </Authorized>
+            </AuthorizeView>
+        </div>
     </div>
 
     <dl class="row mb-4">

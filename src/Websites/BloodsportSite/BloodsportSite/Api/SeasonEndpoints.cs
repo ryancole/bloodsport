@@ -12,6 +12,10 @@ namespace BloodsportSite.Api
                 .RequireAuthorization()
                 .DisableAntiforgery();
 
+            endpoints.MapPost("/seasons/{id}/edit", EditAsync)
+                .RequireAuthorization()
+                .DisableAntiforgery();
+
             endpoints.MapPost("/seasons/{id}/register", RegisterAsync)
                 .RequireAuthorization()
                 .DisableAntiforgery();
@@ -40,10 +44,10 @@ namespace BloodsportSite.Api
             name = name.Trim();
 
             if (string.IsNullOrEmpty(name))
-                return Results.BadRequest("Season name is required.");
+                return Results.Redirect("/seasons/create?error=invalid_name");
 
             if (endDate <= startDate)
-                return Results.BadRequest("End date must be after start date.");
+                return Results.Redirect("/seasons/create?error=invalid_dates");
 
             db.Seasons.Add(new Season
             {
@@ -55,6 +59,30 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/seasons");
+        }
+
+        // Admin: edit a season
+        private static async Task<IResult> EditAsync(
+            HttpContext context,
+            SqlDbContext db,
+            long id,
+            [Microsoft.AspNetCore.Mvc.FromForm] SeasonStatus status,
+            [Microsoft.AspNetCore.Mvc.FromForm] bool? registrationOpen = null)
+        {
+            if (!context.User.IsInRole("Bloodsport.Admin"))
+                return Results.Forbid();
+
+            var season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (season is null)
+                return Results.Redirect("/seasons?error=season_not_found");
+
+            season.Status = status;
+            season.RegistrationOpen = registrationOpen ?? false;
+
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/seasons/{id}");
         }
 
         // Captain: register their team for a season

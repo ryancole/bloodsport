@@ -15,6 +15,10 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
                 .IsRequired();
 
             builder
+                .Property(m => m.RegistrationOpen)
+                .HasDefaultValue(false);
+
+            builder
                 .Property(s => s.DateCreated)
                 .HasDefaultValueSql("GETUTCDATE()");
         }

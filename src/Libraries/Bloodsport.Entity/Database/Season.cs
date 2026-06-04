@@ -6,6 +6,8 @@ namespace Bloodsport.Entity.Database
 
         public long Id { get; private set; }
 
+        public bool RegistrationOpen { get; set; }
+
         public required string Name { get; set; }
 
         public SeasonStatus Status { get; set; } = SeasonStatus.Upcoming;
