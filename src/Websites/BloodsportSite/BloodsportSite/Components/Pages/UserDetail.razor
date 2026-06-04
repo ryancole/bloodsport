@@ -30,19 +30,23 @@ else
     }
     else
     {
-        <div class="d-flex flex-wrap gap-3 mb-4">
-            @foreach (var account in user.RiotAccounts.OrderBy(a => a.GameName))
-            {
-                <a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(account.GameName)-@Uri.EscapeDataString(account.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
-                    <div class="card" style="min-width: 160px;">
-                        <div class="card-body py-2 px-3">
-                            <div class="fw-semibold">@account.GameName</div>
-                            <div class="text-muted small">#@account.TagLine</div>
-                        </div>
-                    </div>
-                </a>
-            }
-        </div>
+        <table class="table table-sm mb-4">
+            <thead>
+                <tr>
+                    <th>Riot ID</th>
+                    <th>Linked</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var account in user.RiotAccounts.OrderBy(a => a.GameName))
+                {
+                    <tr>
+                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(account.GameName)-@Uri.EscapeDataString(account.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@account.GameName#@account.TagLine</strong></a></td>
+                        <td>@account.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     }
 
     <h2>Managed Teams</h2>
@@ -95,7 +99,7 @@ else
                 {
                     <tr>
                         <td><a href="/teams/@membership.Team.Id">@membership.Team.Name</a></td>
-                        <td><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></td>
+                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
                         <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>
                 }

@@ -18,6 +18,8 @@ else if (season is null)
 }
 else
 {
+    <nav class="small mb-2"><a href="/seasons">Seasons</a> / @season.Name</nav>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">@season.Name</h1>
         <div class="d-flex align-items-center gap-2">
@@ -99,7 +101,6 @@ else
                 <tr>
                     <th>Team</th>
                     <th>Manager</th>
-                    <th>Members</th>
                     <th>Registered</th>
                 </tr>
             </thead>
@@ -109,7 +110,6 @@ else
                     <tr>
                         <td><a href="/teams/@reg.Team.Id">@reg.Team.Name</a></td>
                         <td><a href="/users/@reg.Team.Manager.Id">@reg.Team.Manager.DisplayName</a></td>
-                        <td>@reg.Team.TeamMemberships.Count</td>
                         <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>
                 }
@@ -117,7 +117,6 @@ else
         </table>
     }
 
-    <a href="/seasons" class="btn btn-outline-secondary btn-sm mt-2">Back to Seasons</a>
 }
 
 @code {

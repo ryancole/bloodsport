@@ -19,6 +19,8 @@ else if (team is null)
 }
 else
 {
+    <nav class="small mb-2"><a href="/teams">Teams</a> / @team.Name</nav>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">@team.Name</h1>
         @if (isManager)
@@ -59,7 +61,7 @@ else
                 @foreach (var membership in team.TeamMemberships)
                 {
                     <tr>
-                        <td><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></td>
+                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
                         <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>
                 }
@@ -108,7 +110,7 @@ else
                     @foreach (var invite in pendingInvites)
                     {
                         <tr>
-                            <td><strong>@invite.RiotAccount.GameName#@invite.RiotAccount.TagLine</strong></td>
+                            <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(invite.RiotAccount.GameName)-@Uri.EscapeDataString(invite.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@invite.RiotAccount.GameName#@invite.RiotAccount.TagLine</strong></a></td>
                             <td>@invite.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                         </tr>
                     }
@@ -152,7 +154,6 @@ else
         </table>
     }
 
-    <a href="/teams" class="btn btn-outline-secondary btn-sm mt-2">Back to Teams</a>
 }
 
 @code {
