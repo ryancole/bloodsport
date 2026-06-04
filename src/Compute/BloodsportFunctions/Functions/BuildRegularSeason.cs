@@ -5,9 +5,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace BloodsportFunctions.Functions;
-
-public class BuildRegularSeason
+namespace BloodsportFunctions.Functions
+{
+    public class BuildRegularSeason
 {
     private const int WeekCount = 6;
 
@@ -103,4 +103,5 @@ public class BuildRegularSeason
 
         return weeks;
     }
+}
 }

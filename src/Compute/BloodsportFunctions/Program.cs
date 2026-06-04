@@ -1,19 +1,27 @@
 using Bloodsport.Data.Sql;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-var builder = FunctionsApplication.CreateBuilder(args);
+namespace BloodsportFunctions;
 
-builder.ConfigureFunctionsWebApplication();
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = FunctionsApplication.CreateBuilder(args);
 
-builder.Services
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+        builder.ConfigureFunctionsWebApplication();
 
-builder.Services.AddDbContextFactory<SqlDbContext>(options =>
-    options.UseSqlServer(builder.Configuration["SqlConnectionString"]));
+        builder.Services
+            .AddApplicationInsightsTelemetryWorkerService()
+            .ConfigureFunctionsApplicationInsights();
 
-builder.Build().Run();
+        builder.Services.AddDbContextFactory<SqlDbContext>(options =>
+            options.UseSqlServer(builder.Configuration["SqlConnectionString"]));
+
+        builder.Build().Run();
+    }
+}
