@@ -12,6 +12,10 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
         public void Configure(EntityTypeBuilder<TeamMembership> builder)
         {
             builder
+                .HasIndex(m => new { m.TeamId, m.RiotAccountId })
+                .IsUnique();
+
+            builder
                 .Property(t => t.DateCreated)
                 .HasDefaultValueSql("GETUTCDATE()");
 
