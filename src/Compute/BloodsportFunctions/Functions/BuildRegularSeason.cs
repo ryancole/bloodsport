@@ -80,19 +80,63 @@ namespace BloodsportFunctions.Functions
                 return;
             }
 
+            _logger.LogInformation("Building {weekCount} weeks for season {seasonId}.", WeekCount, seasonId);
             var weeks = BuildWeeks(season);
-
             db.SeasonWeeks.AddRange(weeks);
+            await db.SaveChangesAsync(); // flush so weeks get their DB-generated IDs
+
+            _logger.LogInformation("Building matchups for season {seasonId} across {teamCount} teams.", seasonId, teamCount);
+            var teamIds = season.SeasonRegistrations.Select(r => r.TeamId).ToList();
+            var matchups = BuildMatchups(weeks, teamIds);
+            db.SeasonWeekMatchups.AddRange(matchups);
             await db.SaveChangesAsync();
 
-            _logger.LogInformation("Built {weekCount} weeks for season {seasonId} across {teamCount} teams.", WeekCount, seasonId, teamCount);
+            _logger.LogInformation("Built {weekCount} weeks and {matchupCount} matchups for season {seasonId} across {teamCount} teams.", WeekCount, matchups.Count, seasonId, teamCount);
 
             await messageActions.CompleteMessageAsync(message);
         }
 
-        private static void BuildMatchups()
+        // Standard round-robin: fix slot 0, rotate slots 1..n-1 clockwise each round.
+        // A phantom bye slot (-1) is inserted when team count is odd so pairing math
+        // stays uniform; bye pairings are dropped before saving.
+        private static List<SeasonWeekMatchup> BuildMatchups(List<SeasonWeek> weeks, List<long> teamIds)
         {
+            var slots = new List<long>(teamIds);
 
+            if (slots.Count % 2 != 0)
+                slots.Add(-1);
+
+            int n = slots.Count;
+            var matchups = new List<SeasonWeekMatchup>();
+
+            for (int weekIndex = 0; weekIndex < weeks.Count; weekIndex++)
+            {
+                var week = weeks[weekIndex];
+
+                for (int i = 0; i < n / 2; i++)
+                {
+                    long teamOneId = slots[i];
+                    long teamTwoId = slots[n - 1 - i];
+
+                    if (teamOneId == -1 || teamTwoId == -1)
+                        continue;
+
+                    matchups.Add(new SeasonWeekMatchup
+                    {
+                        SeasonWeekId = week.Id,
+                        SeasonWeek = week,
+                        TeamOneId = teamOneId,
+                        TeamTwoId = teamTwoId,
+                    });
+                }
+
+                // Rotate slots 1..n-1 one position clockwise; slot 0 stays fixed.
+                long last = slots[n - 1];
+                slots.RemoveAt(n - 1);
+                slots.Insert(1, last);
+            }
+
+            return matchups;
         }
 
         private static List<SeasonWeek> BuildWeeks(Season season)

@@ -21,10 +21,10 @@ namespace Bloodsport.Entity.Database
         #region Nav props
 
         [JsonIgnore]
-        public virtual required Team TeamOne { get; set; }
+        public virtual Team TeamOne { get; set; }
 
         [JsonIgnore]
-        public virtual required Team TeamTwo { get; set; }
+        public virtual Team TeamTwo { get; set; }
 
         [JsonIgnore]
         public virtual required SeasonWeek SeasonWeek { get; set; }
