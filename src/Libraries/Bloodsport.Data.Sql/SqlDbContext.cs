@@ -27,6 +27,7 @@ namespace Bloodsport.Data.Sql
             new SeasonEntityConfiguration().Configure(modelBuilder.Entity<Season>());
             new SeasonRegistrationEntityConfiguration().Configure(modelBuilder.Entity<SeasonRegistration>());
             new SeasonWeekEntityConfiguration().Configure(modelBuilder.Entity<SeasonWeek>());
+            new SeasonWeekMatchupEntityConfiguration().Configure(modelBuilder.Entity<SeasonWeekMatchup>());
         }
 
         #endregion
@@ -48,6 +49,8 @@ namespace Bloodsport.Data.Sql
         public DbSet<SeasonRegistration> SeasonRegistrations { get; set; }
 
         public DbSet<SeasonWeek> SeasonWeeks { get; set; }
+
+        public DbSet<SeasonWeekMatchup> SeasonWeekMatchups { get; set; }
 
         #endregion
     }

@@ -27,6 +27,9 @@ namespace Bloodsport.Entity.Database
         [JsonIgnore]
         public required virtual Season Season { get; set; }
 
+        [JsonIgnore]
+        public virtual ICollection<SeasonWeekMatchup> SeasonWeekMatchups { get; set; } = [];
+
         #endregion
     }
 }

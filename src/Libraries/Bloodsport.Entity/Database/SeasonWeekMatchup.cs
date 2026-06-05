@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Bloodsport.Entity.Database
 {
@@ -24,13 +21,13 @@ namespace Bloodsport.Entity.Database
         #region Nav props
 
         [JsonIgnore]
-        public virtual SeasonWeek SeasonWeek { get; set; }
+        public virtual required Team TeamOne { get; set; }
 
         [JsonIgnore]
-        public virtual Team TeamOne { get; set; }
+        public virtual required Team TeamTwo { get; set; }
 
         [JsonIgnore]
-        public virtual Team TeamTwo { get; set; }
+        public virtual required SeasonWeek SeasonWeek { get; set; }
 
         #endregion
     }
