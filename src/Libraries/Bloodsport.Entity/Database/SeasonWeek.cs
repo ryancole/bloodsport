@@ -1,4 +1,6 @@
-﻿namespace Bloodsport.Entity.Database
+﻿using System.Text.Json.Serialization;
+
+namespace Bloodsport.Entity.Database
 {
     public class SeasonWeek
     {
@@ -22,6 +24,7 @@
 
         #region Navigation Properties
 
+        [JsonIgnore]
         public required virtual Season Season { get; set; }
 
         #endregion

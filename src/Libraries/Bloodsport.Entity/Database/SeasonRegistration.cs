@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Bloodsport.Entity.Database
 {
     public class SeasonRegistration
@@ -16,8 +18,10 @@ namespace Bloodsport.Entity.Database
 
         #region Navigation Properties
 
+        [JsonIgnore]
         public required virtual Team Team { get; set; }
 
+        [JsonIgnore]
         public required virtual Season Season { get; set; }
 
         #endregion
