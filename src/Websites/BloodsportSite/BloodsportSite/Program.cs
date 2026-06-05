@@ -2,6 +2,7 @@ using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
 using BloodsportSite.Api;
 using BloodsportSite.Components;
+using BloodsportSite.Services;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -41,6 +42,10 @@ namespace BloodsportSite
 
             builder
                 .Services
+                .AddHttpClient<RiotTournamentClient>();
+
+            builder
+                .Services
                 .AddDbContextFactory<SqlDbContext>(ConfigureSqlDbContext);
 
             var app = builder.Build();
@@ -75,6 +80,7 @@ namespace BloodsportSite
             app.MapGroup("/api").MapTeamInvites();
             app.MapGroup("/api").MapUsers();
             app.MapGroup("/api").MapSeasons();
+            app.MapGroup("/api").MapMatchups();
 
             app.Run();
         }

@@ -1,8 +1,11 @@
 @page "/seasons/{seasonId:long}/weeks/{weekId:long}/matchups/{matchupId:long}"
 @using Bloodsport.Data.Sql
 @using Bloodsport.Entity.Database
+@using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <PageTitle>@(matchup is not null ? $"{matchup.TeamOne.Name} vs {matchup.TeamTwo.Name}" : "Matchup")</PageTitle>
 
@@ -25,7 +28,7 @@ else
 
     <h1 class="mb-4">@matchup.TeamOne.Name vs @matchup.TeamTwo.Name</h1>
 
-    <div class="row g-4">
+    <div class="row g-4 mb-4">
         <div class="col-md-5">
             <div class="card">
                 <div class="card-body text-center">
@@ -46,6 +49,38 @@ else
             </div>
         </div>
     </div>
+
+    <h2>Tournament Lobby</h2>
+
+    @if (error == "tournament_not_configured")
+    {
+        <div class="alert alert-warning">This season has not been configured with a Riot tournament ID. An admin must set it up before lobby codes can be generated.</div>
+    }
+    else if (error == "riot_api_error")
+    {
+        <div class="alert alert-danger">Failed to generate a lobby code from the Riot API. Please try again.</div>
+    }
+
+    @if (matchup.TournamentCode is not null)
+    {
+        <div class="alert alert-success d-flex align-items-center gap-3">
+            <div>
+                <strong>Lobby Code:</strong>
+                <span class="font-monospace ms-2 fs-5">@matchup.TournamentCode</span>
+            </div>
+        </div>
+    }
+    else if (isManager)
+    {
+        <p class="text-muted">No lobby code has been generated yet.</p>
+        <form method="post" action="/api/matchups/@matchup.Id/tournament-code">
+            <button type="submit" class="btn btn-primary">Generate Lobby Code</button>
+        </form>
+    }
+    else
+    {
+        <p class="text-muted">No lobby code has been generated yet. A team manager must request one.</p>
+    }
 }
 
 @code {
@@ -55,9 +90,16 @@ else
 
     private SeasonWeekMatchup? matchup;
     private bool notFound;
+    private bool isManager;
+    private string? error;
 
     protected override async Task OnInitializedAsync()
     {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        query.TryGetValue("error", out var errorVal);
+        error = errorVal;
+
         await using var db = await DbFactory.CreateDbContextAsync();
 
         matchup = await db.SeasonWeekMatchups
@@ -68,6 +110,20 @@ else
             .FirstOrDefaultAsync(m => m.Id == MatchupId && m.SeasonWeekId == WeekId);
 
         if (matchup is null)
+        {
             notFound = true;
+            return;
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is not null)
+        {
+            var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+            if (user is not null)
+                isManager = matchup.TeamOne.ManagerId == user.Id || matchup.TeamTwo.ManagerId == user.Id;
+        }
     }
 }

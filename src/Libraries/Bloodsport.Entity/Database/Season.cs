@@ -20,6 +20,10 @@ namespace Bloodsport.Entity.Database
 
         public DateTime DateCreated { get; private set; }
 
+        public long? RiotProviderId { get; set; }
+
+        public long? RiotTournamentId { get; set; }
+
         #endregion
 
         #region Navigation Properties
