@@ -1,0 +1,73 @@
+@page "/seasons/{seasonId:long}/weeks/{weekId:long}/matchups/{matchupId:long}"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
+
+<PageTitle>@(matchup is not null ? $"{matchup.TeamOne.Name} vs {matchup.TeamTwo.Name}" : "Matchup")</PageTitle>
+
+@if (notFound)
+{
+    <p class="text-muted">Matchup not found.</p>
+}
+else if (matchup is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <nav class="small mb-2">
+        <a href="/seasons">Seasons</a> /
+        <a href="/seasons/@matchup.SeasonWeek.Season.Id">@matchup.SeasonWeek.Season.Name</a> /
+        <a href="/seasons/@matchup.SeasonWeek.Season.Id/weeks/@matchup.SeasonWeek.Id">@matchup.SeasonWeek.Name</a> /
+        @matchup.TeamOne.Name vs @matchup.TeamTwo.Name
+    </nav>
+
+    <h1 class="mb-4">@matchup.TeamOne.Name vs @matchup.TeamTwo.Name</h1>
+
+    <div class="row g-4">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title"><a href="/teams/@matchup.TeamOne.Id">@matchup.TeamOne.Name</a></h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-center justify-content-center">
+            <span class="fs-3 text-muted fw-bold">VS</span>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title"><a href="/teams/@matchup.TeamTwo.Id">@matchup.TeamTwo.Name</a></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public long SeasonId { get; set; }
+    [Parameter] public long WeekId { get; set; }
+    [Parameter] public long MatchupId { get; set; }
+
+    private SeasonWeekMatchup? matchup;
+    private bool notFound;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        matchup = await db.SeasonWeekMatchups
+            .Include(m => m.TeamOne)
+            .Include(m => m.TeamTwo)
+            .Include(m => m.SeasonWeek)
+                .ThenInclude(w => w.Season)
+            .FirstOrDefaultAsync(m => m.Id == MatchupId && m.SeasonWeekId == WeekId);
+
+        if (matchup is null)
+            notFound = true;
+    }
+}

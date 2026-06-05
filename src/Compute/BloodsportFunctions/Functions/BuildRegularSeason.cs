@@ -64,6 +64,13 @@ namespace BloodsportFunctions.Functions
                 return;
             }
 
+            if (season.RegistrationOpen)
+            {
+                _logger.LogError("Season {seasonId} still has registration open. Close registration before building the schedule.", seasonId);
+                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "RegistrationOpen", deadLetterErrorDescription: "Registration must be closed before the regular season can be built.");
+                return;
+            }
+
             if (season.SeasonWeeks.Count > 0)
             {
                 _logger.LogWarning("Season {seasonId} already has weeks built. Skipping.", seasonId);
