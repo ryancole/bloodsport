@@ -88,6 +88,37 @@ else
         </div>
     }
 
+    <h2>Regular Season Weeks</h2>
+
+    @if (season.SeasonWeeks.Count == 0)
+    {
+        <p class="text-muted">No weeks scheduled yet.</p>
+    }
+    else
+    {
+        <table class="table mb-4">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var week in season.SeasonWeeks.OrderBy(w => w.Index))
+                {
+                    <tr>
+                        <td>@week.Index</td>
+                        <td><a href="/seasons/@season.Id/weeks/@week.Id">@week.Name</a></td>
+                        <td>@week.DateStart.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        <td>@week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
     <h2>Registered Teams</h2>
 
     @if (season.SeasonRegistrations.Count == 0)
@@ -132,6 +163,7 @@ else
         await using var db = await DbFactory.CreateDbContextAsync();
 
         season = await db.Seasons
+            .Include(s => s.SeasonWeeks)
             .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.Manager)
@@ -167,4 +199,5 @@ else
         alreadyRegisteredTeams = managedTeams.Where(t => registeredTeamIds.Contains(t.Id)).ToList();
         eligibleTeams = managedTeams.Where(t => !registeredTeamIds.Contains(t.Id)).ToList();
     }
+
 }

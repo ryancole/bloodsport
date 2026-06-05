@@ -1,4 +1,6 @@
-﻿namespace Bloodsport.Entity.Database
+﻿using System.Text.Json.Serialization;
+
+namespace Bloodsport.Entity.Database
 {
     public class TeamMembership
     {
@@ -16,8 +18,10 @@
 
         #region Navigation Properties
 
+        [JsonIgnore]
         public required virtual Team Team { get; set; }
 
+        [JsonIgnore]
         public required virtual RiotAccount RiotAccount { get; set; }
 
         #endregion

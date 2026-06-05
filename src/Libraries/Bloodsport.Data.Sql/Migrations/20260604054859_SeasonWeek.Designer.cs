@@ -4,6 +4,7 @@ using Bloodsport.Data.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    partial class SqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260604054859_SeasonWeek")]
+    partial class SeasonWeek
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,39 +167,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.ToTable("SeasonWeeks");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.SeasonWeekMatchup", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<long>("SeasonWeekId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TeamOneId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TeamTwoId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SeasonWeekId");
-
-                    b.HasIndex("TeamOneId");
-
-                    b.HasIndex("TeamTwoId");
-
-                    b.ToTable("SeasonWeekMatchups");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.Team", b =>
                 {
                     b.Property<long>("Id")
@@ -278,8 +248,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("RiotAccountId");
 
-                    b.HasIndex("TeamId", "RiotAccountId")
-                        .IsUnique();
+                    b.HasIndex("TeamId");
 
                     b.ToTable("TeamMemberships");
                 });
@@ -354,33 +323,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("Season");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.SeasonWeekMatchup", b =>
-                {
-                    b.HasOne("Bloodsport.Entity.Database.SeasonWeek", "SeasonWeek")
-                        .WithMany("SeasonWeekMatchups")
-                        .HasForeignKey("SeasonWeekId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bloodsport.Entity.Database.Team", "TeamOne")
-                        .WithMany()
-                        .HasForeignKey("TeamOneId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Bloodsport.Entity.Database.Team", "TeamTwo")
-                        .WithMany()
-                        .HasForeignKey("TeamTwoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("SeasonWeek");
-
-                    b.Navigation("TeamOne");
-
-                    b.Navigation("TeamTwo");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.Team", b =>
                 {
                     b.HasOne("Bloodsport.Entity.Database.User", "Manager")
@@ -442,11 +384,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("SeasonRegistrations");
 
                     b.Navigation("SeasonWeeks");
-                });
-
-            modelBuilder.Entity("Bloodsport.Entity.Database.SeasonWeek", b =>
-                {
-                    b.Navigation("SeasonWeekMatchups");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.Team", b =>

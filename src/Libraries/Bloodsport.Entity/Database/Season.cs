@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Bloodsport.Entity.Database
 {
     public class Season
@@ -22,8 +24,10 @@ namespace Bloodsport.Entity.Database
 
         #region Navigation Properties
 
-        public virtual ICollection<Match> Matches { get; set; } = [];
+        [JsonIgnore]
+        public virtual ICollection<SeasonWeek> SeasonWeeks { get; set; } = [];
 
+        [JsonIgnore]
         public virtual ICollection<SeasonRegistration> SeasonRegistrations { get; set; } = [];
 
         #endregion
