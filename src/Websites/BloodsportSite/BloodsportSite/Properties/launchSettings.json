@@ -4,9 +4,9 @@
       "https": {
         "commandName": "Project",
         "dotnetRunMessages": true,
-        "launchBrowser": true,
+        "launchBrowser": false,
         "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-        "applicationUrl": "https://localhost:7034;http://localhost:5110",
+        "applicationUrl": "https://localhost:7034",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
         }
