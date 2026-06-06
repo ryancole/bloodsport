@@ -38,19 +38,28 @@ else
         <table class="table">
             <thead>
                 <tr>
+                    <th>Matchup</th>
                     <th>Team One</th>
-                    <th></th>
                     <th>Team Two</th>
+                    <th></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var matchup in week.SeasonWeekMatchups)
+                @foreach (var matchup in week.SeasonWeekMatchups.OrderByDescending(m => m.SeasonWeekMatchupResult != null))
                 {
+                    var result = matchup.SeasonWeekMatchupResult;
                     <tr>
+                        <td><a href="/seasons/@week.Season.Id/weeks/@week.Id/matchups/@matchup.Id">@matchup.Name</a></td>
                         <td><a href="/teams/@matchup.TeamOneId">@matchup.TeamOne.Name</a></td>
-                        <td class="text-center text-muted">vs</td>
                         <td><a href="/teams/@matchup.TeamTwoId">@matchup.TeamTwo.Name</a></td>
+                        <td>
+                            @if (result is not null)
+                            {
+                                <span class="badge text-bg-success me-1">Final</span>
+                                <span class="text-muted small">@result.WinnerTeam.Name wins</span>
+                            }
+                        </td>
                         <td><a href="/seasons/@week.Season.Id/weeks/@week.Id/matchups/@matchup.Id">Details</a></td>
                     </tr>
                 }
@@ -76,6 +85,9 @@ else
                 .ThenInclude(m => m.TeamOne)
             .Include(w => w.SeasonWeekMatchups)
                 .ThenInclude(m => m.TeamTwo)
+            .Include(w => w.SeasonWeekMatchups)
+                .ThenInclude(m => m.SeasonWeekMatchupResult)
+                    .ThenInclude(r => r.WinnerTeam)
             .FirstOrDefaultAsync(w => w.Id == WeekId && w.SeasonId == SeasonId);
 
         if (week is null)

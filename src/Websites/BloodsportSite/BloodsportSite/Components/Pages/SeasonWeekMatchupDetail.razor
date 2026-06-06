@@ -80,6 +80,23 @@ else
         }
     </div>
 
+    @* Result *@
+    @if (matchup.SeasonWeekMatchupResult is { } result)
+    {
+        <div class="card border-0 bg-success-subtle rounded-3 mb-5 p-4 text-center">
+            <div class="text-uppercase fw-semibold small text-success-emphasis letter-spacing-1 mb-1">Match Result</div>
+            <div class="fs-3 fw-bold text-success-emphasis">@result.WinnerTeam.Name</div>
+            <div class="small text-muted mt-1">Winner &mdash; recorded @result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 bg-body-secondary rounded-3 mb-5 p-4 text-center">
+            <div class="text-uppercase fw-semibold small text-muted letter-spacing-1 mb-1">Match Result</div>
+            <div class="fs-5 fw-medium text-muted mt-1">Awaiting results&hellip;</div>
+        </div>
+    }
+
     @* Teams *@
     <div class="row g-0 mb-4 align-items-stretch">
         <div class="col-md-5">
@@ -151,6 +168,8 @@ else
                     .ThenInclude(tm => tm.RiotAccount)
             .Include(m => m.SeasonWeek)
                 .ThenInclude(w => w.Season)
+            .Include(m => m.SeasonWeekMatchupResult)
+                .ThenInclude(r => r.WinnerTeam)
             .FirstOrDefaultAsync(m => m.Id == MatchupId && m.SeasonWeekId == WeekId);
 
         if (matchup is null)
