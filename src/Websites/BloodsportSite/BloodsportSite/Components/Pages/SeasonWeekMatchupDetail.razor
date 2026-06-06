@@ -63,12 +63,25 @@ else
 
     @if (matchup.TournamentCode is not null)
     {
-        <div class="alert alert-success d-flex align-items-center gap-3">
-            <div>
-                <strong>Lobby Code:</strong>
-                <span class="font-monospace ms-2 fs-5">@matchup.TournamentCode</span>
+        @if (isMember || isManager)
+        {
+            <div class="alert alert-success d-flex align-items-center gap-3">
+                <div>
+                    <strong>Lobby Code:</strong>
+                    <span class="font-monospace ms-2 fs-5">@matchup.TournamentCode</span>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="alert alert-secondary d-flex align-items-center gap-3">
+                <div>
+                    <strong>Lobby Code:</strong>
+                    <span class="font-monospace ms-2 fs-5">••••••••••••</span>
+                </div>
+            </div>
+            <p class="text-muted small">You must be a member of one of the competing teams to view the lobby code.</p>
+        }
     }
     else if (isManager)
     {
@@ -91,6 +104,7 @@ else
     private SeasonWeekMatchup? matchup;
     private bool notFound;
     private bool isManager;
+    private bool isMember;
     private string? error;
 
     protected override async Task OnInitializedAsync()
@@ -123,7 +137,14 @@ else
         {
             var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
             if (user is not null)
+            {
                 isManager = matchup.TeamOne.ManagerId == user.Id || matchup.TeamTwo.ManagerId == user.Id;
+
+                isMember = await db.TeamMemberships
+                    .Include(m => m.RiotAccount)
+                    .AnyAsync(m => m.RiotAccount.UserId == user.Id &&
+                                   (m.TeamId == matchup.TeamOneId || m.TeamId == matchup.TeamTwoId));
+            }
         }
     }
 }
