@@ -6,62 +6,58 @@ param(
     [long] $WinnerTeamId,
 
     [Parameter(Mandatory)]
-    [string] $SqlConnectionString,
+    [string] $ServerInstance,
 
-    [string] $FunctionUrl = "http://localhost:7071/api/HandleMatchupResult",
+    [Parameter(Mandatory)]
+    [string] $Database,
+
+    [string] $FunctionUrl = "http://localhost:7262/api/HandleMatchupResult",
 
     [string] $FunctionKey = ""
 )
 
 # ── 1. Query the matchup and winning team memberships ──────────────────────────
 
-$connection = New-Object System.Data.SqlClient.SqlConnection $SqlConnectionString
-$connection.Open()
+$sqlParams = @{
+    ServerInstance = $ServerInstance
+    Database       = $Database
+    TrustServerCertificate = $true
+}
 
-$matchupCmd = $connection.CreateCommand()
-$matchupCmd.CommandText = "SELECT TournamentCode FROM SeasonWeekMatchups WHERE Id = @Id"
-$matchupCmd.Parameters.AddWithValue("@Id", $MatchupId) | Out-Null
-$tournamentCode = $matchupCmd.ExecuteScalar()
+$matchupRow = Invoke-Sqlcmd @sqlParams -Query "
+    SELECT TournamentCode FROM SeasonWeekMatchups WHERE Id = $MatchupId
+"
 
-if (-not $tournamentCode) {
+if (-not $matchupRow -or [string]::IsNullOrEmpty($matchupRow.TournamentCode)) {
     Write-Error "No matchup found with Id $MatchupId, or its TournamentCode is null."
-    $connection.Close()
     exit 1
 }
 
-$membersCmd = $connection.CreateCommand()
-$membersCmd.CommandText = @"
-SELECT ra.Puuid, tm.TeamId
-FROM TeamMemberships tm
-INNER JOIN RiotAccounts ra ON ra.Id = tm.RiotAccountId
-WHERE tm.TeamId IN (
-    SELECT TeamOneId FROM SeasonWeekMatchups WHERE Id = @Id
-    UNION
-    SELECT TeamTwoId FROM SeasonWeekMatchups WHERE Id = @Id
-)
-"@
-$membersCmd.Parameters.AddWithValue("@Id", $MatchupId) | Out-Null
+$tournamentCode = $matchupRow.TournamentCode
 
-$reader = $membersCmd.ExecuteReader()
-$participants = @()
+$memberRows = Invoke-Sqlcmd @sqlParams -Query "
+    SELECT ra.Puuid, tm.TeamId
+    FROM TeamMemberships tm
+    INNER JOIN RiotAccounts ra ON ra.Id = tm.RiotAccountId
+    WHERE tm.TeamId IN (
+        SELECT TeamOneId FROM SeasonWeekMatchups WHERE Id = $MatchupId
+        UNION
+        SELECT TeamTwoId FROM SeasonWeekMatchups WHERE Id = $MatchupId
+    )
+"
 
-while ($reader.Read()) {
-    $puuid  = $reader["Puuid"]
-    $teamId = $reader["TeamId"]
-    $participants += @{
-        puuid = $puuid
-        team  = if ($teamId -eq $WinnerTeamId) { 100 } else { 200 }
-        win   = ($teamId -eq $WinnerTeamId)
-    }
-}
-
-$reader.Close()
-$connection.Close()
-
-if ($participants.Count -eq 0) {
+if (-not $memberRows) {
     Write-Error "No team memberships found for matchup $MatchupId."
     exit 1
 }
+
+$participants = @($memberRows | ForEach-Object {
+    @{
+        puuid = $_.Puuid
+        team  = if ($_.TeamId -eq $WinnerTeamId) { 100 } else { 200 }
+        win   = ($_.TeamId -eq $WinnerTeamId)
+    }
+})
 
 # ── 2. Build the callback payload ──────────────────────────────────────────────
 

@@ -1,3 +1,3 @@
-$project = Resolve-Path "$PSScriptRoot\..\..\src\Compute\BloodsportFunctions\BloodsportFunctions.csproj"
+$projectDir = Resolve-Path "$PSScriptRoot\..\..\src\Compute\BloodsportFunctions"
 
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "dotnet run --project `"$project`""
+Start-Process pwsh -ArgumentList "-NoExit", "-WorkingDirectory", $projectDir, "-Command", "dotnet run"
