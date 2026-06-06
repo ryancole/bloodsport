@@ -16,6 +16,8 @@ namespace Bloodsport.Entity.Database
 
         public DateTime DateCreated { get; private set; }
 
+        public string? TournamentCode { get; set; }
+
         #endregion
 
         #region Nav props

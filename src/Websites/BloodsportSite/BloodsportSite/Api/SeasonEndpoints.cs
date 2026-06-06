@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using BloodsportSite.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodsportSite.Api
@@ -27,6 +28,9 @@ namespace BloodsportSite.Api
         private static async Task<IResult> CreateAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
+            RiotTournamentClient riotClient,
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string name,
             [Microsoft.AspNetCore.Mvc.FromForm] DateTime startDate,
             [Microsoft.AspNetCore.Mvc.FromForm] DateTime endDate)
@@ -44,14 +48,32 @@ namespace BloodsportSite.Api
 
             await using var db = dbFactory.CreateDbContext();
 
-            db.Seasons.Add(new Season
+            var season = new Season
             {
                 Name = name,
                 StartDate = startDate,
                 EndDate = endDate,
-            });
+            };
 
+            db.Seasons.Add(season);
             await db.SaveChangesAsync();
+
+            // Provision a Riot provider and tournament for this season.
+            // Failures are logged but don't block season creation — IDs can be set manually if needed.
+            try
+            {
+                var callbackUrl = configuration["RiotApi:CallbackUrl"]
+                    ?? throw new InvalidOperationException("RiotApi:CallbackUrl is not configured.");
+
+                season.RiotProviderId = await riotClient.CreateProviderAsync(callbackUrl);
+                season.RiotTournamentId = await riotClient.CreateTournamentAsync(season.RiotProviderId.Value, name);
+                await db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                var logger = loggerFactory.CreateLogger(nameof(SeasonEndpoints));
+                logger.LogError(ex, "Failed to provision Riot tournament for season {seasonId}. Tournament codes will be unavailable until IDs are set.", season.Id);
+            }
 
             return Results.Redirect("/seasons");
         }

@@ -1,8 +1,8 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Camille.Enums;
+using Camille.RiotGames;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace BloodsportSite.Api
 {
@@ -24,7 +24,7 @@ namespace BloodsportSite.Api
         private static async Task<IResult> LinkAsync(
             HttpContext context,
             IConfiguration config,
-            IHttpClientFactory httpClientFactory,
+            RiotGamesApi riotApi,
             IDbContextFactory<SqlDbContext> dbFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string gameName,
             [Microsoft.AspNetCore.Mvc.FromForm] string tagLine)
@@ -48,28 +48,26 @@ namespace BloodsportSite.Api
             if (user is null)
                 return Results.Redirect("/profile?riot_error=user_not_found");
 
-            var apiKey = config["RiotApi:ApiKey"]!;
-            var baseUrl = config["RiotApi:BaseUrl"]!;
+            var route = Enum.Parse<RegionalRoute>(config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
 
-            var httpClient = httpClientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Add("X-Riot-Token", apiKey);
+            Camille.RiotGames.AccountV1.Account? account;
+            try
+            {
+                account = await riotApi.AccountV1().GetByRiotIdAsync(route, gameName, tagLine);
+            }
+            catch (Camille.RiotGames.Util.RiotResponseException ex) when (ex.GetResponse().StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return Results.Redirect("/profile?riot_error=not_found");
+            }
+            catch
+            {
+                return Results.Redirect("/profile?riot_error=riot_api_failed");
+            }
 
-            var encodedName = Uri.EscapeDataString(gameName);
-            var encodedTag = Uri.EscapeDataString(tagLine);
-            var response = await httpClient.GetAsync($"{baseUrl}/riot/account/v1/accounts/by-riot-id/{encodedName}/{encodedTag}");
-
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (account is null)
                 return Results.Redirect("/profile?riot_error=not_found");
 
-            if (!response.IsSuccessStatusCode)
-                return Results.Redirect("/profile?riot_error=riot_api_failed");
-
-            var accountJson = await response.Content.ReadFromJsonAsync<RiotAccountResponse>();
-
-            if (accountJson is null)
-                return Results.Redirect("/profile?riot_error=riot_api_failed");
-
-            var alreadyLinked = await db.RiotAccounts.AnyAsync(r => r.Puuid == accountJson.Puuid);
+            var alreadyLinked = await db.RiotAccounts.AnyAsync(r => r.Puuid == account.Puuid);
 
             if (alreadyLinked)
                 return Results.Redirect("/profile?riot_error=already_linked");
@@ -78,9 +76,9 @@ namespace BloodsportSite.Api
             {
                 UserId = user.Id,
                 User = user,
-                Puuid = accountJson.Puuid,
-                GameName = accountJson.GameName,
-                TagLine = accountJson.TagLine,
+                Puuid = account.Puuid,
+                GameName = account.GameName,
+                TagLine = account.TagLine,
             });
 
             await db.SaveChangesAsync();
@@ -112,18 +110,6 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/profile");
-        }
-
-        private sealed class RiotAccountResponse
-        {
-            [JsonPropertyName("puuid")]
-            public required string Puuid { get; init; }
-
-            [JsonPropertyName("gameName")]
-            public required string GameName { get; init; }
-
-            [JsonPropertyName("tagLine")]
-            public required string TagLine { get; init; }
         }
     }
 }
