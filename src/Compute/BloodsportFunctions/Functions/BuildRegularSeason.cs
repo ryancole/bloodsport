@@ -54,6 +54,7 @@ namespace BloodsportFunctions.Functions
 
             var season = await db.Seasons
                 .Include(s => s.SeasonRegistrations)
+                    .ThenInclude(r => r.Team)
                 .Include(s => s.SeasonWeeks)
                 .FirstOrDefaultAsync(s => s.Id == seasonId);
 
@@ -94,7 +95,8 @@ namespace BloodsportFunctions.Functions
 
             _logger.LogInformation("Building matchups for season {seasonId} across {teamCount} teams.", seasonId, teamCount);
             var teamIds = season.SeasonRegistrations.Select(r => r.TeamId).ToList();
-            var matchups = BuildMatchups(weeks, teamIds);
+            var teamNames = season.SeasonRegistrations.ToDictionary(r => r.TeamId, r => r.Team.Name);
+            var matchups = BuildMatchups(weeks, teamIds, teamNames);
             db.SeasonWeekMatchups.AddRange(matchups);
             await db.SaveChangesAsync();
 
@@ -106,7 +108,7 @@ namespace BloodsportFunctions.Functions
         // Standard round-robin: fix slot 0, rotate slots 1..n-1 clockwise each round.
         // A phantom bye slot (-1) is inserted when team count is odd so pairing math
         // stays uniform; bye pairings are dropped before saving.
-        private static List<SeasonWeekMatchup> BuildMatchups(List<SeasonWeek> weeks, List<long> teamIds)
+        private static List<SeasonWeekMatchup> BuildMatchups(List<SeasonWeek> weeks, List<long> teamIds, Dictionary<long, string> teamNames)
         {
             var slots = new List<long>(teamIds);
 
@@ -134,6 +136,7 @@ namespace BloodsportFunctions.Functions
                         SeasonWeek = week,
                         TeamOneId = teamOneId,
                         TeamTwoId = teamTwoId,
+                        Name = $"{teamNames[teamOneId]} vs {teamNames[teamTwoId]}, {week.Name}, {week.Season.Name}",
                     });
                 }
 

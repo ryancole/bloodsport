@@ -14,6 +14,8 @@ namespace Bloodsport.Entity.Database
 
         public required long TeamTwoId { get; set; }
 
+        public required string Name { get; set; }
+
         public DateTime DateCreated { get; private set; }
 
         public string? TournamentCode { get; set; }
