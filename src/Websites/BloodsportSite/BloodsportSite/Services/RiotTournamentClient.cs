@@ -1,77 +1,79 @@
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Bloodsport.Entity.RiotApi;
+using Camille.Enums;
+using Camille.RiotGames;
+using StubNs = Camille.RiotGames.TournamentStubV5;
+using TournNs = Camille.RiotGames.TournamentV5;
 
 namespace BloodsportSite.Services
 {
     public class RiotTournamentClient
     {
-        private readonly HttpClient _http;
-        private readonly string _apiKey;
+        private readonly RiotGamesApi _api;
+        private readonly IConfiguration _config;
 
-        private static readonly JsonSerializerOptions _json = new()
+        public RiotTournamentClient(RiotGamesApi api, IConfiguration config)
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        };
-
-        public RiotTournamentClient(HttpClient http, IConfiguration configuration)
-        {
-            _http = http;
-            _apiKey = configuration["RiotApi:ApiKey"]
-                ?? throw new InvalidOperationException("RiotApi:ApiKey is not configured.");
-
-            _http.BaseAddress = new Uri(
-                configuration["RiotApi:BaseUrl"]
-                ?? throw new InvalidOperationException("RiotApi:BaseUrl is not configured."));
+            _api = api;
+            _config = config;
         }
 
-        public async Task<long> CreateProviderAsync(string region, string callbackUrl)
+        private RegionalRoute Route =>
+            Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
+
+        public async Task<long> CreateProviderAsync(string callbackUrl)
         {
-            var body = new { region, url = callbackUrl };
-            var response = await PostAsync("/lol/tournament/v5/providers", body);
-            return JsonSerializer.Deserialize<long>(await response.Content.ReadAsStringAsync());
+            var region = _config["RiotApi:Region"] ?? "NA";
+
+            if (RiotApiEndpoints.UseStub)
+                return await _api.TournamentStubV5().RegisterProviderDataAsync(Route,
+                    new StubNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
+
+            return await _api.TournamentV5().RegisterProviderDataAsync(Route,
+                new TournNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
         }
 
         public async Task<long> CreateTournamentAsync(long providerId, string name)
         {
-            var body = new { providerId, name };
-            var response = await PostAsync("/lol/tournament/v5/tournaments", body);
-            return JsonSerializer.Deserialize<long>(await response.Content.ReadAsStringAsync());
+            if (RiotApiEndpoints.UseStub)
+                return await _api.TournamentStubV5().RegisterTournamentAsync(Route,
+                    new StubNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = name });
+
+            return await _api.TournamentV5().RegisterTournamentAsync(Route,
+                new TournNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = name });
         }
 
-        public async Task<string> CreateTournamentCodeAsync(long tournamentId, long teamSize = 5)
+        public async Task<string> CreateTournamentCodeAsync(long tournamentId, int teamSize = 5)
         {
-            var body = new
+            string[] codes;
+
+            if (RiotApiEndpoints.UseStub)
             {
-                teamSize,
-                pickType = "TOURNAMENT_DRAFT",
-                mapType = "SUMMONERS_RIFT",
-                spectatorType = "ALL",
-                enoughPlayers = false,
-            };
+                codes = await _api.TournamentStubV5().CreateTournamentCodeAsync(Route,
+                    new StubNs.TournamentCodeParametersV5
+                    {
+                        TeamSize = teamSize,
+                        PickType = "TOURNAMENT_DRAFT",
+                        MapType = "SUMMONERS_RIFT",
+                        SpectatorType = "ALL",
+                        EnoughPlayers = false,
+                    },
+                    tournamentId, count: 1);
+            }
+            else
+            {
+                codes = await _api.TournamentV5().CreateTournamentCodeAsync(Route,
+                    new TournNs.TournamentCodeParametersV5
+                    {
+                        TeamSize = teamSize,
+                        PickType = "TOURNAMENT_DRAFT",
+                        MapType = "SUMMONERS_RIFT",
+                        SpectatorType = "ALL",
+                        EnoughPlayers = false,
+                    },
+                    tournamentId, count: 1);
+            }
 
-            var response = await PostAsync(
-                $"/lol/tournament/v5/codes?tournamentId={tournamentId}&count=1",
-                body);
-
-            var codes = JsonSerializer.Deserialize<string[]>(await response.Content.ReadAsStringAsync(), _json);
             return codes?[0] ?? throw new InvalidOperationException("Riot API returned no tournament codes.");
-        }
-
-        private async Task<HttpResponseMessage> PostAsync(string path, object body)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, path);
-            request.Headers.Add("X-Riot-Token", _apiKey);
-            request.Content = new StringContent(
-                JsonSerializer.Serialize(body, _json),
-                Encoding.UTF8,
-                "application/json");
-
-            var response = await _http.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            return response;
         }
     }
 }

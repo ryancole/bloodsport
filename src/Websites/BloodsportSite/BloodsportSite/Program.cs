@@ -1,8 +1,10 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.RiotApi;
 using BloodsportSite.Api;
 using BloodsportSite.Components;
 using BloodsportSite.Services;
+using Camille.RiotGames;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -40,9 +42,17 @@ namespace BloodsportSite
                 .Services
                 .AddHttpClient();
 
+            RiotApiEndpoints.UseStub = builder.Configuration.GetValue<bool>("RiotApi:UseStub");
+
             builder
                 .Services
-                .AddHttpClient<RiotTournamentClient>();
+                .AddSingleton(RiotGamesApi.NewInstance(
+                    builder.Configuration["RiotApi:ApiKey"]
+                        ?? throw new InvalidOperationException("RiotApi:ApiKey is not configured.")));
+
+            builder
+                .Services
+                .AddTransient<RiotTournamentClient>();
 
             builder
                 .Services
