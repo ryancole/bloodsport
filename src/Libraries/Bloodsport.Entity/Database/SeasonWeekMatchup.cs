@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Bloodsport.Entity.Database
 {
@@ -32,6 +32,9 @@ namespace Bloodsport.Entity.Database
 
         [JsonIgnore]
         public virtual required SeasonWeek SeasonWeek { get; set; }
+
+        [JsonIgnore]
+        public virtual SeasonWeekMatchupResult? SeasonWeekMatchupResult { get; set; }
 
         #endregion
     }
