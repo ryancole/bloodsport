@@ -77,13 +77,13 @@ else
             </table>
         }
 
-        <InviteMemberModal TeamId="team.Id" />
+        <InviteMemberModal TeamId="@team.Id" />
     }
 
     <h2 class="mt-4">Members</h2>
     <p class="text-muted small">Teams are limited to 7 members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of players on this roster.</p>
 
-    <TeamMembersTable Memberships="team.TeamMemberships" />
+    <TeamMembersTable Memberships="@team.TeamMemberships" />
 
     <h2 class="mt-4">Matchups</h2>
 
