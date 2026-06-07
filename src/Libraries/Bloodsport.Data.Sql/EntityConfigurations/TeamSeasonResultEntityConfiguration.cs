@@ -12,6 +12,10 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
         public void Configure(EntityTypeBuilder<TeamSeasonResult> builder)
         {
             builder
+                .HasIndex(m => new { m.TeamId, m.SeasonId })
+                .IsUnique();
+
+            builder
                 .Property(t => t.DateCreated)
                 .HasDefaultValueSql("GETUTCDATE()");
 

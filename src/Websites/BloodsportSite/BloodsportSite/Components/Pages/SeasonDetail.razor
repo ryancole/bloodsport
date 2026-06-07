@@ -32,6 +32,12 @@ else
             <AuthorizeView Roles="Bloodsport.Admin">
                 <Authorized>
                     <a href="/seasons/@season.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    @if (season.SeasonWeeks.Count == 0)
+                    {
+                        <form method="post" action="/api/seasons/@season.Id/build" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Build Season</button>
+                        </form>
+                    }
                     @if (season.Status != SeasonStatus.Completed)
                     {
                         <form method="post" action="/api/seasons/@season.Id/end" style="display:inline">

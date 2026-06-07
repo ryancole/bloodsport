@@ -24,6 +24,10 @@ namespace BloodsportSite.Api
                 .RequireAuthorization()
                 .DisableAntiforgery();
 
+            endpoints.MapPost("/seasons/{id}/build", BuildAsync)
+                .RequireAuthorization()
+                .DisableAntiforgery();
+
             endpoints.MapPost("/seasons/{id}/end", EndAsync)
                 .RequireAuthorization()
                 .DisableAntiforgery();
@@ -151,6 +155,24 @@ namespace BloodsportSite.Api
             });
 
             await db.SaveChangesAsync();
+
+            return Results.Redirect($"/seasons/{id}");
+        }
+
+        // Admin: build the regular season schedule by queuing the BuildRegularSeason function
+        private static async Task<IResult> BuildAsync(
+            HttpContext context,
+            ServiceBusClient serviceBusClient,
+            long id)
+        {
+            if (!context.User.IsInRole("Bloodsport.Admin"))
+                return Results.Forbid();
+
+            await using var sender = serviceBusClient.CreateSender("build-regular-season");
+
+            var payload = JsonSerializer.Serialize(new BuildRegularSeasonMessage { SeasonId = id });
+
+            await sender.SendMessageAsync(new ServiceBusMessage(payload));
 
             return Results.Redirect($"/seasons/{id}");
         }
