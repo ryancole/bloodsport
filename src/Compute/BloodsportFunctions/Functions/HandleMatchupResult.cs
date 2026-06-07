@@ -54,6 +54,7 @@ public class HandleMatchupResult
         await using var db = await _dbFactory.CreateDbContextAsync();
 
         var matchup = await db.SeasonWeekMatchups
+            .Include(m => m.SeasonWeek)
             .FirstOrDefaultAsync(m => m.TournamentCode == payload.ShortCode);
 
         if (matchup is null)
@@ -95,6 +96,21 @@ public class HandleMatchupResult
             WinnerTeamId = winningMembership.TeamId,
             WinnerTeam = winningMembership.Team,
         });
+
+        var seasonId = matchup.SeasonWeek.SeasonId;
+        var losingTeamId = matchup.TeamOneId == winningMembership.TeamId ? matchup.TeamTwoId : matchup.TeamOneId;
+
+        var winnerResult = await db.TeamSeasonResults
+            .FirstOrDefaultAsync(r => r.TeamId == winningMembership.TeamId && r.SeasonId == seasonId);
+
+        var loserResult = await db.TeamSeasonResults
+            .FirstOrDefaultAsync(r => r.TeamId == losingTeamId && r.SeasonId == seasonId);
+
+        if (winnerResult is not null)
+            winnerResult.WinCount++;
+
+        if (loserResult is not null)
+            loserResult.LoseCount++;
 
         await db.SaveChangesAsync();
 
