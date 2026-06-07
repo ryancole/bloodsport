@@ -370,9 +370,11 @@ namespace Bloodsport.Data.Sql.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("Roster")
+                    b.Property<string>("RosterJson")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -386,9 +388,10 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("SeasonId");
 
-                    b.HasIndex("TeamId");
+                    b.HasIndex("TeamId", "SeasonId")
+                        .IsUnique();
 
-                    b.ToTable("TeamSeasonRoster");
+                    b.ToTable("TeamSeasonRosters");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.User", b =>

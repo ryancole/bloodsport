@@ -30,6 +30,7 @@ namespace Bloodsport.Data.Sql
             new SeasonWeekMatchupEntityConfiguration().Configure(modelBuilder.Entity<SeasonWeekMatchup>());
             new SeasonWeekMatchupResultEntityConfiguration().Configure(modelBuilder.Entity<SeasonWeekMatchupResult>());
             new TeamSeasonResultEntityConfiguration().Configure(modelBuilder.Entity<TeamSeasonResult>());
+            new TeamSeasonRosterEntityConfiguration().Configure(modelBuilder.Entity<TeamSeasonRoster>());
         }
 
         #endregion
@@ -57,6 +58,8 @@ namespace Bloodsport.Data.Sql
         public DbSet<SeasonWeekMatchupResult> SeasonWeekMatchupResults { get; set; }
 
         public DbSet<TeamSeasonResult> TeamSeasonResults { get; set; }
+
+        public DbSet<TeamSeasonRoster> TeamSeasonRosters { get; set; }
 
         #endregion
     }

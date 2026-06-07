@@ -12,7 +12,7 @@ namespace Bloodsport.Entity.Database
 
         public required long SeasonId { get; set; }
 
-        public required string Roster { get; set;  }
+        public required string RosterJson { get; set;  }
 
         public DateTime DateCreated { get; private set; }
 
@@ -25,6 +25,15 @@ namespace Bloodsport.Entity.Database
 
         [JsonIgnore]
         public virtual Season Season { get; set;  }
+
+        #endregion
+    }
+
+    public class TeamSeasonRosterJson
+    {
+        #region Properties
+
+        public ICollection<string> AllowedSummonerNames { get; set; } = [];
 
         #endregion
     }
