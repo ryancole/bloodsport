@@ -26,6 +26,7 @@ else
         @if (isManager)
         {
             <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#inviteMemberModal">Invite Member</button>
                 <a href="/teams/@team.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
                 <form method="post" action="/api/teams/@team.Id/delete">
                     <AntiforgeryToken />
@@ -45,8 +46,6 @@ else
 
     @if (isManager)
     {
-        <h2>Invite Member</h2>
-
         @if (inviteError is not null)
         {
             <div class="alert alert-danger py-1 px-2 small mb-2">@inviteError</div>
@@ -55,21 +54,6 @@ else
         {
             <div class="alert alert-success py-1 px-2 small mb-2">Invite sent successfully.</div>
         }
-
-        <form method="post" action="/api/teams/@team.Id/invite" class="mb-4">
-            <AntiforgeryToken />
-            <div class="d-flex gap-2 align-items-end">
-                <div>
-                    <label class="form-label small mb-1">Game Name</label>
-                    <input type="text" name="gameName" class="form-control form-control-sm" placeholder="HideOnBush" required />
-                </div>
-                <div>
-                    <label class="form-label small mb-1">Tag</label>
-                    <input type="text" name="tagLine" class="form-control form-control-sm" placeholder="NA1" required />
-                </div>
-                <button type="submit" class="btn btn-sm btn-outline-primary">Send Invite</button>
-            </div>
-        </form>
 
         @if (pendingInvites.Count > 0)
         {
@@ -92,6 +76,8 @@ else
                 </tbody>
             </table>
         }
+
+        <InviteMemberModal TeamId="team.Id" />
     }
 
     <h2 class="mt-4">Members</h2>
