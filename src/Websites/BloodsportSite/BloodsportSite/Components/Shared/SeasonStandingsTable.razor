@@ -1,8 +1,8 @@
 @using Bloodsport.Entity.Database
 
 @{
-    var sorted = Registrations
-        .OrderByDescending(r => Records.GetValueOrDefault(r.TeamId).Wins)
+    var sorted = Results
+        .OrderByDescending(r => r.WinCount)
         .ThenBy(r => r.Team.Name)
         .ToList();
     var totalPages = (int)Math.Ceiling(sorted.Count / (double)PageSize);
@@ -34,7 +34,7 @@
     }
 </div>
 
-@if (Registrations.Count == 0)
+@if (Results.Count == 0)
 {
     <p class="text-muted">No teams registered yet.</p>
 }
@@ -46,18 +46,15 @@ else
                 <th>Team</th>
                 <th>W</th>
                 <th>L</th>
-                <th>Registered</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var reg in pageItems)
+            @foreach (var result in pageItems)
             {
-                var record = Records.GetValueOrDefault(reg.TeamId);
                 <tr>
-                    <td><a href="/teams/@reg.Team.Id">@reg.Team.Name</a></td>
-                    <td>@record.Wins</td>
-                    <td>@record.Losses</td>
-                    <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td><a href="/teams/@result.Team.Id">@result.Team.Name</a></td>
+                    <td>@result.WinCount</td>
+                    <td>@result.LoseCount</td>
                 </tr>
             }
         </tbody>
@@ -68,8 +65,7 @@ else
     private const int PageSize = 20;
 
     [Parameter, EditorRequired] public long SeasonId { get; set; }
-    [Parameter, EditorRequired] public ICollection<SeasonRegistration> Registrations { get; set; } = [];
-    [Parameter, EditorRequired] public Dictionary<long, (int Wins, int Losses)> Records { get; set; } = [];
+    [Parameter, EditorRequired] public ICollection<TeamSeasonResult> Results { get; set; } = [];
     [Parameter] public int CurrentPage { get; set; } = 1;
 
     private string PageUrl(int p) => $"/seasons/{SeasonId}?teamsPage={p}";

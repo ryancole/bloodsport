@@ -132,7 +132,7 @@ else
     }
     else
     {
-        <SeasonStandingsTable SeasonId="season.Id" Registrations="season.SeasonRegistrations" Records="teamRecords" CurrentPage="CurrentPage" />
+        <SeasonStandingsTable SeasonId="season.Id" Results="season.TeamSeasonResults" CurrentPage="CurrentPage" />
     }
 
 }
@@ -146,7 +146,6 @@ else
     private bool notFound;
     private List<Team> eligibleTeams = [];
     private List<Team> alreadyRegisteredTeams = [];
-    private Dictionary<long, (int Wins, int Losses)> teamRecords = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -154,35 +153,15 @@ else
 
         season = await db.Seasons
             .Include(s => s.SeasonWeeks)
-                .ThenInclude(w => w.SeasonWeekMatchups)
-                    .ThenInclude(m => m.SeasonWeekMatchupResult)
             .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.Manager)
             .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.TeamMemberships)
+            .Include(s => s.TeamSeasonResults)
+                .ThenInclude(r => r.Team)
             .FirstOrDefaultAsync(s => s.Id == Id);
-
-        if (season is not null)
-        {
-            var allMatchups = season.SeasonWeeks
-                .SelectMany(w => w.SeasonWeekMatchups)
-                .ToList();
-
-            teamRecords = season.SeasonRegistrations
-                .Select(r => r.TeamId)
-                .ToDictionary(
-                    teamId => teamId,
-                    teamId =>
-                    {
-                        var played = allMatchups
-                            .Where(m => (m.TeamOneId == teamId || m.TeamTwoId == teamId) && m.SeasonWeekMatchupResult is not null)
-                            .ToList();
-                        int wins = played.Count(m => m.SeasonWeekMatchupResult!.WinnerTeamId == teamId);
-                        return (Wins: wins, Losses: played.Count - wins);
-                    });
-        }
 
         if (season is null)
         {
