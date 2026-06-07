@@ -1,6 +1,6 @@
 -- Assign every RiotAccount to exactly one Team as a TeamMembership.
--- 500 riot accounts / 100 teams = 5 members per team.
--- RiotAccounts are shuffled randomly then chunked into groups of 5;
+-- 700 riot accounts / 100 teams = 7 members per team.
+-- RiotAccounts are shuffled randomly then chunked into groups of 7;
 -- each chunk maps to one team by row number.
 -- Assumes 01-users.sql, 02-teams.sql, and 03-riot-accounts.sql have been run first.
 
@@ -19,10 +19,10 @@ NumberedTeams AS (
 Assignments AS (
     SELECT
         sa.RiotAccountId,
-        -- Map each block of 5 accounts to one team (1-5 -> team 1, 6-10 -> team 2, ...)
+        -- Map each block of 7 accounts to one team (1-7 -> team 1, 8-14 -> team 2, ...)
         nt.TeamId
     FROM ShuffledAccounts sa
-    JOIN NumberedTeams nt ON nt.RowNum = CEILING(sa.RowNum * 1.0 / 5)
+    JOIN NumberedTeams nt ON nt.RowNum = CEILING(sa.RowNum * 1.0 / 7)
 )
 INSERT INTO [dbo].[TeamMemberships] ([TeamId], [RiotAccountId])
 SELECT TeamId, RiotAccountId

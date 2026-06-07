@@ -26,6 +26,7 @@ else
         @if (isManager)
         {
             <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#inviteMemberModal">Invite Member</button>
                 <a href="/teams/@team.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
                 <form method="post" action="/api/teams/@team.Id/delete">
                     <AntiforgeryToken />
@@ -45,8 +46,6 @@ else
 
     @if (isManager)
     {
-        <h2>Invite Member</h2>
-
         @if (inviteError is not null)
         {
             <div class="alert alert-danger py-1 px-2 small mb-2">@inviteError</div>
@@ -55,21 +54,6 @@ else
         {
             <div class="alert alert-success py-1 px-2 small mb-2">Invite sent successfully.</div>
         }
-
-        <form method="post" action="/api/teams/@team.Id/invite" class="mb-4">
-            <AntiforgeryToken />
-            <div class="d-flex gap-2 align-items-end">
-                <div>
-                    <label class="form-label small mb-1">Game Name</label>
-                    <input type="text" name="gameName" class="form-control form-control-sm" placeholder="HideOnBush" required />
-                </div>
-                <div>
-                    <label class="form-label small mb-1">Tag</label>
-                    <input type="text" name="tagLine" class="form-control form-control-sm" placeholder="NA1" required />
-                </div>
-                <button type="submit" class="btn btn-sm btn-outline-primary">Send Invite</button>
-            </div>
-        </form>
 
         @if (pendingInvites.Count > 0)
         {
@@ -92,34 +76,14 @@ else
                 </tbody>
             </table>
         }
+
+        <InviteMemberModal TeamId="@team.Id" />
     }
 
     <h2 class="mt-4">Members</h2>
+    <p class="text-muted small">Teams are limited to 7 members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of players on this roster.</p>
 
-    @if (team.TeamMemberships.Count == 0)
-    {
-        <p class="text-muted">No members yet.</p>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Riot ID</th>
-                    <th>Joined</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var membership in team.TeamMemberships)
-                {
-                    <tr>
-                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
-                        <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+    <TeamMembersTable Memberships="@team.TeamMemberships" />
 
     <h2 class="mt-4">Matchups</h2>
 
@@ -237,6 +201,7 @@ else
                 "account_not_found" => "No linked Riot account found with that Game Name and Tag.",
                 "already_member"   => "That Riot account is already a member of this team.",
                 "already_invited"  => "That Riot account already has a pending invite.",
+                "roster_full"      => "This team already has the maximum of 7 members.",
                 _                  => "An unknown error occurred. Please try again.",
             };
         }
@@ -247,6 +212,7 @@ else
             .Include(t => t.Manager)
             .Include(t => t.TeamMemberships)
                 .ThenInclude(m => m.RiotAccount)
+                    .ThenInclude(r => r.User)
             .Include(t => t.SeasonRegistrations)
                 .ThenInclude(r => r.Season)
             .FirstOrDefaultAsync(t => t.Id == Id);

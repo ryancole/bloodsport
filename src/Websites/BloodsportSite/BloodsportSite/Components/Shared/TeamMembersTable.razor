@@ -1,0 +1,32 @@
+@using Bloodsport.Entity.Database
+
+@if (Memberships.Count == 0)
+{
+    <p class="text-muted">No members yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Riot ID</th>
+                <th>User</th>
+                <th>Joined</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var membership in Memberships)
+            {
+                <tr>
+                    <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
+                    <td><a href="/users/@membership.RiotAccount.User.Id">@membership.RiotAccount.User.DisplayName</a></td>
+                    <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter, EditorRequired] public ICollection<TeamMembership> Memberships { get; set; } = [];
+}

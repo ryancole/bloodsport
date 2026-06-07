@@ -59,11 +59,47 @@ public class StartRegularSeason
             return;
         }
 
+        var registeredTeams = await db.SeasonRegistrations
+            .Where(r => r.SeasonId == seasonId)
+            .Include(r => r.Team)
+                .ThenInclude(t => t.TeamMemberships)
+                    .ThenInclude(m => m.RiotAccount)
+            .ToListAsync();
+
+        foreach (var registration in registeredTeams)
+        {
+            var rosterJson = JsonSerializer.Serialize(new TeamSeasonRosterJson
+            {
+                AllowedSummonerNames = registration.Team.TeamMemberships
+                    .Select(m => $"{m.RiotAccount.GameName}#{m.RiotAccount.TagLine}")
+                    .ToList()
+            });
+
+            var existing = await db.TeamSeasonRosters
+                .FirstOrDefaultAsync(r => r.TeamId == registration.TeamId && r.SeasonId == seasonId);
+
+            if (existing is not null)
+            {
+                existing.RosterJson = rosterJson;
+            }
+            else
+            {
+                db.TeamSeasonRosters.Add(new TeamSeasonRoster
+                {
+                    TeamId = registration.TeamId,
+                    SeasonId = seasonId,
+                    Team = registration.Team,
+                    Season = season,
+                    RosterJson = rosterJson,
+                });
+            }
+        }
+
         season.Status = SeasonStatus.Active;
 
         await db.SaveChangesAsync();
 
-        _logger.LogInformation("Season {seasonId} status set to Active.", seasonId);
+        _logger.LogInformation("Season {seasonId} status set to Active with {count} team rosters snapshotted.", seasonId, registeredTeams.Count);
 
         await messageActions.CompleteMessageAsync(message);
     }
