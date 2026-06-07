@@ -81,31 +81,9 @@ else
     }
 
     <h2 class="mt-4">Members</h2>
+    <p class="text-muted small">Teams are limited to 7 members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of players on this roster.</p>
 
-    @if (team.TeamMemberships.Count == 0)
-    {
-        <p class="text-muted">No members yet.</p>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Riot ID</th>
-                    <th>Joined</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var membership in team.TeamMemberships)
-                {
-                    <tr>
-                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
-                        <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+    <TeamMembersTable Memberships="team.TeamMemberships" />
 
     <h2 class="mt-4">Matchups</h2>
 
@@ -223,6 +201,7 @@ else
                 "account_not_found" => "No linked Riot account found with that Game Name and Tag.",
                 "already_member"   => "That Riot account is already a member of this team.",
                 "already_invited"  => "That Riot account already has a pending invite.",
+                "roster_full"      => "This team already has the maximum of 7 members.",
                 _                  => "An unknown error occurred. Please try again.",
             };
         }
@@ -233,6 +212,7 @@ else
             .Include(t => t.Manager)
             .Include(t => t.TeamMemberships)
                 .ThenInclude(m => m.RiotAccount)
+                    .ThenInclude(r => r.User)
             .Include(t => t.SeasonRegistrations)
                 .ThenInclude(r => r.Season)
             .FirstOrDefaultAsync(t => t.Id == Id);
