@@ -1,4 +1,5 @@
 @page "/seasons/{id:long}"
+@inject NavigationManager NavigationManager
 @using Bloodsport.Data.Sql
 @using Bloodsport.Entity.Database
 @using Microsoft.AspNetCore.Authorization
@@ -31,6 +32,12 @@ else
             <AuthorizeView Roles="Bloodsport.Admin">
                 <Authorized>
                     <a href="/seasons/@season.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    @if (season.Status != SeasonStatus.Completed)
+                    {
+                        <form method="post" action="/api/seasons/@season.Id/end" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-danger">End Season</button>
+                        </form>
+                    }
                 </Authorized>
             </AuthorizeView>
         </div>
@@ -119,7 +126,37 @@ else
         </table>
     }
 
-    <h2>Registered Teams</h2>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">Registered Teams</h2>
+        @{
+            var sortedRegistrations = season.SeasonRegistrations
+                .OrderByDescending(r => teamRecords.GetValueOrDefault(r.TeamId).Wins)
+                .ThenBy(r => r.Team.Name)
+                .ToList();
+            var totalPages = (int)Math.Ceiling(sortedRegistrations.Count / (double)PageSize);
+            var pageRegistrations = sortedRegistrations.Skip((CurrentPage - 1) * PageSize).Take(PageSize);
+        }
+        @if (totalPages > 1)
+        {
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="/seasons/@season.Id?teamsPage=@(CurrentPage - 1)">Previous</a>
+                    </li>
+                    @for (var p = 1; p <= totalPages; p++)
+                    {
+                        var pageNum = p;
+                        <li class="page-item @(CurrentPage == pageNum ? "active" : "")">
+                            <a class="page-link" href="/seasons/@season.Id?teamsPage=@pageNum">@pageNum</a>
+                        </li>
+                    }
+                    <li class="page-item @(CurrentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="/seasons/@season.Id?teamsPage=@(CurrentPage + 1)">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
 
     @if (season.SeasonRegistrations.Count == 0)
     {
@@ -137,7 +174,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var reg in season.SeasonRegistrations.OrderByDescending(r => teamRecords.GetValueOrDefault(r.TeamId).Wins).ThenBy(r => r.Team.Name))
+                @foreach (var reg in pageRegistrations)
                 {
                     var record = teamRecords.GetValueOrDefault(reg.TeamId);
                     <tr>
@@ -154,6 +191,8 @@ else
 }
 
 @code {
+    private const int PageSize = 20;
+
     [Parameter] public long Id { get; set; }
 
     private Season? season;
@@ -161,6 +200,8 @@ else
     private List<Team> eligibleTeams = [];
     private List<Team> alreadyRegisteredTeams = [];
     private Dictionary<long, (int Wins, int Losses)> teamRecords = [];
+    [SupplyParameterFromQuery] private int teamsPage { get; set; }
+    private int CurrentPage => teamsPage < 1 ? 1 : teamsPage;
 
     protected override async Task OnInitializedAsync()
     {
