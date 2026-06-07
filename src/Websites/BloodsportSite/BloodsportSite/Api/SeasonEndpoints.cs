@@ -27,6 +27,8 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/seasons/{id}/build", BuildAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/seasons/{id}/start", StartAsync)
+                .RequireAuthorization();
 
             return endpoints;
         }
@@ -205,6 +207,24 @@ namespace BloodsportSite.Api
             await using var sender = serviceBusClient.CreateSender("build-regular-season");
 
             var payload = JsonSerializer.Serialize(new BuildRegularSeasonMessage { SeasonId = id });
+
+            await sender.SendMessageAsync(new ServiceBusMessage(payload));
+
+            return Results.Redirect($"/seasons/{id}");
+        }
+
+        // Admin: start the regular season by queuing the StartRegularSeason function
+        private static async Task<IResult> StartAsync(
+            HttpContext context,
+            ServiceBusClient serviceBusClient,
+            long id)
+        {
+            if (!context.User.IsInRole("Bloodsport.Admin"))
+                return Results.Forbid();
+
+            await using var sender = serviceBusClient.CreateSender("start-regular-season");
+
+            var payload = JsonSerializer.Serialize(new StartRegularSeasonMessage { SeasonId = id });
 
             await sender.SendMessageAsync(new ServiceBusMessage(payload));
 

@@ -34,6 +34,13 @@ else
                             <button type="submit" class="btn btn-sm btn-outline-primary">Build Season</button>
                         </form>
                     }
+                    @if (season.SeasonWeeks.Count > 0 && !season.RegistrationOpen && season.Status == SeasonStatus.PreSeason)
+                    {
+                        <form method="post" action="/api/seasons/@season.Id/start" style="display:inline">
+                            <AntiforgeryToken />
+                            <button type="submit" class="btn btn-sm btn-success">Start Season</button>
+                        </form>
+                    }
                 </Authorized>
             </AuthorizeView>
         </div>
