@@ -57,6 +57,10 @@ else
                             {
                                 <span class="badge text-bg-success me-1">Final</span>
                                 <span class="text-muted small">@result.WinnerTeam.Name wins</span>
+                                @if (result.RosterMismatch)
+                                {
+                                    <span class="badge text-bg-warning ms-1" title="One or more players did not match the locked season roster">Roster Mismatch</span>
+                                }
                             }
                         </td>
                     </tr>

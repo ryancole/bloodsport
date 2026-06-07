@@ -85,11 +85,21 @@ else
     @* Result *@
     @if (matchup.TournamentCode is not null && matchup.SeasonWeekMatchupResult is { } result)
     {
-        <div class="card border-0 bg-success-subtle rounded-3 mb-5 p-4 text-center">
+        <div class="card border-0 bg-success-subtle rounded-3 mb-3 p-4 text-center">
             <div class="text-uppercase fw-semibold small text-success-emphasis letter-spacing-1 mb-1">Match Result</div>
             <div class="fs-3 fw-bold text-success-emphasis">@result.WinnerTeam.Name</div>
             <div class="small text-muted mt-1">Winner &mdash; recorded @result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</div>
         </div>
+        @if (result.RosterMismatch)
+        {
+            <div class="alert alert-warning mb-5">
+                <strong>Roster Mismatch Detected:</strong> One or more players in this match did not match the locked season roster for their team. This result may be subject to review.
+            </div>
+        }
+        else
+        {
+            <div class="mb-5"></div>
+        }
     }
     else if (matchup.TournamentCode is not null)
     {
