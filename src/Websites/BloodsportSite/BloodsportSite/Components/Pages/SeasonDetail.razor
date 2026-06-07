@@ -24,19 +24,14 @@ else
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">@season.Name</h1>
         <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-secondary fs-6">@season.Status</span>
-            @if (season.RegistrationOpen)
-            {
-                <span class="badge bg-success fs-6">Registration Open</span>
-            }
             <AuthorizeView Roles="Bloodsport.Admin">
                 <Authorized>
                     <a href="/seasons/@season.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    @if (season.SeasonWeeks.Count == 0)
+                    @if (season.SeasonWeeks.Count == 0 && !season.RegistrationOpen && season.Status == SeasonStatus.PreSeason)
                     {
                         <form method="post" action="/api/seasons/@season.Id/build" style="display:inline">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-outline-primary" disabled="@season.RegistrationOpen">Build Season</button>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Build Season</button>
                         </form>
                     }
                 </Authorized>
@@ -45,6 +40,14 @@ else
     </div>
 
     <dl class="row mb-4">
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10"><SeasonStatusBadge Status="season.Status" /></dd>
+
+        <dt class="col-sm-2">Registration</dt>
+        <dd class="col-sm-10">
+            <SeasonRegistrationBadge IsOpen="season.RegistrationOpen" />
+        </dd>
+
         <dt class="col-sm-2">Start</dt>
         <dd class="col-sm-10">@season.StartDate.ToLocalTime().ToString("MMMM d, yyyy")</dd>
 
@@ -112,15 +115,6 @@ else
                     {
                         <p class="card-text text-muted">You don't have any teams eligible to register.</p>
                     }
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="card border-secondary mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-muted">Registration is Closed</h5>
-                    <p class="card-text text-muted mb-0">Team registration for this season is not currently open.</p>
                 </div>
             </div>
         }

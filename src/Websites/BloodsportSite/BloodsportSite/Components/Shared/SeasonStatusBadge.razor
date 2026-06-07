@@ -1,0 +1,7 @@
+@using Bloodsport.Entity.Database
+
+<span class="badge @(Status == SeasonStatus.PreSeason ? "bg-warning text-dark" : "bg-secondary")">@Status</span>
+
+@code {
+    [Parameter] public SeasonStatus Status { get; set; }
+}
