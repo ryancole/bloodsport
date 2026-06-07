@@ -1,4 +1,4 @@
--- Seed 500 random users for local dev.
+-- Seed 700 random users for local dev.
 -- EntraObjectId is a unique GUID per user (fake — not real Entra accounts).
 -- Run this before 02-teams.sql.
 
@@ -9,7 +9,9 @@ INSERT INTO @FirstNames VALUES
     ('Kira'), ('Liam'), ('Maya'), ('Noel'), ('Olivia'),
     ('Priya'), ('Quinn'), ('Ravi'), ('Sofia'), ('Tyler'),
     ('Amber'), ('Blake'), ('Chloe'), ('Derek'), ('Eva'),
-    ('Felix'), ('Gina'), ('Hugo'), ('Isla'), ('Jake');
+    ('Felix'), ('Gina'), ('Hugo'), ('Isla'), ('Jake'),
+    ('Kai'), ('Luna'), ('Marcus'), ('Nadia'), ('Oscar'),
+    ('Petra'), ('Rex'), ('Sasha'), ('Tara'), ('Victor');
 
 DECLARE @LastNames TABLE (Name NVARCHAR(50));
 INSERT INTO @LastNames VALUES
@@ -18,7 +20,9 @@ INSERT INTO @LastNames VALUES
     ('Petrov'), ('Okonkwo'), ('Chen'), ('Dupont'), ('Santos'),
     ('Kapoor'), ('Walsh'), ('Sharma'), ('Andersson'), ('Brooks'),
     ('Hale'), ('Cruz'), ('Jensen'), ('Novak'), ('Tanaka'),
-    ('Muller'), ('Diaz'), ('Kwan'), ('Fischer'), ('Patel');
+    ('Muller'), ('Diaz'), ('Kwan'), ('Fischer'), ('Patel'),
+    ('Osei'), ('Bergmann'), ('Castillo'), ('Watanabe'), ('Kowalski'),
+    ('Nkosi'), ('Larsen'), ('Vega'), ('Mansour'), ('Johansson');
 
 DECLARE @FirstCount INT = (SELECT COUNT(*) FROM @FirstNames);
 DECLARE @LastCount  INT = (SELECT COUNT(*) FROM @LastNames);
@@ -26,7 +30,7 @@ DECLARE @LastCount  INT = (SELECT COUNT(*) FROM @LastNames);
 DECLARE @i INT = 1;
 DECLARE @DisplayName NVARCHAR(101);
 
-WHILE @i <= 500
+WHILE @i <= 700
 BEGIN
     SELECT @DisplayName =
         (SELECT TOP 1 Name FROM @FirstNames ORDER BY NEWID()) + ' ' +
