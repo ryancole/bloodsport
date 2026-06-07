@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
-using Bloodsport.Entity.Database;
 using Bloodsport.Entity.ServiceBus;
+using Bloodsport.Entity.Database;
 using BloodsportSite.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,9 +28,6 @@ namespace BloodsportSite.Api
                 .RequireAuthorization()
                 .DisableAntiforgery();
 
-            endpoints.MapPost("/seasons/{id}/end", EndAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
 
             return endpoints;
         }
@@ -171,24 +168,6 @@ namespace BloodsportSite.Api
             await using var sender = serviceBusClient.CreateSender("build-regular-season");
 
             var payload = JsonSerializer.Serialize(new BuildRegularSeasonMessage { SeasonId = id });
-
-            await sender.SendMessageAsync(new ServiceBusMessage(payload));
-
-            return Results.Redirect($"/seasons/{id}");
-        }
-
-        // Admin: end a season by queuing the EndRegularSeason function
-        private static async Task<IResult> EndAsync(
-            HttpContext context,
-            ServiceBusClient serviceBusClient,
-            long id)
-        {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
-                return Results.Forbid();
-
-            await using var sender = serviceBusClient.CreateSender("end-regular-season");
-
-            var payload = JsonSerializer.Serialize(new EndRegularSeasonMessage { SeasonId = id });
 
             await sender.SendMessageAsync(new ServiceBusMessage(payload));
 

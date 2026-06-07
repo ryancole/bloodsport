@@ -38,12 +38,6 @@ else
                             <button type="submit" class="btn btn-sm btn-outline-primary">Build Season</button>
                         </form>
                     }
-                    @if (season.Status != SeasonStatus.Completed)
-                    {
-                        <form method="post" action="/api/seasons/@season.Id/end" style="display:inline">
-                            <button type="submit" class="btn btn-sm btn-danger">End Season</button>
-                        </form>
-                    }
                 </Authorized>
             </AuthorizeView>
         </div>
