@@ -30,7 +30,11 @@ namespace Bloodsport.Entity.Database
         [JsonIgnore]
         public virtual ICollection<SeasonRegistration> SeasonRegistrations { get; set;} = [];
 
+        [JsonIgnore]
         public virtual ICollection<SeasonWeekMatchupResult> SeasonWeekMatchupResults { get; set; } = [];
+
+        [JsonIgnore]
+        public virtual ICollection<TeamSeasonResult> TeamSeasonResults { get; set; } = [];
 
         #endregion
     }

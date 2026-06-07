@@ -66,6 +66,7 @@ else
             @if (isManager && matchup.TournamentCode is null)
             {
                 <form method="post" action="/api/matchups/@matchup.Id/tournament-code">
+                    <AntiforgeryToken />
                     <button type="submit" class="btn btn-primary px-4">Generate Lobby Code</button>
                 </form>
             }

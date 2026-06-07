@@ -9,8 +9,7 @@ namespace BloodsportSite.Api
         public static IEndpointRouteBuilder MapUsers(this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapPost("/users/update-display-name", UpdateDisplayNameAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             return endpoints;
         }

@@ -25,7 +25,7 @@ namespace BloodsportFunctions.Functions
         [Function(nameof(BuildRegularSeason))]
         public async Task Run(
             [ServiceBusTrigger("build-regular-season", Connection = "ServiceBusConnection")]
-        ServiceBusReceivedMessage message,
+            ServiceBusReceivedMessage message,
             ServiceBusMessageActions messageActions)
         {
             BuildRegularSeasonMessage? payload;
@@ -67,9 +67,8 @@ namespace BloodsportFunctions.Functions
 
             if (season.RegistrationOpen)
             {
-                _logger.LogError("Season {seasonId} still has registration open. Close registration before building the schedule.", seasonId);
-                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "RegistrationOpen", deadLetterErrorDescription: "Registration must be closed before the regular season can be built.");
-                return;
+                _logger.LogInformation("Season {seasonId} has registration open. Closing registration before building the schedule.", seasonId);
+                season.RegistrationOpen = false;
             }
 
             if (season.SeasonWeeks.Count > 0)
@@ -98,6 +97,16 @@ namespace BloodsportFunctions.Functions
             var teamNames = season.SeasonRegistrations.ToDictionary(r => r.TeamId, r => r.Team.Name);
             var matchups = BuildMatchups(weeks, teamIds, teamNames);
             db.SeasonWeekMatchups.AddRange(matchups);
+
+            var seasonResults = teamIds.Select(teamId => new TeamSeasonResult
+            {
+                TeamId = teamId,
+                SeasonId = seasonId,
+                WinCount = 0,
+                LoseCount = 0,
+            });
+            db.TeamSeasonResults.AddRange(seasonResults);
+
             await db.SaveChangesAsync();
 
             _logger.LogInformation("Built {weekCount} weeks and {matchupCount} matchups for season {seasonId} across {teamCount} teams.", WeekCount, matchups.Count, seasonId, teamCount);

@@ -28,6 +28,7 @@ else
             <div class="d-flex gap-2">
                 <a href="/teams/@team.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
                 <form method="post" action="/api/teams/@team.Id/delete">
+                    <AntiforgeryToken />
                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                 </form>
             </div>
@@ -56,6 +57,7 @@ else
         }
 
         <form method="post" action="/api/teams/@team.Id/invite" class="mb-4">
+            <AntiforgeryToken />
             <div class="d-flex gap-2 align-items-end">
                 <div>
                     <label class="form-label small mb-1">Game Name</label>
@@ -168,6 +170,10 @@ else
                     <th>Season</th>
                     <th>Status</th>
                     <th>Registered</th>
+                    @if (isManager)
+                    {
+                        <th></th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -183,6 +189,19 @@ else
                             }
                         </td>
                         <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        @if (isManager)
+                        {
+                            <td>
+                                @if (reg.Season.RegistrationOpen)
+                                {
+                                    <form method="post" action="/api/seasons/@reg.Season.Id/unregister">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="teamId" value="@team.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Unregister</button>
+                                    </form>
+                                }
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

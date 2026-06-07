@@ -1,3 +1,4 @@
+using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
 using Bloodsport.Entity.RiotApi;
@@ -53,6 +54,12 @@ namespace BloodsportSite
             builder
                 .Services
                 .AddTransient<RiotTournamentClient>();
+
+            builder
+                .Services
+                .AddSingleton(new ServiceBusClient(
+                    builder.Configuration.GetConnectionString("ServiceBus")
+                        ?? throw new InvalidOperationException("ConnectionStrings:ServiceBus is not configured.")));
 
             builder
                 .Services
