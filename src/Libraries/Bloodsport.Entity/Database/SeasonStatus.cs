@@ -3,7 +3,8 @@ namespace Bloodsport.Entity.Database
     public enum SeasonStatus
     {
         Upcoming = 0,
-        Active = 1,
-        Completed = 2,
+        PreSeason = 1,
+        Active = 2,
+        Completed = 3
     }
 }
