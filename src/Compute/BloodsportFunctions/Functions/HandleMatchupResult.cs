@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Bloodsport.Data.Sql;
+using Bloodsport.Entity.Database;
 using Bloodsport.Entity.RiotApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -89,15 +90,58 @@ public class HandleMatchupResult
             return new UnprocessableEntityResult();
         }
 
-        db.SeasonWeekMatchupResults.Add(new Bloodsport.Entity.Database.SeasonWeekMatchupResult
+        var seasonId = matchup.SeasonWeek.SeasonId;
+
+        var allPuuids = payload.Participants.Select(p => p.Puuid).ToHashSet();
+
+        var participantAccounts = await db.RiotAccounts
+            .Where(a => allPuuids.Contains(a.Puuid))
+            .ToListAsync();
+
+        var teamOneRoster = await db.TeamSeasonRosters
+            .FirstOrDefaultAsync(r => r.TeamId == matchup.TeamOneId && r.SeasonId == seasonId);
+
+        var teamTwoRoster = await db.TeamSeasonRosters
+            .FirstOrDefaultAsync(r => r.TeamId == matchup.TeamTwoId && r.SeasonId == seasonId);
+
+        var teamOneAllowed = teamOneRoster is not null
+            ? (JsonSerializer.Deserialize<TeamSeasonRosterJson>(teamOneRoster.RosterJson)?.AllowedSummonerNames ?? [])
+            : (ICollection<string>)[];
+
+        var teamTwoAllowed = teamTwoRoster is not null
+            ? (JsonSerializer.Deserialize<TeamSeasonRosterJson>(teamTwoRoster.RosterJson)?.AllowedSummonerNames ?? [])
+            : (ICollection<string>)[];
+
+        var rosterMismatch = false;
+
+        foreach (var participant in payload.Participants)
+        {
+            var account = participantAccounts.FirstOrDefault(a => a.Puuid == participant.Puuid);
+            if (account is null)
+            {
+                rosterMismatch = true;
+                break;
+            }
+
+            var summonerName = $"{account.GameName}#{account.TagLine}";
+            var allowedForTeam = participant.Team == 1 ? teamOneAllowed : teamTwoAllowed;
+
+            if (!allowedForTeam.Contains(summonerName))
+            {
+                rosterMismatch = true;
+                break;
+            }
+        }
+
+        db.SeasonWeekMatchupResults.Add(new SeasonWeekMatchupResult
         {
             SeasonWeekMatchupId = matchup.Id,
             SeasonWeekMatchup = matchup,
             WinnerTeamId = winningMembership.TeamId,
             WinnerTeam = winningMembership.Team,
+            RosterMismatch = rosterMismatch,
         });
 
-        var seasonId = matchup.SeasonWeek.SeasonId;
         var losingTeamId = matchup.TeamOneId == winningMembership.TeamId ? matchup.TeamTwoId : matchup.TeamOneId;
 
         var winnerResult = await db.TeamSeasonResults

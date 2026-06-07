@@ -8,6 +8,8 @@ namespace Bloodsport.Entity.Database
 
         public long Id { get; private set; }
 
+        public bool RosterMismatch { get; set; }
+
         public required long WinnerTeamId { get; set; }
 
         public required long SeasonWeekMatchupId { get; set; }
