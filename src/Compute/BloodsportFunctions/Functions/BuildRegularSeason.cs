@@ -97,6 +97,16 @@ namespace BloodsportFunctions.Functions
             var teamNames = season.SeasonRegistrations.ToDictionary(r => r.TeamId, r => r.Team.Name);
             var matchups = BuildMatchups(weeks, teamIds, teamNames);
             db.SeasonWeekMatchups.AddRange(matchups);
+
+            var seasonResults = teamIds.Select(teamId => new TeamSeasonResult
+            {
+                TeamId = teamId,
+                SeasonId = seasonId,
+                WinCount = 0,
+                LoseCount = 0,
+            });
+            db.TeamSeasonResults.AddRange(seasonResults);
+
             await db.SaveChangesAsync();
 
             _logger.LogInformation("Built {weekCount} weeks and {matchupCount} matchups for season {seasonId} across {teamCount} teams.", WeekCount, matchups.Count, seasonId, teamCount);
