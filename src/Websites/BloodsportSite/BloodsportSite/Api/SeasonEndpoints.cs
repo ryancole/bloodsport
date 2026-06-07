@@ -13,20 +13,19 @@ namespace BloodsportSite.Api
         public static IEndpointRouteBuilder MapSeasons(this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapPost("/seasons/create", CreateAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             endpoints.MapPost("/seasons/{id}/edit", EditAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             endpoints.MapPost("/seasons/{id}/register", RegisterAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
+
+            endpoints.MapPost("/seasons/{id}/unregister", UnregisterAsync)
+                .RequireAuthorization();
 
             endpoints.MapPost("/seasons/{id}/build", BuildAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
 
             return endpoints;
@@ -154,6 +153,44 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect($"/seasons/{id}");
+        }
+
+        // Captain: remove their team's registration from a season while registration is still open
+        private static async Task<IResult> UnregisterAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            [Microsoft.AspNetCore.Mvc.FromForm] long teamId)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect($"/seasons/{id}?error=not_authenticated");
+
+            var season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (season is null)
+                return Results.Redirect($"/teams/{teamId}?error=season_not_found");
+
+            if (!season.RegistrationOpen)
+                return Results.Redirect($"/teams/{teamId}?error=registration_closed");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == teamId && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect($"/teams/{teamId}?error=team_not_found");
+
+            var registration = await db.SeasonRegistrations
+                .FirstOrDefaultAsync(r => r.SeasonId == id && r.TeamId == teamId);
+
+            if (registration is null)
+                return Results.Redirect($"/teams/{teamId}?error=not_registered");
+
+            db.SeasonRegistrations.Remove(registration);
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/teams/{teamId}");
         }
 
         // Admin: build the regular season schedule by queuing the BuildRegularSeason function

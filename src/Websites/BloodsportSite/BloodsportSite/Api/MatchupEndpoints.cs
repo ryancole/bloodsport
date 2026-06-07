@@ -10,8 +10,7 @@ namespace BloodsportSite.Api
         public static IEndpointRouteBuilder MapMatchups(this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapPost("/matchups/{id}/tournament-code", RequestTournamentCodeAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             return endpoints;
         }

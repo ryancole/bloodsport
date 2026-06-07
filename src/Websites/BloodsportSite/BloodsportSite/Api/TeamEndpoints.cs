@@ -9,16 +9,13 @@ namespace BloodsportSite.Api
         public static IEndpointRouteBuilder MapTeams(this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapPost("/teams/create", CreateAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             endpoints.MapPost("/teams/{id}/edit", EditAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             endpoints.MapPost("/teams/{id}/delete", DeleteAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             return endpoints;
         }

@@ -11,12 +11,10 @@ namespace BloodsportSite.Api
         public static IEndpointRouteBuilder MapRiotLink(this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapPost("/riot/link", LinkAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             endpoints.MapPost("/riot/unlink", UnlinkAsync)
-                .RequireAuthorization()
-                .DisableAntiforgery();
+                .RequireAuthorization();
 
             return endpoints;
         }

@@ -35,7 +35,8 @@ else
                     @if (season.SeasonWeeks.Count == 0)
                     {
                         <form method="post" action="/api/seasons/@season.Id/build" style="display:inline">
-                            <button type="submit" class="btn btn-sm btn-outline-primary">Build Season</button>
+                            <AntiforgeryToken />
+                            <button type="submit" class="btn btn-sm btn-outline-primary" disabled="@season.RegistrationOpen">Build Season</button>
                         </form>
                     }
                 </Authorized>
@@ -51,79 +52,83 @@ else
         <dd class="col-sm-10">@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
-    @if (season.RegistrationOpen)
+    @if (season.Status == SeasonStatus.Upcoming)
     {
-        <div class="mb-4">
-            @if (alreadyRegisteredTeams.Count > 0)
-            {
-                <div class="alert alert-success py-2">
-                    @if (alreadyRegisteredTeams.Count == 1)
+        @if (season.RegistrationOpen)
+        {
+            <div class="card border-success mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Registration is Open</h5>
+
+                    @if (alreadyRegisteredTeams.Count > 0)
                     {
-                        <span><strong>@alreadyRegisteredTeams[0].Name</strong> is registered for this season.</span>
+                        <p class="card-text">
+                            @if (alreadyRegisteredTeams.Count == 1)
+                            {
+                                <span><a href="/teams/@alreadyRegisteredTeams[0].Id"><strong>@alreadyRegisteredTeams[0].Name</strong></a> is registered for this season.</span>
+                            }
+                            else
+                            {
+                                <span>Your teams @for (var i = 0; i < alreadyRegisteredTeams.Count; i++)
+                                {
+                                    var team = alreadyRegisteredTeams[i];
+                                    <a href="/teams/@team.Id"><strong>@team.Name</strong></a>
+                                    if (i < alreadyRegisteredTeams.Count - 1)
+                                    {
+                                        <text>, </text>
+                                    }
+                                } are registered for this season.</span>
+                            }
+                        </p>
                     }
-                    else
+
+                    @if (eligibleTeams.Count > 0)
                     {
-                        <span>Your teams <strong>@string.Join(", ", alreadyRegisteredTeams.Select(t => t.Name))</strong> are registered for this season.</span>
+                        <p class="card-text text-muted">Register one of your teams to compete in this season.</p>
+                        <form method="post" action="/api/seasons/@season.Id/register">
+                            <AntiforgeryToken />
+                            <div class="d-flex gap-2 align-items-center">
+                                @if (eligibleTeams.Count == 1)
+                                {
+                                    <input type="hidden" name="teamId" value="@eligibleTeams[0].Id" />
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Register @eligibleTeams[0].Name
+                                    </button>
+                                }
+                                else
+                                {
+                                    <select name="teamId" class="form-select form-select-sm" style="max-width: 250px;">
+                                        @foreach (var team in eligibleTeams)
+                                        {
+                                            <option value="@team.Id">@team.Name</option>
+                                        }
+                                    </select>
+                                    <button type="submit" class="btn btn-success btn-sm">Register</button>
+                                }
+                            </div>
+                        </form>
+                    }
+                    else if (alreadyRegisteredTeams.Count == 0)
+                    {
+                        <p class="card-text text-muted">You don't have any teams eligible to register.</p>
                     }
                 </div>
-            }
-
-            @if (eligibleTeams.Count > 0)
-            {
-                <form method="post" action="/api/seasons/@season.Id/register">
-                    <div class="d-flex gap-2 align-items-center">
-                        @if (eligibleTeams.Count == 1)
-                        {
-                            <input type="hidden" name="teamId" value="@eligibleTeams[0].Id" />
-                            <button type="submit" class="btn btn-success btn-sm">
-                                Register @eligibleTeams[0].Name
-                            </button>
-                        }
-                        else
-                        {
-                            <select name="teamId" class="form-select form-select-sm" style="max-width: 250px;">
-                                @foreach (var team in eligibleTeams)
-                                {
-                                    <option value="@team.Id">@team.Name</option>
-                                }
-                            </select>
-                            <button type="submit" class="btn btn-success btn-sm">Register</button>
-                        }
-                    </div>
-                </form>
-            }
-        </div>
+            </div>
+        }
+        else
+        {
+            <div class="card border-secondary mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Registration is Closed</h5>
+                    <p class="card-text text-muted mb-0">Team registration for this season is not currently open.</p>
+                </div>
+            </div>
+        }
     }
 
-    <h2>Regular Season Weeks</h2>
-
-    @if (season.SeasonWeeks.Count == 0)
+    @if (season.Status == SeasonStatus.Active || season.Status == SeasonStatus.Completed)
     {
-        <p class="text-muted">No weeks scheduled yet.</p>
-    }
-    else
-    {
-        <table class="table mb-4">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Start</th>
-                    <th>End</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var week in season.SeasonWeeks.OrderBy(w => w.Index))
-                {
-                    <tr>
-                        <td>@week.Index</td>
-                        <td><a href="/seasons/@season.Id/weeks/@week.Id">@week.Name</a></td>
-                        <td>@week.DateStart.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                        <td>@week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <SeasonWeeksTable SeasonId="season.Id" Weeks="season.SeasonWeeks" />
     }
 
     @if (season.Status == SeasonStatus.Upcoming)
