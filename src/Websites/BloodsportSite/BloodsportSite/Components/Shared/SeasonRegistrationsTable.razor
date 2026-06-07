@@ -1,0 +1,69 @@
+@using Bloodsport.Entity.Database
+
+@{
+    var sorted = Registrations.OrderBy(r => r.Team.Name).ToList();
+    var totalPages = (int)Math.Ceiling(sorted.Count / (double)PageSize);
+    var page = CurrentPage < 1 ? 1 : CurrentPage;
+    var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="mb-0">Registered Teams</h2>
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(page == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@PageUrl(page - 1)">Previous</a>
+                </li>
+                @for (var p = 1; p <= totalPages; p++)
+                {
+                    var pageNum = p;
+                    <li class="page-item @(page == pageNum ? "active" : "")">
+                        <a class="page-link" href="@PageUrl(pageNum)">@pageNum</a>
+                    </li>
+                }
+                <li class="page-item @(page == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@PageUrl(page + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@if (Registrations.Count == 0)
+{
+    <p class="text-muted">No teams registered yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Team</th>
+                <th>Manager</th>
+                <th>Registered</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reg in pageItems)
+            {
+                <tr>
+                    <td><a href="/teams/@reg.Team.Id">@reg.Team.Name</a></td>
+                    <td><a href="/users/@reg.Team.Manager.Id">@reg.Team.Manager.DisplayName</a></td>
+                    <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private const int PageSize = 20;
+
+    [Parameter, EditorRequired] public long SeasonId { get; set; }
+    [Parameter, EditorRequired] public ICollection<SeasonRegistration> Registrations { get; set; } = [];
+    [Parameter] public int CurrentPage { get; set; } = 1;
+
+    private string PageUrl(int p) => $"/seasons/{SeasonId}?teamsPage={p}";
+}
