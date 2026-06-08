@@ -5,6 +5,7 @@ namespace Bloodsport.Entity.Database
         Upcoming = 0,
         PreSeason = 1,
         Active = 2,
-        Completed = 3
+        Playoffs = 3,
+        Completed = 4
     }
 }
