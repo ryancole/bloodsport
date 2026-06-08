@@ -31,8 +31,8 @@ else
             <tr>
                 <th>Name</th>
                 <th>Status</th>
-                <th>Start</th>
-                <th>End</th>
+                <th>Estimated Start</th>
+                <th>Estimated End</th>
                 <th>Teams</th>
             </tr>
         </thead>
@@ -48,8 +48,8 @@ else
                             <span class="badge bg-success ms-2">Registration Open</span>
                         }
                     </td>
-                    <td>@season.StartDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    <td>@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</td>
+                    <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</td>
                     <td>@season.SeasonRegistrations.Count</td>
                 </tr>
             }

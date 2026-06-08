@@ -87,6 +87,13 @@ namespace BloodsportFunctions.Functions
                 return;
             }
 
+            if (season.EstimatedDateStart is null)
+            {
+                _logger.LogError("Season {seasonId} is missing estimated start date.", seasonId);
+                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "MissingDates", deadLetterErrorDescription: "Season must have EstimatedDateStart set before building.");
+                return;
+            }
+
             _logger.LogInformation("Building {weekCount} weeks for season {seasonId}.", WeekCount, seasonId);
             var weeks = BuildWeeks(season);
             db.SeasonWeeks.AddRange(weeks);
@@ -160,15 +167,15 @@ namespace BloodsportFunctions.Functions
 
         private static List<SeasonWeek> BuildWeeks(Season season)
         {
-            var totalDuration = season.EndDate - season.StartDate;
-            var weekDuration = TimeSpan.FromTicks(totalDuration.Ticks / WeekCount);
+            if (season.EstimatedDateStart is not DateTime dateStart)
+                throw new InvalidOperationException($"Season {season.Id} is missing estimated start date.");
 
             var weeks = new List<SeasonWeek>();
 
             for (int i = 0; i < WeekCount; i++)
             {
-                var weekStart = season.StartDate + TimeSpan.FromTicks(weekDuration.Ticks * i);
-                var weekEnd = i == WeekCount - 1 ? season.EndDate : season.StartDate + TimeSpan.FromTicks(weekDuration.Ticks * (i + 1));
+                var weekStart = dateStart.AddDays(7 * i);
+                var weekEnd = weekStart.AddDays(7);
 
                 weeks.Add(new SeasonWeek
                 {

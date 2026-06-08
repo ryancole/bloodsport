@@ -10,19 +10,19 @@ namespace Bloodsport.Entity.Database
 
         public bool RegistrationOpen { get; set; }
 
+        public long? RiotProviderId { get; set; }
+
+        public long? RiotTournamentId { get; set; }
+
         public required string Name { get; set; }
 
         public SeasonStatus Status { get; set; } = SeasonStatus.Upcoming;
 
-        public DateTime StartDate { get; set; }
+        public DateTime? EstimatedDateEnd { get; set; }
 
-        public DateTime EndDate { get; set; }
+        public DateTime? EstimatedDateStart { get; set; }
 
         public DateTime DateCreated { get; private set; }
-
-        public long? RiotProviderId { get; set; }
-
-        public long? RiotTournamentId { get; set; }
 
         #endregion
 
