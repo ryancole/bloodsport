@@ -55,11 +55,18 @@ else
                         <td>
                             @if (result is not null)
                             {
-                                <span class="badge text-bg-success me-1">Final</span>
-                                <span class="text-muted small">@result.WinnerTeam.Name wins</span>
-                                @if (result.RosterMismatch)
+                                @if (result.DidNotPlay)
                                 {
-                                    <span class="badge text-bg-warning ms-1" title="One or more players did not match the locked season roster">Roster Mismatch</span>
+                                    <span class="badge text-bg-secondary me-1">Did Not Play</span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-success me-1">Final</span>
+                                    <span class="text-muted small">@result.WinnerTeam?.Name wins</span>
+                                    @if (result.RosterMismatch)
+                                    {
+                                        <span class="badge text-bg-warning ms-1" title="One or more players did not match the locked season roster">Roster Mismatch</span>
+                                    }
                                 }
                             }
                         </td>
