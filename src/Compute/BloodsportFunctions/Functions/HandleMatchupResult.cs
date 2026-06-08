@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
-using Bloodsport.Entity.RiotApi;
+using Camille.RiotGames.TournamentV5;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -24,11 +24,11 @@ public class HandleMatchupResult
     [Function("HandleMatchupResult")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
-        RiotTournamentCallbackPayload? payload;
+        TournamentGamesV5? payload;
 
         try
         {
-            payload = await JsonSerializer.DeserializeAsync<RiotTournamentCallbackPayload>(req.Body);
+            payload = await JsonSerializer.DeserializeAsync<TournamentGamesV5>(req.Body);
         }
         catch (JsonException ex)
         {
@@ -42,15 +42,15 @@ public class HandleMatchupResult
             return new BadRequestResult();
         }
 
-        var winningParticipants = payload.Participants.Where(p => p.Win).ToList();
-
-        if (winningParticipants.Count == 0)
+        if (payload.WinningTeam.Length == 0)
         {
-            _logger.LogWarning("Riot callback for {shortCode} contained no winning participants.", payload.ShortCode);
+            _logger.LogWarning("Riot callback for {shortCode} contained no winning team participants.", payload.ShortCode);
             return new OkResult();
         }
 
-        var winningPuuids = winningParticipants.Select(p => p.Puuid).ToHashSet();
+        var winningPuuids = payload.WinningTeam.Select(p => p.Puuid).ToHashSet();
+        var losingPuuids = payload.LosingTeam.Select(p => p.Puuid).ToHashSet();
+        var allPuuids = winningPuuids.Concat(losingPuuids).ToHashSet();
 
         await using var db = await _dbFactory.CreateDbContextAsync();
 
@@ -73,7 +73,6 @@ public class HandleMatchupResult
             return new OkResult();
         }
 
-        // Find a team membership whose RiotAccount PUUID is in the winning side
         var winningMembership = await db.TeamMemberships
             .Include(tm => tm.RiotAccount)
             .Include(tm => tm.Team)
@@ -91,8 +90,6 @@ public class HandleMatchupResult
         }
 
         var seasonId = matchup.SeasonWeek.SeasonId;
-
-        var allPuuids = payload.Participants.Select(p => p.Puuid).ToHashSet();
 
         var participantAccounts = await db.RiotAccounts
             .Where(a => allPuuids.Contains(a.Puuid))
@@ -112,11 +109,16 @@ public class HandleMatchupResult
             ? (JsonSerializer.Deserialize<TeamSeasonRosterJson>(teamTwoRoster.RosterJson)?.AllowedSummonerNames ?? [])
             : (ICollection<string>)[];
 
+        // Winning team maps to the team we resolved as winner; losing team maps to the other.
+        var losingTeamId = matchup.TeamOneId == winningMembership.TeamId ? matchup.TeamTwoId : matchup.TeamOneId;
+        var winnerAllowed = winningMembership.TeamId == matchup.TeamOneId ? teamOneAllowed : teamTwoAllowed;
+        var loserAllowed = losingTeamId == matchup.TeamOneId ? teamOneAllowed : teamTwoAllowed;
+
         var rosterMismatch = false;
 
-        foreach (var participant in payload.Participants)
+        foreach (var puuid in winningPuuids.Concat(losingPuuids))
         {
-            var account = participantAccounts.FirstOrDefault(a => a.Puuid == participant.Puuid);
+            var account = participantAccounts.FirstOrDefault(a => a.Puuid == puuid);
             if (account is null)
             {
                 rosterMismatch = true;
@@ -124,9 +126,9 @@ public class HandleMatchupResult
             }
 
             var summonerName = $"{account.GameName}#{account.TagLine}";
-            var allowedForTeam = participant.Team == 1 ? teamOneAllowed : teamTwoAllowed;
+            var allowed = winningPuuids.Contains(puuid) ? winnerAllowed : loserAllowed;
 
-            if (!allowedForTeam.Contains(summonerName))
+            if (!allowed.Contains(summonerName))
             {
                 rosterMismatch = true;
                 break;
@@ -141,8 +143,6 @@ public class HandleMatchupResult
             WinnerTeam = winningMembership.Team,
             RosterMismatch = rosterMismatch,
         });
-
-        var losingTeamId = matchup.TeamOneId == winningMembership.TeamId ? matchup.TeamTwoId : matchup.TeamOneId;
 
         var winnerResult = await db.TeamSeasonResults
             .FirstOrDefaultAsync(r => r.TeamId == winningMembership.TeamId && r.SeasonId == seasonId);
