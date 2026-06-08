@@ -30,7 +30,7 @@ public class EndRegularSeasonWeek
             .Include(w => w.Season)
             .Include(w => w.SeasonWeekMatchups)
                 .ThenInclude(m => m.SeasonWeekMatchupResult)
-            .Where(w => w.Season.Status == SeasonStatus.Active && w.DateEnd < now)
+            .Where(w => w.Season.Status == SeasonStatus.Active && w.DateEnd < now && !w.HasBeenEnded)
             .ToListAsync();
 
         var resultsAdded = 0;
@@ -51,6 +51,8 @@ public class EndRegularSeasonWeek
 
                 resultsAdded++;
             }
+
+            week.HasBeenEnded = true;
         }
 
         if (resultsAdded > 0)

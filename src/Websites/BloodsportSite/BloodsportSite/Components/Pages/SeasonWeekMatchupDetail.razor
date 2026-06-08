@@ -32,7 +32,7 @@ else
     <p class="text-muted small mb-4">@matchup.SeasonWeek.DateStart.ToLocalTime().ToString("MMMM d, yyyy") – @matchup.SeasonWeek.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</p>
 
     @* Tournament Lobby *@
-    @if (matchup.SeasonWeek.DateEnd >= DateTime.UtcNow)
+    @if (!matchup.SeasonWeek.HasBeenEnded)
     {
     <div class="card border-0 bg-body-secondary rounded-3 mb-4 p-4">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
@@ -69,7 +69,7 @@ else
             </div>
             @if (isManager && matchup.TournamentCode is null)
             {
-                @if (matchup.SeasonWeek.DateEnd < DateTime.UtcNow)
+                @if (matchup.SeasonWeek.HasBeenEnded)
                 {
                     <div class="text-muted small">This week has ended — lobby codes can no longer be generated.</div>
                 }
@@ -102,16 +102,9 @@ else
     {
         <MatchupResultCard Result="result" />
     }
-    else if (matchup.SeasonWeek.DateEnd < DateTime.UtcNow)
+    else if (matchup.TournamentCode is not null && !matchup.SeasonWeek.HasBeenEnded)
     {
         <MatchupPendingResultAlert />
-    }
-    else if (matchup.TournamentCode is not null)
-    {
-        <div class="card border-0 bg-body-secondary rounded-3 mb-4 p-4 text-center">
-            <div class="text-uppercase fw-semibold small text-muted letter-spacing-1 mb-1">Match Result</div>
-            <div class="fs-5 fw-medium text-muted mt-1">Awaiting results&hellip;</div>
-        </div>
     }
 
     @* Teams *@
