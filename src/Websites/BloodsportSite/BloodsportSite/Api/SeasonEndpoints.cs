@@ -30,6 +30,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/seasons/{id}/start", StartAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/seasons/{id}/start-playoffs", StartPlayoffsAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -224,6 +227,24 @@ namespace BloodsportSite.Api
             await using var sender = serviceBusClient.CreateSender("start-regular-season");
 
             var payload = JsonSerializer.Serialize(new StartRegularSeasonMessage { SeasonId = id });
+
+            await sender.SendMessageAsync(new ServiceBusMessage(payload));
+
+            return Results.Redirect($"/seasons/{id}");
+        }
+
+        // Admin: start playoffs by queuing the BuildPlayoffBracket function
+        private static async Task<IResult> StartPlayoffsAsync(
+            HttpContext context,
+            ServiceBusClient serviceBusClient,
+            long id)
+        {
+            if (!context.User.IsInRole("Bloodsport.Admin"))
+                return Results.Forbid();
+
+            await using var sender = serviceBusClient.CreateSender("build-playoff-bracket");
+
+            var payload = JsonSerializer.Serialize(new BuildPlayoffBracketMessage { SeasonId = id });
 
             await sender.SendMessageAsync(new ServiceBusMessage(payload));
 
