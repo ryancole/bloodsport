@@ -8,9 +8,11 @@ namespace Bloodsport.Entity.Database
 
         public long Id { get; private set; }
 
+        public bool DidNotPlay { get; set; }    
+
         public bool RosterMismatch { get; set; }
 
-        public required long WinnerTeamId { get; set; }
+        public long? WinnerTeamId { get; set; }
 
         public required long SeasonWeekMatchupId { get; set; }
 
@@ -21,7 +23,7 @@ namespace Bloodsport.Entity.Database
         #region Nav props
 
         [JsonIgnore]
-        public virtual required Team WinnerTeam { get; set; }
+        public virtual Team? WinnerTeam { get; set; }
 
         [JsonIgnore]
         public virtual required SeasonWeekMatchup SeasonWeekMatchup { get; set; }

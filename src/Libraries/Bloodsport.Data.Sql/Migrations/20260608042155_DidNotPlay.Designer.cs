@@ -4,6 +4,7 @@ using Bloodsport.Data.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    partial class SqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608042155_DidNotPlay")]
+    partial class DidNotPlay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,9 +155,6 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.Property<DateTime>("DateStart")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("HasBeenEnded")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Index")
                         .HasColumnType("int");

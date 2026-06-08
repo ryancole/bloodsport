@@ -26,8 +26,7 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
                 .HasOne(r => r.WinnerTeam)
                 .WithMany(r => r.SeasonWeekMatchupResults)
                 .HasForeignKey(r => r.WinnerTeamId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         #endregion
