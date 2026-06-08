@@ -52,6 +52,9 @@ namespace BloodsportSite.Api
             if (matchup.TournamentCode is not null)
                 return Results.Redirect(MatchupUrl(matchup));
 
+            if (matchup.SeasonWeek.DateEnd < DateTime.UtcNow)
+                return Results.Redirect($"{MatchupUrl(matchup)}?error=week_ended");
+
             var season = matchup.SeasonWeek.Season;
 
             if (season.RiotTournamentId is null)
