@@ -90,7 +90,16 @@ else
                                 @result.SeasonWeekMatchup.Name
                             </a>
                         </td>
-                        <td><a href="/teams/@result.WinnerTeamId">@result.WinnerTeam.Name</a></td>
+                        <td>
+                            @if (result.WinnerTeam is not null)
+                            {
+                                <a href="/teams/@result.WinnerTeamId">@result.WinnerTeam.Name</a>
+                            }
+                            else
+                            {
+                                <span>Did Not Play</span>
+                            }
+                        </td>
                         <td>@result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>
                 }

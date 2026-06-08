@@ -11,20 +11,25 @@ else
     <table class="table mb-4">
         <thead>
             <tr>
-                <th>#</th>
                 <th>Name</th>
                 <th>Start</th>
                 <th>End</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var week in Weeks.OrderBy(w => w.Index))
             {
                 <tr>
-                    <td>@week.Index</td>
                     <td><a href="/seasons/@SeasonId/weeks/@week.Id">@week.Name</a></td>
                     <td>@week.DateStart.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     <td>@week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>
+                        @if (week.HasBeenEnded)
+                        {
+                            <span class="badge bg-secondary">Closed</span>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
