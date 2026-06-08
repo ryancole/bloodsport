@@ -10,6 +10,8 @@ namespace Bloodsport.Entity.Database
 
         public required long SeasonId { get; set; }  
 
+        public bool HasBeenEnded { get; set; }
+
         public required int Index { get; set; }
 
         public required string Name { get; set;  }
