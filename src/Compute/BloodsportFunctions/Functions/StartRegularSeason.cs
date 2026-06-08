@@ -50,7 +50,9 @@ public class StartRegularSeason
 
         await using var db = await _dbFactory.CreateDbContextAsync();
 
-        var season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == seasonId);
+        var season = await db.Seasons
+            .Include(s => s.SeasonWeeks)
+            .FirstOrDefaultAsync(s => s.Id == seasonId);
 
         if (season is null)
         {
@@ -94,6 +96,10 @@ public class StartRegularSeason
                 });
             }
         }
+
+        var lastWeek = season.SeasonWeeks.OrderByDescending(w => w.Index).FirstOrDefault();
+        if (lastWeek is not null)
+            season.EstimatedDateEnd = lastWeek.DateEnd;
 
         season.Status = SeasonStatus.Active;
 

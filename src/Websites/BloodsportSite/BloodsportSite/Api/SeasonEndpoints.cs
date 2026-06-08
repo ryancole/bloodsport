@@ -41,8 +41,7 @@ namespace BloodsportSite.Api
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string name,
-            [Microsoft.AspNetCore.Mvc.FromForm] DateTime startDate,
-            [Microsoft.AspNetCore.Mvc.FromForm] DateTime endDate)
+            [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
         {
             if (!context.User.IsInRole("Bloodsport.Admin"))
                 return Results.Forbid();
@@ -52,16 +51,14 @@ namespace BloodsportSite.Api
             if (string.IsNullOrEmpty(name))
                 return Results.Redirect("/seasons/create?error=invalid_name");
 
-            if (endDate <= startDate)
-                return Results.Redirect("/seasons/create?error=invalid_dates");
+            DateTime? parsedStartDate = DateTime.TryParse(startDate, out var d) ? d : null;
 
             await using var db = dbFactory.CreateDbContext();
 
             var season = new Season
             {
                 Name = name,
-                EstimatedDateStart = startDate,
-                EstimatedDateEnd = endDate,
+                EstimatedDateStart = parsedStartDate,
             };
 
             db.Seasons.Add(season);
@@ -93,7 +90,8 @@ namespace BloodsportSite.Api
             IDbContextFactory<SqlDbContext> dbFactory,
             long id,
             [Microsoft.AspNetCore.Mvc.FromForm] SeasonStatus status,
-            [Microsoft.AspNetCore.Mvc.FromForm] bool? registrationOpen = null)
+            [Microsoft.AspNetCore.Mvc.FromForm] bool? registrationOpen = null,
+            [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
         {
             if (!context.User.IsInRole("Bloodsport.Admin"))
                 return Results.Forbid();
@@ -106,6 +104,7 @@ namespace BloodsportSite.Api
 
             season.Status = status;
             season.RegistrationOpen = registrationOpen ?? false;
+            season.EstimatedDateStart = DateTime.TryParse(startDate, out var d) ? d : null;
 
             await db.SaveChangesAsync();
 

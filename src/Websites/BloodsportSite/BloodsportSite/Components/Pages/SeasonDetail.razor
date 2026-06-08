@@ -55,10 +55,10 @@ else
             <SeasonRegistrationBadge IsOpen="season.RegistrationOpen" />
         </dd>
 
-        <dt class="col-sm-2">Start</dt>
+        <dt class="col-sm-2">Estimated Start</dt>
         <dd class="col-sm-10">@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
 
-        <dt class="col-sm-2">End</dt>
+        <dt class="col-sm-2">Estimated End</dt>
         <dd class="col-sm-10">@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
     </dl>
 

@@ -87,10 +87,10 @@ namespace BloodsportFunctions.Functions
                 return;
             }
 
-            if (season.EstimatedDateStart is null || season.EstimatedDateEnd is null)
+            if (season.EstimatedDateStart is null)
             {
-                _logger.LogError("Season {seasonId} is missing estimated start or end date.", seasonId);
-                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "MissingDates", deadLetterErrorDescription: "Season must have both EstimatedDateStart and EstimatedDateEnd set before building.");
+                _logger.LogError("Season {seasonId} is missing estimated start date.", seasonId);
+                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "MissingDates", deadLetterErrorDescription: "Season must have EstimatedDateStart set before building.");
                 return;
             }
 
@@ -167,18 +167,15 @@ namespace BloodsportFunctions.Functions
 
         private static List<SeasonWeek> BuildWeeks(Season season)
         {
-            if (season.EstimatedDateStart is not DateTime dateStart || season.EstimatedDateEnd is not DateTime dateEnd)
-                throw new InvalidOperationException($"Season {season.Id} is missing estimated start or end date.");
-
-            var totalDuration = dateEnd - dateStart;
-            var weekDuration = TimeSpan.FromTicks(totalDuration.Ticks / WeekCount);
+            if (season.EstimatedDateStart is not DateTime dateStart)
+                throw new InvalidOperationException($"Season {season.Id} is missing estimated start date.");
 
             var weeks = new List<SeasonWeek>();
 
             for (int i = 0; i < WeekCount; i++)
             {
-                var weekStart = dateStart + TimeSpan.FromTicks(weekDuration.Ticks * i);
-                var weekEnd = i == WeekCount - 1 ? dateEnd : dateStart + TimeSpan.FromTicks(weekDuration.Ticks * (i + 1));
+                var weekStart = dateStart.AddDays(7 * i);
+                var weekEnd = weekStart.AddDays(7);
 
                 weeks.Add(new SeasonWeek
                 {
