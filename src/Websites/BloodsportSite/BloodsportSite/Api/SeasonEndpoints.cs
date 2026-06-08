@@ -60,8 +60,8 @@ namespace BloodsportSite.Api
             var season = new Season
             {
                 Name = name,
-                StartDate = startDate,
-                EndDate = endDate,
+                EstimatedDateStart = startDate,
+                EstimatedDateEnd = endDate,
             };
 
             db.Seasons.Add(season);

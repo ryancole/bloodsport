@@ -41,7 +41,7 @@ else
                                 </div>
                             </div>
                             <p class="card-text text-muted small mb-2">
-                                @season.StartDate.ToLocalTime().ToString("MMMM d, yyyy") – @season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")
+                                @(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD") – @(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")
                             </p>
                             <p class="card-text small">
                                 <strong>@season.SeasonRegistrations.Count</strong> team@(season.SeasonRegistrations.Count == 1 ? "" : "s") registered
@@ -110,7 +110,7 @@ else
         seasons = await db.Seasons
             .Include(s => s.SeasonRegistrations)
             .Where(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)
-            .OrderBy(s => s.StartDate)
+            .OrderBy(s => s.EstimatedDateStart)
             .ToListAsync();
 
         recentResults = await db.SeasonWeekMatchupResults

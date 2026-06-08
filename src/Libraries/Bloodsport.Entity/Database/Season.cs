@@ -18,6 +18,10 @@ namespace Bloodsport.Entity.Database
 
         public SeasonStatus Status { get; set; } = SeasonStatus.Upcoming;
 
+        public DateTime? EstimatedDateEnd { get; set; }
+
+        public DateTime? EstimatedDateStart { get; set; }
+
         public DateTime DateCreated { get; private set; }
 
         #endregion

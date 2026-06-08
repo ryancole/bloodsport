@@ -48,8 +48,8 @@ else
                             <span class="badge bg-success ms-2">Registration Open</span>
                         }
                     </td>
-                    <td>@season.StartDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    <td>@season.EndDate.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</td>
+                    <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</td>
                     <td>@season.SeasonRegistrations.Count</td>
                 </tr>
             }

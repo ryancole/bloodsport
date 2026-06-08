@@ -141,7 +141,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var reg in team.SeasonRegistrations.OrderByDescending(r => r.Season.StartDate))
+                @foreach (var reg in team.SeasonRegistrations.OrderByDescending(r => r.Season.EstimatedDateStart))
                 {
                     <tr>
                         <td><a href="/seasons/@reg.Season.Id">@reg.Season.Name</a></td>
@@ -229,7 +229,7 @@ else
             .Include(m => m.SeasonWeek)
                 .ThenInclude(w => w.Season)
             .Where(m => m.TeamOneId == Id || m.TeamTwoId == Id)
-            .OrderByDescending(m => m.SeasonWeek.Season.StartDate)
+            .OrderByDescending(m => m.SeasonWeek.Season.EstimatedDateStart)
                 .ThenBy(m => m.SeasonWeek.Index)
             .ToListAsync();
 
