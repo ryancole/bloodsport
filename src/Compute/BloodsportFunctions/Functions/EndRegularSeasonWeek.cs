@@ -18,7 +18,7 @@ public class EndRegularSeasonWeek
     }
 
     [Function("EndRegularSeasonWeek")]
-    public async Task Run([TimerTrigger("0 0 0 * * *")] TimerInfo myTimer)
+    public async Task Run([TimerTrigger("0 0 * * * *")] TimerInfo myTimer)
     {
         _logger.LogInformation("EndRegularSeasonWeek triggered at: {executionTime}", DateTime.UtcNow);
 
