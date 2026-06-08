@@ -66,10 +66,17 @@ else
             </div>
             @if (isManager && matchup.TournamentCode is null)
             {
-                <form method="post" action="/api/matchups/@matchup.Id/tournament-code">
-                    <AntiforgeryToken />
-                    <button type="submit" class="btn btn-primary px-4">Generate Lobby Code</button>
-                </form>
+                @if (matchup.SeasonWeek.DateEnd < DateTime.UtcNow)
+                {
+                    <div class="text-muted small">This week has ended — lobby codes can no longer be generated.</div>
+                }
+                else
+                {
+                    <form method="post" action="/api/matchups/@matchup.Id/tournament-code">
+                        <AntiforgeryToken />
+                        <button type="submit" class="btn btn-primary px-4">Generate Lobby Code</button>
+                    </form>
+                }
             }
         </div>
         @if (error == "tournament_not_configured")
@@ -118,7 +125,7 @@ else
     </div>
     <div class="row g-0 mb-4 align-items-stretch">
         <div class="col-md-5">
-            <TeamSeasonRosterCard TeamId="@matchup.TeamOne.Id" TeamName="@matchup.TeamOne.Name" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-primary-subtle text-primary-emphasis" />
+            <TeamSeasonRosterCard TeamId="@matchup.TeamOne.Id" TeamName="@matchup.TeamOne.Name" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-primary-subtle text-primary-emphasis" UserIds="@rosterUserIds" />
         </div>
 
         <div class="col-md-2 d-flex align-items-center justify-content-center py-4">
@@ -126,7 +133,7 @@ else
         </div>
 
         <div class="col-md-5">
-            <TeamSeasonRosterCard TeamId="@matchup.TeamTwo.Id" TeamName="@matchup.TeamTwo.Name" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-danger-subtle text-danger-emphasis" />
+            <TeamSeasonRosterCard TeamId="@matchup.TeamTwo.Id" TeamName="@matchup.TeamTwo.Name" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-danger-subtle text-danger-emphasis" UserIds="@rosterUserIds" />
         </div>
     </div>
 }
@@ -143,6 +150,7 @@ else
     private string? error;
     private ICollection<string> teamOneRoster = [];
     private ICollection<string> teamTwoRoster = [];
+    private Dictionary<string, long> rosterUserIds = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -180,6 +188,12 @@ else
 
         teamOneRoster = ParseRoster(rosters.FirstOrDefault(r => r.TeamId == matchup.TeamOneId));
         teamTwoRoster = ParseRoster(rosters.FirstOrDefault(r => r.TeamId == matchup.TeamTwoId));
+
+        var allSummonerNames = teamOneRoster.Concat(teamTwoRoster).ToHashSet();
+        var accounts = await db.RiotAccounts
+            .Where(a => allSummonerNames.Contains(a.GameName + "#" + a.TagLine))
+            .ToListAsync();
+        rosterUserIds = accounts.ToDictionary(a => $"{a.GameName}#{a.TagLine}", a => a.UserId);
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var oid = authState.User.FindFirst("oid")?.Value
