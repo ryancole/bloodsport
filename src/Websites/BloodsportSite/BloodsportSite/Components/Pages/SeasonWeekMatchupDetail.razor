@@ -28,7 +28,8 @@ else
     </nav>
 
     <h1 class="mb-1">@matchup.TeamOne.Name vs @matchup.TeamTwo.Name</h1>
-    <p class="text-muted mb-4">@matchup.SeasonWeek.Name &mdash; @matchup.SeasonWeek.Season.Name</p>
+    <p class="text-muted mb-1">@matchup.SeasonWeek.Name &mdash; @matchup.SeasonWeek.Season.Name</p>
+    <p class="text-muted small mb-4">@matchup.SeasonWeek.DateStart.ToLocalTime().ToString("MMMM d, yyyy") – @matchup.SeasonWeek.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</p>
 
     @* Tournament Lobby *@
     <div class="card border-0 bg-body-secondary rounded-3 mb-4 p-4">
@@ -90,27 +91,13 @@ else
     </div>
 
     @* Result *@
-    @if (matchup.TournamentCode is not null && matchup.SeasonWeekMatchupResult is { } result)
+    @if (result is not null)
     {
-        <div class="card border-0 bg-success-subtle rounded-3 mb-3 p-4 text-center">
-            <div class="text-uppercase fw-semibold small text-success-emphasis letter-spacing-1 mb-1">Match Result</div>
-            <div class="fs-3 fw-bold text-success-emphasis">@result.WinnerTeam.Name</div>
-            <div class="small text-muted mt-1">Winner &mdash; recorded @result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</div>
-        </div>
-        @if (result.RosterMismatch)
-        {
-            <div class="alert alert-warning mb-5">
-                <strong>Roster Mismatch Detected:</strong> One or more players in this match did not match the locked season roster for their team. This result may be subject to review.
-            </div>
-        }
-        else
-        {
-            <div class="mb-5"></div>
-        }
+        <MatchupResultCard Result="result" />
     }
     else if (matchup.TournamentCode is not null)
     {
-        <div class="card border-0 bg-body-secondary rounded-3 mb-5 p-4 text-center">
+        <div class="card border-0 bg-body-secondary rounded-3 mb-4 p-4 text-center">
             <div class="text-uppercase fw-semibold small text-muted letter-spacing-1 mb-1">Match Result</div>
             <div class="fs-5 fw-medium text-muted mt-1">Awaiting results&hellip;</div>
         </div>
@@ -144,6 +131,7 @@ else
     [Parameter] public long MatchupId { get; set; }
 
     private SeasonWeekMatchup? matchup;
+    private SeasonWeekMatchupResult? result;
     private bool notFound;
     private bool isManager;
     private bool isMember;
@@ -166,9 +154,11 @@ else
             .Include(m => m.TeamTwo)
             .Include(m => m.SeasonWeek)
                 .ThenInclude(w => w.Season)
-            .Include(m => m.SeasonWeekMatchupResult)
-                .ThenInclude(r => r.WinnerTeam)
             .FirstOrDefaultAsync(m => m.Id == MatchupId && m.SeasonWeekId == WeekId);
+
+        result = await db.SeasonWeekMatchupResults
+            .Include(r => r.WinnerTeam)
+            .FirstOrDefaultAsync(r => r.SeasonWeekMatchupId == MatchupId);
 
         if (matchup is null)
         {
