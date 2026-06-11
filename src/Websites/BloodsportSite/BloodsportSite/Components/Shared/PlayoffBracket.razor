@@ -1,0 +1,99 @@
+@using Bloodsport.Entity.Database
+
+@{
+    // highest round number = first round played
+    var roundGroups = Matchups
+        .GroupBy(m => m.Round)
+        .OrderByDescending(g => g.Key)
+        .ToList();
+    int totalRounds = roundGroups.Count;
+}
+
+@if (!Matchups.Any())
+{
+    <p class="text-muted fst-italic">Bracket has not been built yet.</p>
+}
+else
+{
+    <div class="playoff-bracket-outer">
+
+        @* Header row: round labels *@
+        <div class="bracket-header">
+            @for (int ri = 0; ri < roundGroups.Count; ri++)
+            {
+                var group = roundGroups[ri];
+                <div class="bracket-col-label">@RoundLabel(group.Key, totalRounds)</div>
+                @if (ri < roundGroups.Count - 1)
+                {
+                    <div class="bracket-connector-spacer"></div>
+                }
+            }
+        </div>
+
+        @* Body row: matchup slots interleaved with connector columns *@
+        <div class="bracket-body">
+            @for (int ri = 0; ri < roundGroups.Count; ri++)
+            {
+                var group = roundGroups[ri];
+                var matchups = group.OrderBy(m => m.MatchNumber).ToList();
+                bool isFirstRound = ri == 0;
+                bool isLastRound = ri == roundGroups.Count - 1;
+
+                <div class="bracket-slots">
+                    @foreach (var matchup in matchups)
+                    {
+                        <div class="bracket-slot @(isFirstRound ? "" : "has-left-stub")">
+                            <div class="bracket-card">
+                                @TeamRow(matchup.TeamOne, matchup.WinningTeamId.HasValue && matchup.WinningTeamId == matchup.TeamOneId)
+                                @TeamRow(matchup.TeamTwo, matchup.WinningTeamId.HasValue && matchup.WinningTeamId == matchup.TeamTwoId)
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (!isLastRound)
+                {
+                    @* One connector-pair per two matchups in this round.
+                       Each pair has flex:2, so it spans the same vertical space as two adjacent slots.
+                       The ::before line runs from 25%–75% of the pair height, which aligns exactly
+                       with the vertical centres of those two slots. *@
+                    <div class="bracket-connector-col">
+                        @for (int pi = 0; pi < matchups.Count / 2; pi++)
+                        {
+                            <div class="connector-pair"></div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+    </div>
+}
+
+@code {
+    [Parameter] public List<PlayoffMatchup> Matchups { get; set; } = [];
+
+    private static string RoundLabel(int round, int totalRounds) => round switch
+    {
+        1 => "Final",
+        2 => "Semifinals",
+        3 => "Quarterfinals",
+        _ => $"Round of {(int)Math.Pow(2, round)}"
+    };
+
+    private RenderFragment TeamRow(PlayoffTeam? team, bool isWinner) => __builder =>
+    {
+        <div class="@("bracket-team" + (isWinner ? " winner" : ""))">
+            @if (team is not null)
+            {
+                <span class="bracket-seed">@team.Seed</span>
+                <span class="bracket-name">@(team.Team?.Name ?? "Unknown")</span>
+            }
+            else
+            {
+                <span class="bracket-seed text-muted">—</span>
+                <span class="bracket-name text-muted">TBD</span>
+            }
+        </div>
+    };
+}

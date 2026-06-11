@@ -118,7 +118,7 @@ else
 
         seasons = await db.Seasons
             .Include(s => s.SeasonRegistrations)
-            .Where(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming || s.Status == SeasonStatus.PreSeason || s.Status == SeasonStatus.Playoffs)
+            .Where(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming || s.Status == SeasonStatus.PreSeason)
             .OrderBy(s => s.EstimatedDateStart)
             .ToListAsync();
 
@@ -135,7 +135,6 @@ else
     private static string StatusBadgeClass(SeasonStatus status) => status switch
     {
         SeasonStatus.Active => "bg-primary",
-        SeasonStatus.Playoffs => "bg-warning text-dark",
         SeasonStatus.PreSeason => "bg-info text-dark",
         SeasonStatus.Upcoming => "bg-secondary",
         SeasonStatus.Completed => "bg-dark",

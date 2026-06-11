@@ -30,7 +30,7 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/seasons/{id}/start", StartAsync)
                 .RequireAuthorization();
 
-            endpoints.MapPost("/seasons/{id}/start-playoffs", StartPlayoffsAsync)
+            endpoints.MapPost("/seasons/{id}/create-playoffs", CreatePlayoffsAsync)
                 .RequireAuthorization();
 
             return endpoints;
@@ -233,22 +233,37 @@ namespace BloodsportSite.Api
             return Results.Redirect($"/seasons/{id}");
         }
 
-        // Admin: start playoffs by queuing the BuildPlayoffBracket function
-        private static async Task<IResult> StartPlayoffsAsync(
+        // Admin: create a Playoff record for a completed season and redirect to its detail page
+        private static async Task<IResult> CreatePlayoffsAsync(
             HttpContext context,
-            ServiceBusClient serviceBusClient,
+            IDbContextFactory<SqlDbContext> dbFactory,
             long id)
         {
             if (!context.User.IsInRole("Bloodsport.Admin"))
                 return Results.Forbid();
 
-            await using var sender = serviceBusClient.CreateSender("build-playoff-bracket");
+            await using var db = dbFactory.CreateDbContext();
 
-            var payload = JsonSerializer.Serialize(new BuildPlayoffBracketMessage { SeasonId = id });
+            var season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == id);
 
-            await sender.SendMessageAsync(new ServiceBusMessage(payload));
+            if (season is null)
+                return Results.Redirect("/seasons?error=season_not_found");
 
-            return Results.Redirect($"/seasons/{id}");
+            if (season.Status != SeasonStatus.Completed)
+                return Results.Redirect($"/seasons/{id}?error=invalid_season_status");
+
+            var playoff = new Playoff
+            {
+                SeasonId = id,
+                Season = season,
+                Name = $"{season.Name} Playoffs",
+                Status = PlayoffStatus.Pending,
+            };
+
+            db.Playoffs.Add(playoff);
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/playoffs/{playoff.Id}");
         }
 
         private static async Task<User?> GetCurrentUserAsync(HttpContext context, SqlDbContext db)

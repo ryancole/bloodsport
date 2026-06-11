@@ -46,67 +46,91 @@ public class BuildPlayoffBracket
             return;
         }
 
-        var seasonId = payload.SeasonId;
-
         await using var db = await _dbFactory.CreateDbContextAsync();
 
-        var season = await db.Seasons
-            .Include(s => s.TeamSeasonResults)
-                .ThenInclude(r => r.Team)
-            .FirstOrDefaultAsync(s => s.Id == seasonId);
+        var playoff = await db.Playoffs
+            .Include(p => p.Season)
+                .ThenInclude(s => s.TeamSeasonResults)
+                    .ThenInclude(r => r.Team)
+            .FirstOrDefaultAsync(p => p.Id == payload.PlayoffId);
 
-        if (season is null)
+        if (playoff is null)
         {
-            _logger.LogError("Season {seasonId} not found.", seasonId);
-            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "SeasonNotFound", deadLetterErrorDescription: $"Season {seasonId} does not exist.");
+            _logger.LogError("Playoff {playoffId} not found.", payload.PlayoffId);
+            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "PlayoffNotFound", deadLetterErrorDescription: $"Playoff {payload.PlayoffId} does not exist.");
             return;
         }
 
-        if (season.Status != SeasonStatus.Active)
-        {
-            _logger.LogError("Season {seasonId} is not Active (current status: {status}).", seasonId, season.Status);
-            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InvalidSeasonStatus", deadLetterErrorDescription: $"Season must be Active to build a playoff bracket. Current status: {season.Status}.");
-            return;
-        }
+        var allTeams = playoff.Season.TeamSeasonResults
+            .OrderByDescending(r => r.WinCount)
+            .ThenBy(r => r.LoseCount)
+            .ToList();
 
-        int totalTeams = season.TeamSeasonResults.Count;
+        int totalTeams = allTeams.Count;
 
         if (totalTeams < 2)
         {
-            _logger.LogError("Season {seasonId} has fewer than 2 team results ({count}).", seasonId, totalTeams);
+            _logger.LogError("Season {seasonId} has fewer than 2 team results ({count}). Cannot seed a playoff bracket.", playoff.SeasonId, totalTeams);
             await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InsufficientTeams", deadLetterErrorDescription: "At least 2 teams must have season results to build a playoff bracket.");
             return;
         }
 
-        int bracketSize = ComputeBracketSize(totalTeams);
-        int roundCount = (int)Math.Log2(bracketSize);
+        // Take the top 50% of teams, floored to the nearest power of 2.
+        // A power-of-2 bracket size is required for clean single-elimination without byes.
+        int half = (int)Math.Floor(totalTeams / 2.0);
+        int bracketSize = 1;
+        while (bracketSize * 2 <= half)
+            bracketSize *= 2;
+
+        // Minimum bracket size is 2.
+        bracketSize = Math.Max(bracketSize, 2);
+
+        var qualifiedTeams = allTeams.Take(bracketSize).ToList();
 
         _logger.LogInformation(
-            "Building {bracketSize}-team single-elimination bracket for season {seasonId} ({roundCount} rounds). Total teams: {totalTeams}.",
-            bracketSize, seasonId, roundCount, totalTeams);
+            "Playoff {playoffId} (Season {seasonId}): {total} total teams, {count} qualify for playoffs (bracket size: {bracketSize}).",
+            playoff.Id, playoff.SeasonId, totalTeams, bracketSize, bracketSize);
 
-        var seededTeams = season.TeamSeasonResults
-            .OrderByDescending(r => r.WinCount)
-            .ThenBy(r => r.LoseCount)
-            .Take(bracketSize)
+        // --- Seed PlayoffTeam records ---
+
+        var playoffTeams = qualifiedTeams
+            .Select((result, index) => new PlayoffTeam
+            {
+                PlayoffId = playoff.Id,
+                Playoff = playoff,
+                TeamId = result.TeamId,
+                Team = result.Team,
+                Seed = index + 1,
+            })
             .ToList();
 
-        // Create all matchup slots for every round, from last round to first so that
-        // NextMatchupId FKs can be wired after the first flush (target rows need DB IDs first).
+        db.PlayoffTeams.AddRange(playoffTeams);
+        await db.SaveChangesAsync(); // flush to get DB-generated IDs
+
+        _logger.LogInformation(
+            "Inserted {count} PlayoffTeam records for playoff {playoffId}.",
+            playoffTeams.Count, playoff.Id);
+
+        // --- Build bracket matchup slots ---
+        // Round 1 = grand final (1 matchup). Round roundCount = first round played (bracketSize/2 matchups).
+        // Matchups per round: 2^(round - 1).
+
+        int roundCount = (int)Math.Log2(bracketSize);
+
         var allMatchups = new List<PlayoffMatchup>();
 
         for (int round = roundCount; round >= 1; round--)
         {
             int matchupsInRound = (int)Math.Pow(2, round - 1);
 
-            for (int position = 0; position < matchupsInRound; position++)
+            for (int matchNumber = 0; matchNumber < matchupsInRound; matchNumber++)
             {
                 allMatchups.Add(new PlayoffMatchup
                 {
-                    SeasonId = seasonId,
-                    Season = season,
+                    PlayoffId = playoff.Id,
+                    Playoff = playoff,
                     Round = round,
-                    Position = position,
+                    MatchNumber = matchNumber,
                 });
             }
         }
@@ -114,47 +138,40 @@ public class BuildPlayoffBracket
         db.PlayoffMatchups.AddRange(allMatchups);
         await db.SaveChangesAsync(); // flush to get DB-generated IDs
 
-        // Index by (round, position) for easy lookup.
-        var matchupIndex = allMatchups.ToDictionary(m => (m.Round, m.Position));
+        // --- Wire NextMatchupId ---
+        // A matchup at (round R, matchNumber M) advances to (round R-1, matchNumber M/2).
+        // Round 1 is the grand final — no next matchup.
 
-        // Wire NextMatchupId: a matchup at (round R, position P) feeds into (round R+1, position P/2).
+        var matchupIndex = allMatchups.ToDictionary(m => (m.Round, m.MatchNumber));
+
         foreach (var matchup in allMatchups)
         {
-            if (matchup.Round == roundCount)
-                continue; // Grand Final has no next matchup
+            if (matchup.Round == 1)
+                continue;
 
-            var next = matchupIndex[(matchup.Round + 1, matchup.Position / 2)];
+            var next = matchupIndex[(matchup.Round - 1, matchup.MatchNumber / 2)];
             matchup.NextMatchupId = next.Id;
         }
 
-        // Populate first-round teams using standard seeding: seed 1 vs seed N, seed 2 vs seed N-1, etc.
-        // TeamOneId = higher seed (lower index).
-        int n = seededTeams.Count;
-        for (int i = 0; i < n / 2; i++)
-        {
-            var matchup = matchupIndex[(1, i)];
-            matchup.TeamOneId = seededTeams[i].TeamId;
-            matchup.TeamTwoId = seededTeams[n - 1 - i].TeamId;
-        }
+        // --- Seed first-round matchups using 1-vs-N method ---
+        // First round is round roundCount. Pairing: match M gets seed (M+1) vs seed (bracketSize-M).
+        // e.g. for 8 teams: match 0 → seed 1 vs 8, match 1 → seed 2 vs 7, match 2 → seed 3 vs 6, match 3 → seed 4 vs 5.
 
-        season.Status = SeasonStatus.Playoffs;
+        var seedIndex = playoffTeams.ToDictionary(pt => pt.Seed);
+
+        for (int m = 0; m < bracketSize / 2; m++)
+        {
+            var matchup = matchupIndex[(roundCount, m)];
+            matchup.TeamOneId = seedIndex[m + 1].Id;
+            matchup.TeamTwoId = seedIndex[bracketSize - m].Id;
+        }
 
         await db.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Built {bracketSize}-team bracket ({roundCount} rounds, {matchupCount} total matchups) for season {seasonId}.",
-            bracketSize, roundCount, allMatchups.Count, seasonId);
+            "Built {roundCount}-round bracket with {matchupCount} total matchups for playoff {playoffId}.",
+            roundCount, allMatchups.Count, playoff.Id);
 
         await messageActions.CompleteMessageAsync(message);
-    }
-
-    // Returns the largest power of 2 that is <= floor(totalTeams * 0.20), minimum 2.
-    private static int ComputeBracketSize(int totalTeams)
-    {
-        int qualifierCount = Math.Max((int)Math.Floor(totalTeams * 0.20), 2);
-        int size = 1;
-        while (size * 2 <= qualifierCount)
-            size *= 2;
-        return size;
     }
 }

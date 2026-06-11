@@ -98,6 +98,7 @@ namespace BloodsportSite
             app.MapGroup("/api").MapUsers();
             app.MapGroup("/api").MapSeasons();
             app.MapGroup("/api").MapMatchups();
+            app.MapGroup("/api").MapPlayoffs();
 
             app.Run();
         }

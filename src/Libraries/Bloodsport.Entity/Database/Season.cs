@@ -29,6 +29,9 @@ namespace Bloodsport.Entity.Database
         #region Navigation Properties
 
         [JsonIgnore]
+        public virtual Playoff Playoff { get; set; }
+
+        [JsonIgnore]
         public virtual ICollection<SeasonWeek> SeasonWeeks { get; set; } = [];
 
         [JsonIgnore]
@@ -40,9 +43,14 @@ namespace Bloodsport.Entity.Database
         [JsonIgnore]
         public virtual ICollection<TeamSeasonRoster> TeamSeasonRosters { get; set; } = [];
 
-        [JsonIgnore]
-        public virtual ICollection<PlayoffMatchup> PlayoffMatchups { get; set; } = [];
-
         #endregion
+    }
+
+    public enum SeasonStatus
+    {
+        Upcoming = 0,
+        PreSeason = 1,
+        Active = 2,
+        Completed = 4
     }
 }

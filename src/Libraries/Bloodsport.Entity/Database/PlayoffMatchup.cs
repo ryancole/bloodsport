@@ -8,15 +8,17 @@ namespace Bloodsport.Entity.Database
 
         public long Id { get; private set; }
 
-        public required long SeasonId { get; set; }
+        public required long PlayoffId { get; set; }
 
         public required int Round { get; set; }
 
-        public required int Position { get; set; }
+        public required int MatchNumber { get; set; }
 
         public long? TeamOneId { get; set; }
 
         public long? TeamTwoId { get; set; }
+
+        public long? WinningTeamId { get; set; }
 
         public long? NextMatchupId { get; set; }
 
@@ -27,19 +29,19 @@ namespace Bloodsport.Entity.Database
         #region Navigation Properties
 
         [JsonIgnore]
-        public virtual required Season Season { get; set; }
+        public virtual required Playoff Playoff { get; set; }
 
         [JsonIgnore]
-        public virtual Team? TeamOne { get; set; }
+        public virtual PlayoffTeam? TeamOne { get; set; }
 
         [JsonIgnore]
-        public virtual Team? TeamTwo { get; set; }
+        public virtual PlayoffTeam? TeamTwo { get; set; }
+
+        [JsonIgnore]
+        public virtual PlayoffTeam? WinningTeam { get; set; }
 
         [JsonIgnore]
         public virtual PlayoffMatchup? NextMatchup { get; set; }
-
-        [JsonIgnore]
-        public virtual PlayoffMatchupResult? PlayoffMatchupResult { get; set; }
 
         #endregion
     }
