@@ -1,7 +1,58 @@
 @page "/playoffs"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
 
 <PageTitle>Playoffs</PageTitle>
 
 <h1 class="mb-4">Playoffs</h1>
 
-<p class="text-muted">No playoff data available yet.</p>
+@if (playoffs is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (playoffs.Count == 0)
+{
+    <p class="text-muted">No playoffs yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Season</th>
+                <th>Status</th>
+                <th>Teams</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var playoff in playoffs)
+            {
+                <tr>
+                    <td><a href="/playoffs/@playoff.Id">@playoff.Name</a></td>
+                    <td><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></td>
+                    <td>@playoff.Status</td>
+                    <td>@playoff.PlayoffTeams.Count</td>
+                    <td>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Playoff>? playoffs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        playoffs = await db.Playoffs
+            .Include(p => p.Season)
+            .Include(p => p.PlayoffTeams)
+            .OrderByDescending(p => p.DateCreated)
+            .ToListAsync();
+    }
+}

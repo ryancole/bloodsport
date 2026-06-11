@@ -1,0 +1,112 @@
+@page "/playoffs/{id:long}"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
+
+<PageTitle>@(playoff?.Name ?? "Playoff")</PageTitle>
+
+@if (notFound)
+{
+    <p class="text-muted">Playoff not found.</p>
+}
+else if (playoff is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <nav class="small mb-2">
+        <a href="/playoffs">Playoffs</a> / @playoff.Name
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">@playoff.Name</h1>
+        <AuthorizeView Roles="Bloodsport.Admin">
+            <Authorized>
+                @if (playoff.PlayoffMatchups.Count == 0)
+                {
+                    <form method="post" action="/api/playoffs/@playoff.Id/build-bracket" style="display:inline">
+                        <AntiforgeryToken />
+                        <button type="submit" class="btn btn-sm btn-primary">Build Bracket</button>
+                    </form>
+                }
+            </Authorized>
+        </AuthorizeView>
+    </div>
+
+    <dl class="row mb-4">
+        <dt class="col-sm-2">Season</dt>
+        <dd class="col-sm-10"><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></dd>
+
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10"><span class="badge @StatusBadgeClass(playoff.Status)">@playoff.Status</span></dd>
+
+        <dt class="col-sm-2">Teams</dt>
+        <dd class="col-sm-10">@playoff.PlayoffTeams.Count</dd>
+
+        <dt class="col-sm-2">Created</dt>
+        <dd class="col-sm-10">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+    </dl>
+
+    @if (playoff.PlayoffTeams.Count > 0)
+    {
+        <h2 class="mb-3">Teams</h2>
+        <table class="table mb-5">
+            <thead>
+                <tr>
+                    <th>Seed</th>
+                    <th>Team</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pt in playoff.PlayoffTeams.OrderBy(t => t.Seed))
+                {
+                    <tr>
+                        <td>@pt.Seed</td>
+                        <td><a href="/teams/@pt.TeamId">@pt.Team.Name</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <h2 class="mb-3">Bracket</h2>
+    <PlayoffBracket Matchups="playoff.PlayoffMatchups.ToList()" />
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private Playoff? playoff;
+    private bool notFound;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        playoff = await db.Playoffs
+            .Include(p => p.Season)
+            .Include(p => p.PlayoffTeams)
+                .ThenInclude(pt => pt.Team)
+            .Include(p => p.PlayoffMatchups)
+                .ThenInclude(m => m.TeamOne)
+                    .ThenInclude(pt => pt!.Team)
+            .Include(p => p.PlayoffMatchups)
+                .ThenInclude(m => m.TeamTwo)
+                    .ThenInclude(pt => pt!.Team)
+            .FirstOrDefaultAsync(p => p.Id == Id);
+
+        if (playoff is null)
+            notFound = true;
+    }
+
+    private static string StatusBadgeClass(PlayoffStatus status) => status switch
+    {
+        PlayoffStatus.Pending => "bg-secondary",
+        PlayoffStatus.Active => "bg-success",
+        PlayoffStatus.Completed => "bg-dark",
+        _ => "bg-secondary"
+    };
+}

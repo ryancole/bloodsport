@@ -41,6 +41,13 @@ else
                             <button type="submit" class="btn btn-sm btn-success">Start Season</button>
                         </form>
                     }
+                    @if (season.Status == SeasonStatus.Completed && season.Playoff is null)
+                    {
+                        <form method="post" action="/api/seasons/@season.Id/create-playoffs" style="display:inline">
+                            <AntiforgeryToken />
+                            <button type="submit" class="btn btn-sm btn-primary">Create Playoffs</button>
+                        </form>
+                    }
                 </Authorized>
             </AuthorizeView>
         </div>
@@ -166,6 +173,7 @@ else
 
         season = await db.Seasons
             .Include(s => s.SeasonWeeks)
+            .Include(s => s.Playoff)
             .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.Manager)

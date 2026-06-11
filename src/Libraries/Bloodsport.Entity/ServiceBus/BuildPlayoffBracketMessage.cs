@@ -4,7 +4,7 @@ namespace Bloodsport.Entity.ServiceBus
     {
         #region Properties
 
-        public long SeasonId { get; set; }
+        public long PlayoffId { get; set; }
 
         #endregion
     }
