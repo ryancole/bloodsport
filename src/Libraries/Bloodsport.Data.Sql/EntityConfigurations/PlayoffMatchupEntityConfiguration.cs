@@ -1,6 +1,7 @@
-using Bloodsport.Entity.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using Bloodsport.Entity.Database;
 
 namespace Bloodsport.Data.Sql.EntityConfigurations
 {
@@ -15,35 +16,23 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
                 .HasDefaultValueSql("GETUTCDATE()");
 
             builder
-                .HasOne(m => m.Season)
-                .WithMany(s => s.PlayoffMatchups)
-                .HasForeignKey(m => m.SeasonId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
+                .HasOne(m => m.Playoff)
+                .WithMany(m => m.PlayoffMatchups);
 
             builder
                 .HasOne(m => m.TeamOne)
                 .WithMany()
-                .HasForeignKey(m => m.TeamOneId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(m => m.TeamOneId);
 
             builder
                 .HasOne(m => m.TeamTwo)
                 .WithMany()
-                .HasForeignKey(m => m.TeamTwoId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(m => m.TeamTwoId);
 
             builder
                 .HasOne(m => m.NextMatchup)
                 .WithMany()
-                .HasForeignKey(m => m.NextMatchupId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder
-                .HasOne(m => m.PlayoffMatchupResult)
-                .WithOne(r => r.PlayoffMatchup)
-                .HasForeignKey<PlayoffMatchupResult>(r => r.PlayoffMatchupId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(m => m.NextMatchupId);
         }
 
         #endregion
