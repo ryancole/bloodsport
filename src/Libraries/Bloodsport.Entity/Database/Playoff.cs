@@ -12,7 +12,7 @@ namespace Bloodsport.Entity.Database
 
         public required string Name { get; set; }
 
-        public required PlayoffStatus Status { get; set; } = PlayoffStatus.Pending;
+        public required PlayoffStatus Status { get; set; } = PlayoffStatus.Upcoming;
 
         public DateTime DateCreated { get; private set; }
 
@@ -34,7 +34,7 @@ namespace Bloodsport.Entity.Database
 
     public enum PlayoffStatus
     {
-        Pending,
+        Upcoming,
         Active,
         Completed
     }

@@ -1,0 +1,34 @@
+@using Bloodsport.Entity.Database
+
+@if (Playoffs.Count == 0)
+{
+    <p class="text-muted mb-5">No upcoming or active playoffs.</p>
+}
+else
+{
+    <table class="table mb-5">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Season</th>
+                <th>Status</th>
+                <th>Teams</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var playoff in Playoffs)
+            {
+                <tr>
+                    <td><a href="/playoffs/@playoff.Id">@playoff.Name</a></td>
+                    <td><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></td>
+                    <td>@playoff.Status</td>
+                    <td>@playoff.PlayoffTeams.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter, EditorRequired] public List<Playoff> Playoffs { get; set; } = [];
+}

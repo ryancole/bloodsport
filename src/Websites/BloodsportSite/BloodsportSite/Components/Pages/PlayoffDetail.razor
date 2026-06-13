@@ -50,27 +50,7 @@ else
         <dd class="col-sm-10">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
-    @if (playoff.PlayoffTeams.Count > 0)
-    {
-        <h2 class="mb-3">Teams</h2>
-        <table class="table mb-5">
-            <thead>
-                <tr>
-                    <th>Seed</th>
-                    <th>Team</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var pt in playoff.PlayoffTeams.OrderBy(t => t.Seed))
-                {
-                    <tr>
-                        <td>@pt.Seed</td>
-                        <td><a href="/teams/@pt.TeamId">@pt.Team.Name</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+    <PlayoffTeamsTable PlayoffId="playoff.Id" Teams="playoff.PlayoffTeams" CurrentPage="CurrentPage" />
 
     <h2 class="mb-3">Bracket</h2>
     <PlayoffBracket Matchups="playoff.PlayoffMatchups.ToList()" />
@@ -78,12 +58,20 @@ else
 
 @code {
     [Parameter] public long Id { get; set; }
+    [SupplyParameterFromQuery] private int teamsPage { get; set; }
+    private int CurrentPage => teamsPage < 1 ? 1 : teamsPage;
 
     private Playoff? playoff;
     private bool notFound;
+    private long _loadedId;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        if (_loadedId == Id)
+            return;
+
+        _loadedId = Id;
+
         await using var db = await DbFactory.CreateDbContextAsync();
 
         playoff = await db.Playoffs
@@ -104,7 +92,7 @@ else
 
     private static string StatusBadgeClass(PlayoffStatus status) => status switch
     {
-        PlayoffStatus.Pending => "bg-secondary",
+        PlayoffStatus.Upcoming => "bg-secondary",
         PlayoffStatus.Active => "bg-success",
         PlayoffStatus.Completed => "bg-dark",
         _ => "bg-secondary"
