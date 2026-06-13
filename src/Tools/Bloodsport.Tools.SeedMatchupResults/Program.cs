@@ -5,13 +5,14 @@ using Microsoft.Data.SqlClient;
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
     Console.WriteLine("Usage: SeedMatchupResults --season <id> --server <instance> --database <name> [--url <functionUrl>] [--key <functionKey>] [--skip <0-100>]");
+    Console.WriteLine("Default --url: http://localhost:7071/api/HandleSeasonWeekMatchup");
     return;
 }
 
 long seasonId = 0;
 string server = "";
 string database = "";
-string functionUrl = "http://localhost:7071/api/HandleMatchupResult";
+string functionUrl = "http://localhost:7071/api/HandleSeasonWeekMatchup";
 string functionKey = "";
 int skipPercent = 20;
 
