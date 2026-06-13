@@ -257,7 +257,7 @@ namespace BloodsportSite.Api
                 SeasonId = id,
                 Season = season,
                 Name = $"{season.Name} Playoffs",
-                Status = PlayoffStatus.Pending,
+                Status = PlayoffStatus.Upcoming,
             };
 
             db.Playoffs.Add(playoff);
