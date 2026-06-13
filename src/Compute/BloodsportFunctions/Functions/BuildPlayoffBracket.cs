@@ -116,12 +116,16 @@ public class BuildPlayoffBracket
         // Matchups per round: 2^(round - 1).
 
         int roundCount = (int)Math.Log2(bracketSize);
+        const int DaysPerRound = 3;
+        var now = DateTime.UtcNow;
 
         var allMatchups = new List<PlayoffMatchup>();
 
         for (int round = roundCount; round >= 1; round--)
         {
             int matchupsInRound = (int)Math.Pow(2, round - 1);
+            // First round ends in DaysPerRound days; each later round adds DaysPerRound more.
+            var dateEnd = now.AddDays((roundCount - round + 1) * DaysPerRound);
 
             for (int matchNumber = 0; matchNumber < matchupsInRound; matchNumber++)
             {
@@ -131,6 +135,7 @@ public class BuildPlayoffBracket
                     Playoff = playoff,
                     Round = round,
                     MatchNumber = matchNumber,
+                    DateEnd = dateEnd,
                 });
             }
         }
