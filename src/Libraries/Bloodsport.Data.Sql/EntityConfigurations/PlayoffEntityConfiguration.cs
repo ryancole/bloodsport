@@ -13,7 +13,7 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
         {
             builder
                 .Property(m => m.Status)
-                .HasDefaultValue(PlayoffStatus.Pending);
+                .HasDefaultValue(PlayoffStatus.Upcoming);
 
             builder
                 .Property(s => s.DateCreated)

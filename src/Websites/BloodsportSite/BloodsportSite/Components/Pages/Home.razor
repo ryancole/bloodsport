@@ -53,6 +53,10 @@ else
         </div>
     }
 
+    <h2 class="mb-3">Playoffs</h2>
+
+    <PlayoffsTable Playoffs="activePlayoffs" />
+
     <h2 class="mb-3">Recent Results</h2>
 
     @if (recentResults.Count == 0)
@@ -110,6 +114,7 @@ else
 
 @code {
     private List<Season>? seasons;
+    private List<Playoff> activePlayoffs = [];
     private List<SeasonWeekMatchupResult> recentResults = [];
 
     protected override async Task OnInitializedAsync()
@@ -120,6 +125,13 @@ else
             .Include(s => s.SeasonRegistrations)
             .Where(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming || s.Status == SeasonStatus.PreSeason)
             .OrderBy(s => s.EstimatedDateStart)
+            .ToListAsync();
+
+        activePlayoffs = await db.Playoffs
+            .Include(p => p.Season)
+            .Include(p => p.PlayoffTeams)
+            .Where(p => p.Status == PlayoffStatus.Active || p.Status == PlayoffStatus.Upcoming)
+            .OrderByDescending(p => p.DateCreated)
             .ToListAsync();
 
         recentResults = await db.SeasonWeekMatchupResults

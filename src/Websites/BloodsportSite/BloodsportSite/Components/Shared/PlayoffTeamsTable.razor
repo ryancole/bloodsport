@@ -1,0 +1,67 @@
+@using Bloodsport.Entity.Database
+
+@{
+    var sorted = Teams.OrderBy(t => t.Seed).ToList();
+    var totalPages = (int)Math.Ceiling(sorted.Count / (double)PageSize);
+    var page = CurrentPage < 1 ? 1 : CurrentPage;
+    var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="mb-0">Teams</h2>
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(page == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@PageUrl(page - 1)">Previous</a>
+                </li>
+                @for (var p = 1; p <= totalPages; p++)
+                {
+                    var pageNum = p;
+                    <li class="page-item @(page == pageNum ? "active" : "")">
+                        <a class="page-link" href="@PageUrl(pageNum)">@pageNum</a>
+                    </li>
+                }
+                <li class="page-item @(page == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@PageUrl(page + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@if (Teams.Count == 0)
+{
+    <p class="text-muted">No teams yet.</p>
+}
+else
+{
+    <table class="table mb-5">
+        <thead>
+            <tr>
+                <th>Seed</th>
+                <th>Team</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pt in pageItems)
+            {
+                <tr>
+                    <td>@pt.Seed</td>
+                    <td><a href="/teams/@pt.TeamId">@pt.Team.Name</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private const int PageSize = 10;
+
+    [Parameter, EditorRequired] public long PlayoffId { get; set; }
+    [Parameter, EditorRequired] public ICollection<PlayoffTeam> Teams { get; set; } = [];
+    [Parameter] public int CurrentPage { get; set; } = 1;
+
+    private string PageUrl(int p) => $"/playoffs/{PlayoffId}?tab=teams&teamsPage={p}";
+}

@@ -87,7 +87,7 @@ else
             @if (team is not null)
             {
                 <span class="bracket-seed">@team.Seed</span>
-                <span class="bracket-name">@(team.Team?.Name ?? "Unknown")</span>
+                <a class="bracket-name" href="/teams/@team.TeamId">@(team.Team?.Name ?? "Unknown")</a>
             }
             else
             {
