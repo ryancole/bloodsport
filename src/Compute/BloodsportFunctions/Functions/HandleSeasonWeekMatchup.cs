@@ -10,18 +10,18 @@ using Microsoft.Extensions.Logging;
 
 namespace BloodsportFunctions.Functions;
 
-public class HandleMatchupResult
+public class HandleSeasonWeekMatchup
 {
-    private readonly ILogger<HandleMatchupResult> _logger;
+    private readonly ILogger<HandleSeasonWeekMatchup> _logger;
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
 
-    public HandleMatchupResult(ILogger<HandleMatchupResult> logger, IDbContextFactory<SqlDbContext> dbFactory)
+    public HandleSeasonWeekMatchup(ILogger<HandleSeasonWeekMatchup> logger, IDbContextFactory<SqlDbContext> dbFactory)
     {
         _logger = logger;
         _dbFactory = dbFactory;
     }
 
-    [Function("HandleMatchupResult")]
+    [Function("HandleSeasonWeekMatchup")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
         TournamentGamesV5? payload;
