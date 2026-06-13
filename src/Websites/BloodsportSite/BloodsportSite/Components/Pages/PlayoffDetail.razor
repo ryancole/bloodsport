@@ -50,28 +50,37 @@ else
         <dd class="col-sm-10">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
-    <PlayoffTeamsTable PlayoffId="playoff.Id" Teams="playoff.PlayoffTeams" CurrentPage="CurrentPage" />
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link @(ActiveTab == "bracket" ? "active" : "")" href="/playoffs/@playoff.Id?tab=bracket">Bracket</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(ActiveTab == "teams" ? "active" : "")" href="/playoffs/@playoff.Id?tab=teams">Teams</a>
+        </li>
+    </ul>
 
-    <h2 class="mb-3">Bracket</h2>
-    <PlayoffBracket Matchups="playoff.PlayoffMatchups.ToList()" />
+    @if (ActiveTab == "teams")
+    {
+        <PlayoffTeamsTable PlayoffId="playoff.Id" Teams="playoff.PlayoffTeams" CurrentPage="CurrentPage" />
+    }
+    else
+    {
+        <PlayoffBracket Matchups="playoff.PlayoffMatchups.ToList()" />
+    }
 }
 
 @code {
     [Parameter] public long Id { get; set; }
     [SupplyParameterFromQuery] private int teamsPage { get; set; }
+    [SupplyParameterFromQuery] private string? tab { get; set; }
     private int CurrentPage => teamsPage < 1 ? 1 : teamsPage;
+    private string ActiveTab => tab == "teams" ? "teams" : "bracket";
 
     private Playoff? playoff;
     private bool notFound;
-    private long _loadedId;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        if (_loadedId == Id)
-            return;
-
-        _loadedId = Id;
-
         await using var db = await DbFactory.CreateDbContextAsync();
 
         playoff = await db.Playoffs
