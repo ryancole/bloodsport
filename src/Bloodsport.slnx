@@ -8,6 +8,7 @@
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Tools/Bloodsport.Tools.SeedMatchupResults/Bloodsport.Tools.SeedMatchupResults.csproj" Id="77f73a7d-c282-45e4-b450-41af1d74a243" />
+    <Project Path="Tools/Bloodsport.Tools.SeedPlayoffMatchupResults/Bloodsport.Tools.SeedPlayoffMatchupResults.csproj" />
   </Folder>
   <Folder Name="/Websites/">
     <Project Path="Websites/BloodsportSite/BloodsportSite.Client/BloodsportSite.Client.csproj" Id="3c54ec1e-aca5-436b-81dc-406a37f16de5" />
