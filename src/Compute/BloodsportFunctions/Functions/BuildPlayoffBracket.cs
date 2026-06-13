@@ -153,17 +153,19 @@ public class BuildPlayoffBracket
             matchup.NextMatchupId = next.Id;
         }
 
-        // --- Seed first-round matchups using 1-vs-N method ---
-        // First round is round roundCount. Pairing: match M gets seed (M+1) vs seed (bracketSize-M).
-        // e.g. for 8 teams: match 0 → seed 1 vs 8, match 1 → seed 2 vs 7, match 2 → seed 3 vs 6, match 3 → seed 4 vs 5.
+        // --- Seed first-round matchups using standard bracket seeding ---
+        // Seed order is generated recursively so top seeds can only meet in later rounds.
+        // e.g. for 8 teams: [1,8,4,5,2,7,3,6] → match 0: 1v8, match 1: 4v5, match 2: 2v7, match 3: 3v6.
+        // With MatchNumber/2 advancement: semi 0 = (1 or 8) vs (4 or 5), semi 1 = (2 or 7) vs (3 or 6).
 
         var seedIndex = playoffTeams.ToDictionary(pt => pt.Seed);
+        var seedOrder = GenerateBracketSeedOrder(bracketSize);
 
         for (int m = 0; m < bracketSize / 2; m++)
         {
             var matchup = matchupIndex[(roundCount, m)];
-            matchup.TeamOneId = seedIndex[m + 1].Id;
-            matchup.TeamTwoId = seedIndex[bracketSize - m].Id;
+            matchup.TeamOneId = seedIndex[seedOrder[m * 2]].Id;
+            matchup.TeamTwoId = seedIndex[seedOrder[m * 2 + 1]].Id;
         }
 
         await db.SaveChangesAsync();
@@ -173,5 +175,26 @@ public class BuildPlayoffBracket
             roundCount, allMatchups.Count, playoff.Id);
 
         await messageActions.CompleteMessageAsync(message);
+    }
+
+    // Generates the slot-order array for standard single-elimination seeding.
+    // Slots come in pairs: slot 2m and 2m+1 are TeamOne and TeamTwo of match m.
+    // e.g. bracketSize=8 → [1,8,4,5,2,7,3,6]
+    private static int[] GenerateBracketSeedOrder(int bracketSize)
+    {
+        var order = new int[] { 1, 2 };
+        int size = 2;
+        while (size < bracketSize)
+        {
+            size *= 2;
+            var next = new int[size];
+            for (int i = 0; i < size / 2; i++)
+            {
+                next[i * 2] = order[i];
+                next[i * 2 + 1] = size + 1 - order[i];
+            }
+            order = next;
+        }
+        return order;
     }
 }

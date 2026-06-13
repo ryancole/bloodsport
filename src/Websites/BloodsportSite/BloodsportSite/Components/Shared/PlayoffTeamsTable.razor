@@ -63,5 +63,5 @@ else
     [Parameter, EditorRequired] public ICollection<PlayoffTeam> Teams { get; set; } = [];
     [Parameter] public int CurrentPage { get; set; } = 1;
 
-    private string PageUrl(int p) => $"/playoffs/{PlayoffId}?teamsPage={p}";
+    private string PageUrl(int p) => $"/playoffs/{PlayoffId}?tab=teams&teamsPage={p}";
 }
