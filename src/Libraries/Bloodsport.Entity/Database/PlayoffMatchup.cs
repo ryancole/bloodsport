@@ -22,6 +22,8 @@ namespace Bloodsport.Entity.Database
 
         public long? NextMatchupId { get; set; }
 
+        public string? TournamentCode { get; set; }
+
         public DateTime DateEnd { get; set; }
 
         public DateTime DateCreated { get; private set; }

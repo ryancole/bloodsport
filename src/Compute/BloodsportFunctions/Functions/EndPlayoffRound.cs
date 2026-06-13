@@ -6,18 +6,18 @@ using Microsoft.Extensions.Logging;
 
 namespace BloodsportFunctions.Functions;
 
-public class EndPlayoffWeek
+public class EndPlayoffRound
 {
-    private readonly ILogger<EndPlayoffWeek> _logger;
+    private readonly ILogger<EndPlayoffRound> _logger;
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
 
-    public EndPlayoffWeek(ILoggerFactory loggerFactory, IDbContextFactory<SqlDbContext> dbFactory)
+    public EndPlayoffRound(ILoggerFactory loggerFactory, IDbContextFactory<SqlDbContext> dbFactory)
     {
-        _logger = loggerFactory.CreateLogger<EndPlayoffWeek>();
+        _logger = loggerFactory.CreateLogger<EndPlayoffRound>();
         _dbFactory = dbFactory;
     }
 
-    [Function("EndPlayoffWeek")]
+    [Function("EndPlayoffRound")]
     public async Task Run([TimerTrigger("0 0 * * * *", RunOnStartup = true)] TimerInfo myTimer)
     {
         
