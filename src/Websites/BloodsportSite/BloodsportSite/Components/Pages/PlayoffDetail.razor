@@ -32,6 +32,13 @@ else
                         <button type="submit" class="btn btn-sm btn-primary">Build Bracket</button>
                     </form>
                 }
+                @if (playoff.Status == PlayoffStatus.Upcoming)
+                {
+                    <form method="post" action="/api/playoffs/@playoff.Id/start" style="display:inline">
+                        <AntiforgeryToken />
+                        <button type="submit" class="btn btn-sm btn-success">Start Playoff</button>
+                    </form>
+                }
             </Authorized>
         </AuthorizeView>
     </div>
