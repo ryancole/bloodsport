@@ -59,6 +59,26 @@ else
         <dd class="col-sm-10">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
+    @if (grandFinalWinner is not null)
+    {
+        <div class="alert alert-success d-flex align-items-center gap-2 mb-3" role="alert">
+            <span style="font-size:1.4rem">🏆</span>
+            <strong>@grandFinalWinner.Team?.Name</strong> wins the @playoff.Name!
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+        <script>
+            (function () {
+                var end = Date.now() + 3000;
+                var colors = ['#ffd700', '#ff4500', '#00bfff'];
+                (function frame() {
+                    confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+                    confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                })();
+            })();
+        </script>
+    }
+
     @if (playoff.PlayoffRounds.Any(r => r.DateEnd == null))
     {
         <div class="alert alert-warning" role="alert">
@@ -95,6 +115,13 @@ else
     private Playoff? playoff;
     private bool notFound;
 
+    private PlayoffTeam? grandFinalWinner => playoff?.PlayoffRounds
+        .OrderBy(r => r.PlayoffMatchups.Count)
+        .FirstOrDefault()
+        ?.PlayoffMatchups
+        .SingleOrDefault()
+        ?.WinningTeam;
+
     protected override async Task OnInitializedAsync()
     {
         await using var db = await DbFactory.CreateDbContextAsync();
@@ -110,6 +137,10 @@ else
             .Include(p => p.PlayoffRounds)
                 .ThenInclude(r => r.PlayoffMatchups)
                     .ThenInclude(m => m.TeamTwo)
+                        .ThenInclude(pt => pt!.Team)
+            .Include(p => p.PlayoffRounds)
+                .ThenInclude(r => r.PlayoffMatchups)
+                    .ThenInclude(m => m.WinningTeam)
                         .ThenInclude(pt => pt!.Team)
             .FirstOrDefaultAsync(p => p.Id == Id);
 

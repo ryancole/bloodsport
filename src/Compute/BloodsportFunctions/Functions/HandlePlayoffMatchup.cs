@@ -155,6 +155,11 @@ public class HandlePlayoffMatchup
             else
                 nextMatchup.TeamTwoId = winningPlayoffTeam.Id;
         }
+        else
+        {
+            // No next matchup means this is the grand final.
+            matchup.PlayoffRound.Playoff.Status = PlayoffStatus.Completed;
+        }
 
         await db.SaveChangesAsync();
 

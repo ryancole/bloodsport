@@ -20,10 +20,11 @@ namespace BloodsportSite.Api
             return endpoints;
         }
 
-        // Admin: set playoff status to Active
+        // Admin: queue the StartPlayoff function for a playoff
         private static async Task<IResult> StartPlayoffAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
+            ServiceBusClient serviceBusClient,
             long id)
         {
             if (!context.User.IsInRole("Bloodsport.Admin"))
@@ -31,33 +32,16 @@ namespace BloodsportSite.Api
 
             await using var db = dbFactory.CreateDbContext();
 
-            var playoff = await db.Playoffs
-                .Include(p => p.PlayoffRounds)
-                    .ThenInclude(r => r.PlayoffMatchups)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var playoff = await db.Playoffs.FirstOrDefaultAsync(p => p.Id == id);
 
             if (playoff is null)
                 return Results.Redirect("/playoffs?error=playoff_not_found");
 
-            const int DaysPerRound = 3;
-            var now = DateTime.UtcNow;
+            await using var sender = serviceBusClient.CreateSender("start-playoff");
 
-            // Assign DateEnd to each round: most matchups = first round played.
-            var orderedRounds = playoff.PlayoffRounds
-                .OrderByDescending(r => r.PlayoffMatchups.Count)
-                .ToList();
+            var payload = JsonSerializer.Serialize(new StartPlayoffMessage { PlayoffId = id });
 
-            for (int i = 0; i < orderedRounds.Count; i++)
-            {
-                var roundDateEnd = now.AddDays((i + 1) * DaysPerRound);
-                orderedRounds[i].DateEnd = roundDateEnd;
-
-                foreach (var matchup in orderedRounds[i].PlayoffMatchups)
-                    matchup.DateEnd = roundDateEnd;
-            }
-
-            playoff.Status = PlayoffStatus.Active;
-            await db.SaveChangesAsync();
+            await sender.SendMessageAsync(new ServiceBusMessage(payload));
 
             return Results.Redirect($"/playoffs/{id}");
         }
