@@ -20,7 +20,7 @@ else
             @for (int ri = 0; ri < orderedRounds.Count; ri++)
             {
                 var round = orderedRounds[ri];
-                <div class="bracket-col-label">@round.Name</div>
+                <PlayoffRoundLabel Round="round" />
                 @if (ri < orderedRounds.Count - 1)
                 {
                     <div class="bracket-connector-spacer"></div>

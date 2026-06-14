@@ -31,7 +31,7 @@ public class EndPlayoffRound
             .Include(r => r.PlayoffMatchups)
             .Where(r =>
                 r.Playoff.Status == PlayoffStatus.Active &&
-                r.DateEnd < now &&
+                r.DateEnd != null && r.DateEnd < now &&
                 r.PlayoffMatchups.Any(m => m.WinningTeamId == null))
             .ToListAsync();
 

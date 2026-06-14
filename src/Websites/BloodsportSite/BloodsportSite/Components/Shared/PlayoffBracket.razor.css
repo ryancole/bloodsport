@@ -9,17 +9,6 @@
     margin-bottom: 4px;
 }
 
-.bracket-col-label {
-    flex: 1;
-    min-width: 180px;
-    text-align: center;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6c757d;
-}
-
 /* Spacer in the header row that sits above each connector column */
 .bracket-connector-spacer {
     width: 32px;

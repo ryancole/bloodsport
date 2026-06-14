@@ -115,22 +115,18 @@ public class BuildPlayoffBracket
         // Round 1 = grand final (1 matchup). Round roundCount = first round played (bracketSize/2 matchups).
 
         int roundCount = (int)Math.Log2(bracketSize);
-        const int DaysPerRound = 3;
-        var now = DateTime.UtcNow;
 
         var roundMap = new Dictionary<int, PlayoffRound>(); // round number → entity
 
         for (int round = roundCount; round >= 1; round--)
         {
             int matchupsInRound = (int)Math.Pow(2, round - 1);
-            var dateEnd = now.AddDays((roundCount - round + 1) * DaysPerRound);
 
             roundMap[round] = new PlayoffRound
             {
                 PlayoffId = playoff.Id,
                 Playoff = playoff,
                 Name = GetRoundName(matchupsInRound),
-                DateEnd = dateEnd,
             };
         }
 
@@ -154,7 +150,6 @@ public class BuildPlayoffBracket
                     PlayoffRoundId = playoffRound.Id,
                     PlayoffRound = playoffRound,
                     MatchNumber = matchNumber,
-                    DateEnd = playoffRound.DateEnd,
                 };
                 allMatchups.Add(matchup);
                 matchupIndex[(round, matchNumber)] = matchup;

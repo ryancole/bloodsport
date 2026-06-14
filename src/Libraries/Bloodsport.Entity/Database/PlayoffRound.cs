@@ -12,7 +12,7 @@ namespace Bloodsport.Entity.Database
 
         public required string Name { get; set; }
 
-        public required DateTime DateEnd { get; set; }
+        public DateTime? DateEnd { get; set; }
 
         public DateTime DateCreated { get; private set; }
 
