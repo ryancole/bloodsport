@@ -26,7 +26,7 @@ else
         <AuthorizeView Roles="Bloodsport.Admin">
             <Authorized>
                 <div class="d-flex gap-2">
-                    @if (playoff.PlayoffMatchups.Count == 0)
+                    @if (playoff.PlayoffRounds.Count == 0)
                     {
                         <form method="post" action="/api/playoffs/@playoff.Id/build-bracket">
                             <AntiforgeryToken />
@@ -59,6 +59,13 @@ else
         <dd class="col-sm-10">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
+    @if (playoff.PlayoffRounds.Any(r => r.DateEnd == null))
+    {
+        <div class="alert alert-warning" role="alert">
+            This playoff has not started yet. Round end dates will be available once the playoff begins.
+        </div>
+    }
+
     <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
             <a class="nav-link @(ActiveTab == "bracket" ? "active" : "")" href="/playoffs/@playoff.Id?tab=bracket">Bracket</a>
@@ -74,7 +81,7 @@ else
     }
     else
     {
-        <PlayoffBracket Matchups="playoff.PlayoffMatchups.ToList()" />
+        <PlayoffBracket Rounds="playoff.PlayoffRounds.ToList()" />
     }
 }
 
@@ -96,12 +103,14 @@ else
             .Include(p => p.Season)
             .Include(p => p.PlayoffTeams)
                 .ThenInclude(pt => pt.Team)
-            .Include(p => p.PlayoffMatchups)
-                .ThenInclude(m => m.TeamOne)
-                    .ThenInclude(pt => pt!.Team)
-            .Include(p => p.PlayoffMatchups)
-                .ThenInclude(m => m.TeamTwo)
-                    .ThenInclude(pt => pt!.Team)
+            .Include(p => p.PlayoffRounds)
+                .ThenInclude(r => r.PlayoffMatchups)
+                    .ThenInclude(m => m.TeamOne)
+                        .ThenInclude(pt => pt!.Team)
+            .Include(p => p.PlayoffRounds)
+                .ThenInclude(r => r.PlayoffMatchups)
+                    .ThenInclude(m => m.TeamTwo)
+                        .ThenInclude(pt => pt!.Team)
             .FirstOrDefaultAsync(p => p.Id == Id);
 
         if (playoff is null)

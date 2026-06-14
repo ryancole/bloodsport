@@ -1,0 +1,7 @@
+@using Bloodsport.Entity.Database
+
+<div class="bracket-col-label" title="@(Round.DateEnd.HasValue ? $"Ends {Round.DateEnd.Value.ToLocalTime().ToString("MMM d, yyyy h:mm tt")}" : null)">@Round.Name</div>
+
+@code {
+    [Parameter] public required PlayoffRound Round { get; set; }
+}

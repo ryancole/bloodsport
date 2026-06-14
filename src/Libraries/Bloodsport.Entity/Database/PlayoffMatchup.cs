@@ -8,9 +8,7 @@ namespace Bloodsport.Entity.Database
 
         public long Id { get; private set; }
 
-        public required long PlayoffId { get; set; }
-
-        public required int Round { get; set; }
+        public required long PlayoffRoundId { get; set; }
 
         public required int MatchNumber { get; set; }
 
@@ -33,7 +31,7 @@ namespace Bloodsport.Entity.Database
         #region Navigation Properties
 
         [JsonIgnore]
-        public virtual required Playoff Playoff { get; set; }
+        public virtual PlayoffRound PlayoffRound { get; set; }
 
         [JsonIgnore]
         public virtual PlayoffTeam? TeamOne { get; set; }

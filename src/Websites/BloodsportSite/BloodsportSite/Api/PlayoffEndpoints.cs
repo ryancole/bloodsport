@@ -31,10 +31,30 @@ namespace BloodsportSite.Api
 
             await using var db = dbFactory.CreateDbContext();
 
-            var playoff = await db.Playoffs.FirstOrDefaultAsync(p => p.Id == id);
+            var playoff = await db.Playoffs
+                .Include(p => p.PlayoffRounds)
+                    .ThenInclude(r => r.PlayoffMatchups)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (playoff is null)
                 return Results.Redirect("/playoffs?error=playoff_not_found");
+
+            const int DaysPerRound = 3;
+            var now = DateTime.UtcNow;
+
+            // Assign DateEnd to each round: most matchups = first round played.
+            var orderedRounds = playoff.PlayoffRounds
+                .OrderByDescending(r => r.PlayoffMatchups.Count)
+                .ToList();
+
+            for (int i = 0; i < orderedRounds.Count; i++)
+            {
+                var roundDateEnd = now.AddDays((i + 1) * DaysPerRound);
+                orderedRounds[i].DateEnd = roundDateEnd;
+
+                foreach (var matchup in orderedRounds[i].PlayoffMatchups)
+                    matchup.DateEnd = roundDateEnd;
+            }
 
             playoff.Status = PlayoffStatus.Active;
             await db.SaveChangesAsync();
