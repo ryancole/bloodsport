@@ -136,6 +136,7 @@ public class BuildPlayoffBracket
                     //Round = round,
                     MatchNumber = matchNumber,
                     DateEnd = dateEnd,
+                    PlayoffRoundId = 0
                 });
             }
         }
