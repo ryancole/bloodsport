@@ -67,6 +67,12 @@ else
 
         <dt class="col-sm-2">Estimated End</dt>
         <dd class="col-sm-10">@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
+
+        @if (season.Playoff is not null)
+        {
+            <dt class="col-sm-2">Playoff</dt>
+            <dd class="col-sm-10"><a href="/playoffs/@season.Playoff.Id">@season.Playoff.Name</a></dd>
+        }
     </dl>
 
     @if (season.Status == SeasonStatus.PreSeason)
