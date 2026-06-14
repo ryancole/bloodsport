@@ -16,10 +16,6 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
                 .HasDefaultValueSql("GETUTCDATE()");
 
             builder
-                .HasOne(m => m.Playoff)
-                .WithMany(m => m.PlayoffMatchups);
-
-            builder
                 .HasOne(m => m.TeamOne)
                 .WithMany()
                 .HasForeignKey(m => m.TeamOneId);

@@ -55,7 +55,7 @@ public class HandlePlayoffMatchup
         await using var db = await _dbFactory.CreateDbContextAsync();
 
         var matchup = await db.PlayoffMatchups
-            .Include(m => m.Playoff)
+            //.Include(m => m.Playoff)
             .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
             .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
             .FirstOrDefaultAsync(m => m.TournamentCode == payload.ShortCode);
@@ -97,7 +97,8 @@ public class HandlePlayoffMatchup
         var losingPlayoffTeam  = winningMembership.TeamId == teamOneId ? matchup.TeamTwo : matchup.TeamOne;
 
         // Roster validation against season rosters.
-        var seasonId = matchup.Playoff.SeasonId;
+        //var seasonId = matchup.Playoff.SeasonId;
+        var seasonId = default(long);
 
         var participantAccounts = await db.RiotAccounts
             .Where(a => allPuuids.Contains(a.Puuid))

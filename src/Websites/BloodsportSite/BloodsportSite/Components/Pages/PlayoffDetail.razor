@@ -26,7 +26,7 @@ else
         <AuthorizeView Roles="Bloodsport.Admin">
             <Authorized>
                 <div class="d-flex gap-2">
-                    @if (playoff.PlayoffMatchups.Count == 0)
+                    @if (true) @* TODO: playoff.PlayoffMatchups.Count == 0 *@
                     {
                         <form method="post" action="/api/playoffs/@playoff.Id/build-bracket">
                             <AntiforgeryToken />
@@ -74,7 +74,7 @@ else
     }
     else
     {
-        <PlayoffBracket Matchups="playoff.PlayoffMatchups.ToList()" />
+        <PlayoffBracket Matchups="[]" /> @* TODO: playoff.PlayoffMatchups.ToList() *@
     }
 }
 
@@ -96,12 +96,12 @@ else
             .Include(p => p.Season)
             .Include(p => p.PlayoffTeams)
                 .ThenInclude(pt => pt.Team)
-            .Include(p => p.PlayoffMatchups)
-                .ThenInclude(m => m.TeamOne)
-                    .ThenInclude(pt => pt!.Team)
-            .Include(p => p.PlayoffMatchups)
-                .ThenInclude(m => m.TeamTwo)
-                    .ThenInclude(pt => pt!.Team)
+            //.Include(p => p.PlayoffMatchups)
+            //    .ThenInclude(m => m.TeamOne)
+            //        .ThenInclude(pt => pt!.Team)
+            //.Include(p => p.PlayoffMatchups)
+            //    .ThenInclude(m => m.TeamTwo)
+            //        .ThenInclude(pt => pt!.Team)
             .FirstOrDefaultAsync(p => p.Id == Id);
 
         if (playoff is null)

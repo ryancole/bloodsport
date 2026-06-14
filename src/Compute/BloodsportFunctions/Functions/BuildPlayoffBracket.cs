@@ -131,9 +131,9 @@ public class BuildPlayoffBracket
             {
                 allMatchups.Add(new PlayoffMatchup
                 {
-                    PlayoffId = playoff.Id,
-                    Playoff = playoff,
-                    Round = round,
+                    //PlayoffId = playoff.Id,
+                    //Playoff = playoff,
+                    //Round = round,
                     MatchNumber = matchNumber,
                     DateEnd = dateEnd,
                 });
@@ -147,16 +147,16 @@ public class BuildPlayoffBracket
         // A matchup at (round R, matchNumber M) advances to (round R-1, matchNumber M/2).
         // Round 1 is the grand final — no next matchup.
 
-        var matchupIndex = allMatchups.ToDictionary(m => (m.Round, m.MatchNumber));
+        //var matchupIndex = allMatchups.ToDictionary(m => (m.Round, m.MatchNumber));
 
-        foreach (var matchup in allMatchups)
-        {
-            if (matchup.Round == 1)
-                continue;
+        //foreach (var matchup in allMatchups)
+        //{
+        //    if (matchup.Round == 1)
+        //        continue;
 
-            var next = matchupIndex[(matchup.Round - 1, matchup.MatchNumber / 2)];
-            matchup.NextMatchupId = next.Id;
-        }
+        //    var next = matchupIndex[(matchup.Round - 1, matchup.MatchNumber / 2)];
+        //    matchup.NextMatchupId = next.Id;
+        //}
 
         // --- Seed first-round matchups using standard bracket seeding ---
         // Seed order is generated recursively so top seeds can only meet in later rounds.
@@ -166,12 +166,12 @@ public class BuildPlayoffBracket
         var seedIndex = playoffTeams.ToDictionary(pt => pt.Seed);
         var seedOrder = GenerateBracketSeedOrder(bracketSize);
 
-        for (int m = 0; m < bracketSize / 2; m++)
-        {
-            var matchup = matchupIndex[(roundCount, m)];
-            matchup.TeamOneId = seedIndex[seedOrder[m * 2]].Id;
-            matchup.TeamTwoId = seedIndex[seedOrder[m * 2 + 1]].Id;
-        }
+        //for (int m = 0; m < bracketSize / 2; m++)
+        //{
+        //    var matchup = matchupIndex[(roundCount, m)];
+        //    matchup.TeamOneId = seedIndex[seedOrder[m * 2]].Id;
+        //    matchup.TeamTwoId = seedIndex[seedOrder[m * 2 + 1]].Id;
+        //}
 
         await db.SaveChangesAsync();
 

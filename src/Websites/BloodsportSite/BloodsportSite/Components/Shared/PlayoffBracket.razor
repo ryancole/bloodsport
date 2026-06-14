@@ -1,11 +1,12 @@
 @using Bloodsport.Entity.Database
 
 @{
-    // highest round number = first round played
-    var roundGroups = Matchups
-        .GroupBy(m => m.Round)
-        .OrderByDescending(g => g.Key)
-        .ToList();
+    // TODO: re-implement grouping once PlayoffRound is wired up
+    //var roundGroups = Matchups
+    //    .GroupBy(m => m.Round)
+    //    .OrderByDescending(g => g.Key)
+    //    .ToList();
+    var roundGroups = new List<IGrouping<int, PlayoffMatchup>>();
     int totalRounds = roundGroups.Count;
 }
 
