@@ -55,9 +55,10 @@ await using (var cmd = conn.CreateCommand())
     cmd.CommandText = """
         SELECT m.Id, m.TournamentCode, t1.TeamId, t2.TeamId
         FROM PlayoffMatchups m
+        INNER JOIN PlayoffRounds r ON r.Id = m.PlayoffRoundId
         LEFT JOIN PlayoffTeams t1 ON t1.Id = m.TeamOneId
         LEFT JOIN PlayoffTeams t2 ON t2.Id = m.TeamTwoId
-        WHERE m.PlayoffId = @PlayoffId
+        WHERE r.PlayoffId = @PlayoffId
           AND m.TeamOneId IS NOT NULL
           AND m.TeamTwoId IS NOT NULL
           AND m.WinningTeamId IS NULL
