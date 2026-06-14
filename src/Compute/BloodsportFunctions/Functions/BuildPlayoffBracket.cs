@@ -111,33 +111,53 @@ public class BuildPlayoffBracket
             "Inserted {count} PlayoffTeam records for playoff {playoffId}.",
             playoffTeams.Count, playoff.Id);
 
-        // --- Build bracket matchup slots ---
+        // --- Build PlayoffRound records ---
         // Round 1 = grand final (1 matchup). Round roundCount = first round played (bracketSize/2 matchups).
-        // Matchups per round: 2^(round - 1).
 
         int roundCount = (int)Math.Log2(bracketSize);
         const int DaysPerRound = 3;
         var now = DateTime.UtcNow;
 
-        var allMatchups = new List<PlayoffMatchup>();
+        var roundMap = new Dictionary<int, PlayoffRound>(); // round number → entity
 
         for (int round = roundCount; round >= 1; round--)
         {
             int matchupsInRound = (int)Math.Pow(2, round - 1);
-            // First round ends in DaysPerRound days; each later round adds DaysPerRound more.
             var dateEnd = now.AddDays((roundCount - round + 1) * DaysPerRound);
+
+            roundMap[round] = new PlayoffRound
+            {
+                PlayoffId = playoff.Id,
+                Playoff = playoff,
+                Name = GetRoundName(matchupsInRound),
+                DateEnd = dateEnd,
+            };
+        }
+
+        db.PlayoffRounds.AddRange(roundMap.Values);
+        await db.SaveChangesAsync(); // flush to get DB-generated IDs
+
+        // --- Create matchups per round ---
+
+        var allMatchups = new List<PlayoffMatchup>();
+        var matchupIndex = new Dictionary<(int round, int matchNumber), PlayoffMatchup>();
+
+        for (int round = roundCount; round >= 1; round--)
+        {
+            int matchupsInRound = (int)Math.Pow(2, round - 1);
+            var playoffRound = roundMap[round];
 
             for (int matchNumber = 0; matchNumber < matchupsInRound; matchNumber++)
             {
-                allMatchups.Add(new PlayoffMatchup
+                var matchup = new PlayoffMatchup
                 {
-                    //PlayoffId = playoff.Id,
-                    //Playoff = playoff,
-                    //Round = round,
+                    PlayoffRoundId = playoffRound.Id,
+                    PlayoffRound = playoffRound,
                     MatchNumber = matchNumber,
-                    DateEnd = dateEnd,
-                    PlayoffRoundId = 0
-                });
+                    DateEnd = playoffRound.DateEnd,
+                };
+                allMatchups.Add(matchup);
+                matchupIndex[(round, matchNumber)] = matchup;
             }
         }
 
@@ -148,16 +168,14 @@ public class BuildPlayoffBracket
         // A matchup at (round R, matchNumber M) advances to (round R-1, matchNumber M/2).
         // Round 1 is the grand final — no next matchup.
 
-        //var matchupIndex = allMatchups.ToDictionary(m => (m.Round, m.MatchNumber));
+        foreach (var (key, matchup) in matchupIndex)
+        {
+            if (key.round == 1)
+                continue;
 
-        //foreach (var matchup in allMatchups)
-        //{
-        //    if (matchup.Round == 1)
-        //        continue;
-
-        //    var next = matchupIndex[(matchup.Round - 1, matchup.MatchNumber / 2)];
-        //    matchup.NextMatchupId = next.Id;
-        //}
+            var next = matchupIndex[(key.round - 1, key.matchNumber / 2)];
+            matchup.NextMatchupId = next.Id;
+        }
 
         // --- Seed first-round matchups using standard bracket seeding ---
         // Seed order is generated recursively so top seeds can only meet in later rounds.
@@ -167,12 +185,12 @@ public class BuildPlayoffBracket
         var seedIndex = playoffTeams.ToDictionary(pt => pt.Seed);
         var seedOrder = GenerateBracketSeedOrder(bracketSize);
 
-        //for (int m = 0; m < bracketSize / 2; m++)
-        //{
-        //    var matchup = matchupIndex[(roundCount, m)];
-        //    matchup.TeamOneId = seedIndex[seedOrder[m * 2]].Id;
-        //    matchup.TeamTwoId = seedIndex[seedOrder[m * 2 + 1]].Id;
-        //}
+        for (int m = 0; m < bracketSize / 2; m++)
+        {
+            var matchup = matchupIndex[(roundCount, m)];
+            matchup.TeamOneId = seedIndex[seedOrder[m * 2]].Id;
+            matchup.TeamTwoId = seedIndex[seedOrder[m * 2 + 1]].Id;
+        }
 
         await db.SaveChangesAsync();
 
@@ -182,6 +200,14 @@ public class BuildPlayoffBracket
 
         await messageActions.CompleteMessageAsync(message);
     }
+
+    private static string GetRoundName(int matchupsInRound) => matchupsInRound switch
+    {
+        1 => "Grand Final",
+        2 => "Semifinals",
+        4 => "Quarterfinals",
+        _ => $"Round of {matchupsInRound * 2}",
+    };
 
     // Generates the slot-order array for standard single-elimination seeding.
     // Slots come in pairs: slot 2m and 2m+1 are TeamOne and TeamTwo of match m.

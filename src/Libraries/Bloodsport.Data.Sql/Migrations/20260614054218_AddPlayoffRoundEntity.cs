@@ -19,7 +19,7 @@ namespace Bloodsport.Data.Sql.Migrations
                 defaultValue: 0L);
 
             migrationBuilder.CreateTable(
-                name: "PlayoffRound",
+                name: "PlayoffRounds",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -27,13 +27,13 @@ namespace Bloodsport.Data.Sql.Migrations
                     PlayoffId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlayoffRound", x => x.Id);
+                    table.PrimaryKey("PK_PlayoffRounds", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PlayoffRound_Playoffs_PlayoffId",
+                        name: "FK_PlayoffRounds_Playoffs_PlayoffId",
                         column: x => x.PlayoffId,
                         principalTable: "Playoffs",
                         principalColumn: "Id",
@@ -46,15 +46,15 @@ namespace Bloodsport.Data.Sql.Migrations
                 column: "PlayoffRoundId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlayoffRound_PlayoffId",
-                table: "PlayoffRound",
+                name: "IX_PlayoffRounds_PlayoffId",
+                table: "PlayoffRounds",
                 column: "PlayoffId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_PlayoffMatchups_PlayoffRound_PlayoffRoundId",
+                name: "FK_PlayoffMatchups_PlayoffRounds_PlayoffRoundId",
                 table: "PlayoffMatchups",
                 column: "PlayoffRoundId",
-                principalTable: "PlayoffRound",
+                principalTable: "PlayoffRounds",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -63,11 +63,11 @@ namespace Bloodsport.Data.Sql.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_PlayoffMatchups_PlayoffRound_PlayoffRoundId",
+                name: "FK_PlayoffMatchups_PlayoffRounds_PlayoffRoundId",
                 table: "PlayoffMatchups");
 
             migrationBuilder.DropTable(
-                name: "PlayoffRound");
+                name: "PlayoffRounds");
 
             migrationBuilder.DropIndex(
                 name: "IX_PlayoffMatchups_PlayoffRoundId",

@@ -116,7 +116,9 @@ namespace Bloodsport.Data.Sql.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<DateTime>("DateEnd")
                         .HasColumnType("datetime2");
@@ -132,7 +134,7 @@ namespace Bloodsport.Data.Sql.Migrations
 
                     b.HasIndex("PlayoffId");
 
-                    b.ToTable("PlayoffRound");
+                    b.ToTable("PlayoffRounds");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.PlayoffTeam", b =>

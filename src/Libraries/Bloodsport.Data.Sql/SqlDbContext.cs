@@ -34,6 +34,7 @@ namespace Bloodsport.Data.Sql
 
             new PlayoffEntityConfiguration().Configure(modelBuilder.Entity<Playoff>());
             new PlayoffTeamEntityConfiguration().Configure(modelBuilder.Entity<PlayoffTeam>());
+            new PlayoffRoundEntityConfiguration().Configure(modelBuilder.Entity<PlayoffRound>());
             new PlayoffMatchupEntityConfiguration().Configure(modelBuilder.Entity<PlayoffMatchup>());
         }
 
@@ -68,6 +69,8 @@ namespace Bloodsport.Data.Sql
         public DbSet<Playoff> Playoffs { get; set; }
 
         public DbSet<PlayoffTeam> PlayoffTeams { get; set; }
+
+        public DbSet<PlayoffRound> PlayoffRounds { get; set; }
 
         public DbSet<PlayoffMatchup> PlayoffMatchups { get; set; }
 
