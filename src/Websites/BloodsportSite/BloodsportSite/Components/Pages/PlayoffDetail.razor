@@ -25,20 +25,22 @@ else
         <h1 class="mb-0">@playoff.Name</h1>
         <AuthorizeView Roles="Bloodsport.Admin">
             <Authorized>
-                @if (playoff.PlayoffMatchups.Count == 0)
-                {
-                    <form method="post" action="/api/playoffs/@playoff.Id/build-bracket" style="display:inline">
-                        <AntiforgeryToken />
-                        <button type="submit" class="btn btn-sm btn-primary">Build Bracket</button>
-                    </form>
-                }
-                @if (playoff.Status == PlayoffStatus.Upcoming)
-                {
-                    <form method="post" action="/api/playoffs/@playoff.Id/start" style="display:inline">
-                        <AntiforgeryToken />
-                        <button type="submit" class="btn btn-sm btn-success">Start Playoff</button>
-                    </form>
-                }
+                <div class="d-flex gap-2">
+                    @if (playoff.PlayoffMatchups.Count == 0)
+                    {
+                        <form method="post" action="/api/playoffs/@playoff.Id/build-bracket">
+                            <AntiforgeryToken />
+                            <button type="submit" class="btn btn-sm btn-primary">Build Bracket</button>
+                        </form>
+                    }
+                    @if (playoff.Status == PlayoffStatus.Upcoming)
+                    {
+                        <form method="post" action="/api/playoffs/@playoff.Id/start">
+                            <AntiforgeryToken />
+                            <button type="submit" class="btn btn-sm btn-success">Start Playoff</button>
+                        </form>
+                    }
+                </div>
             </Authorized>
         </AuthorizeView>
     </div>

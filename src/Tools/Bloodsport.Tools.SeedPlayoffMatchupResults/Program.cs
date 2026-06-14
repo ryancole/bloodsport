@@ -4,15 +4,15 @@ using Microsoft.Data.SqlClient;
 
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
-    Console.WriteLine("Usage: SeedMatchupResults --season <id> --server <instance> --database <name> [--url <functionUrl>] [--key <functionKey>] [--skip <0-100>]");
-    Console.WriteLine("Default --url: http://localhost:7071/api/HandleSeasonWeekMatchup");
+    Console.WriteLine("Usage: SeedPlayoffMatchupResults --playoff <id> --server <instance> --database <name> [--url <functionUrl>] [--key <functionKey>] [--skip <0-100>]");
+    Console.WriteLine("Default --url: http://localhost:7071/api/HandlePlayoffMatchup");
     return;
 }
 
-long seasonId = 0;
+long playoffId = 0;
 string server = "";
 string database = "";
-string functionUrl = "http://localhost:7071/api/HandleSeasonWeekMatchup";
+string functionUrl = "http://localhost:7071/api/HandlePlayoffMatchup";
 string functionKey = "";
 int skipPercent = 20;
 
@@ -20,7 +20,7 @@ for (int i = 0; i < args.Length - 1; i++)
 {
     switch (args[i])
     {
-        case "--season":   seasonId    = long.Parse(args[++i]); break;
+        case "--playoff":  playoffId   = long.Parse(args[++i]); break;
         case "--server":   server      = args[++i]; break;
         case "--database": database    = args[++i]; break;
         case "--url":      functionUrl = args[++i]; break;
@@ -29,9 +29,9 @@ for (int i = 0; i < args.Length - 1; i++)
     }
 }
 
-if (seasonId == 0 || string.IsNullOrEmpty(server) || string.IsNullOrEmpty(database))
+if (playoffId == 0 || string.IsNullOrEmpty(server) || string.IsNullOrEmpty(database))
 {
-    Console.Error.WriteLine("--season, --server, and --database are required.");
+    Console.Error.WriteLine("--playoff, --server, and --database are required.");
     Environment.Exit(1);
 }
 
@@ -46,22 +46,23 @@ var connString = new SqlConnectionStringBuilder
 await using var conn = new SqlConnection(connString);
 await conn.OpenAsync();
 
-// ── 1. Query matchups without results for the season ─────────────────────────
+// ── 1. Query playoff matchups without a winner for the playoff ────────────────
 
 var matchups = new List<Matchup>();
 
 await using (var cmd = conn.CreateCommand())
 {
     cmd.CommandText = """
-        SELECT m.Id, m.TournamentCode, m.TeamOneId, m.TeamTwoId
-        FROM SeasonWeekMatchups m
-        INNER JOIN SeasonWeeks w ON w.Id = m.SeasonWeekId
-        WHERE w.SeasonId = @SeasonId
-          AND NOT EXISTS (
-              SELECT 1 FROM SeasonWeekMatchupResults r WHERE r.SeasonWeekMatchupId = m.Id
-          )
+        SELECT m.Id, m.TournamentCode, t1.TeamId, t2.TeamId
+        FROM PlayoffMatchups m
+        LEFT JOIN PlayoffTeams t1 ON t1.Id = m.TeamOneId
+        LEFT JOIN PlayoffTeams t2 ON t2.Id = m.TeamTwoId
+        WHERE m.PlayoffId = @PlayoffId
+          AND m.TeamOneId IS NOT NULL
+          AND m.TeamTwoId IS NOT NULL
+          AND m.WinningTeamId IS NULL
         """;
-    cmd.Parameters.AddWithValue("@SeasonId", seasonId);
+    cmd.Parameters.AddWithValue("@PlayoffId", playoffId);
 
     await using var reader = await cmd.ExecuteReaderAsync();
     while (await reader.ReadAsync())
@@ -74,13 +75,30 @@ await using (var cmd = conn.CreateCommand())
 
 if (matchups.Count == 0)
 {
-    Console.WriteLine($"No pending matchups (without results) found for season {seasonId}.");
+    Console.WriteLine($"No pending matchups (without results) found for playoff {playoffId}.");
     return;
 }
 
 Console.WriteLine($"Found {matchups.Count} matchup(s) without results.");
 
-// ── 2. Query all team member PUUIDs for the season ────────────────────────────
+// ── 2. Query the season ID for this playoff ───────────────────────────────────
+
+long seasonId = 0;
+
+await using (var cmd = conn.CreateCommand())
+{
+    cmd.CommandText = "SELECT SeasonId FROM Playoffs WHERE Id = @PlayoffId";
+    cmd.Parameters.AddWithValue("@PlayoffId", playoffId);
+    var result = await cmd.ExecuteScalarAsync();
+    if (result is null)
+    {
+        Console.Error.WriteLine($"Playoff {playoffId} not found.");
+        Environment.Exit(1);
+    }
+    seasonId = (long)result;
+}
+
+// ── 3. Query all team member PUUIDs for the season ────────────────────────────
 
 var puuidsByTeam = new Dictionary<long, List<string>>();
 
@@ -106,7 +124,7 @@ await using (var cmd = conn.CreateCommand())
     }
 }
 
-// ── 3. POST a TournamentGamesV5 result for each pending matchup ───────────────
+// ── 4. POST a TournamentGamesV5 result for each pending matchup ───────────────
 
 using var http = new HttpClient();
 if (!string.IsNullOrEmpty(functionKey))
@@ -120,9 +138,9 @@ foreach (var matchup in matchups)
 
     if (string.IsNullOrEmpty(tournamentCode))
     {
-        tournamentCode = $"SEED-{matchup.Id}";
+        tournamentCode = $"SEED-PLAYOFF-{matchup.Id}";
         await using var updateCmd = conn.CreateCommand();
-        updateCmd.CommandText = "UPDATE SeasonWeekMatchups SET TournamentCode = @Code WHERE Id = @Id";
+        updateCmd.CommandText = "UPDATE PlayoffMatchups SET TournamentCode = @Code WHERE Id = @Id";
         updateCmd.Parameters.AddWithValue("@Code", tournamentCode);
         updateCmd.Parameters.AddWithValue("@Id", matchup.Id);
         await updateCmd.ExecuteNonQueryAsync();

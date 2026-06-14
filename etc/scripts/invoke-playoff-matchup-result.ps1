@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)]
-    [long] $SeasonId,
+    [long] $PlayoffId,
 
     [Parameter(Mandatory)]
     [string] $ServerInstance,
@@ -8,7 +8,7 @@ param(
     [Parameter(Mandatory)]
     [string] $Database,
 
-    [string] $FunctionUrl = "http://localhost:7071/api/HandleSeasonWeekMatchup",
+    [string] $FunctionUrl = "http://localhost:7071/api/HandlePlayoffMatchup",
 
     [string] $FunctionKey = "",
 
@@ -16,11 +16,11 @@ param(
     [int] $SkipPercent = 20
 )
 
-$projectPath = "$PSScriptRoot\..\..\src\Tools\Bloodsport.Tools.SeedMatchupResults\Bloodsport.Tools.SeedMatchupResults.csproj"
+$projectPath = "$PSScriptRoot\..\..\src\Tools\Bloodsport.Tools.SeedPlayoffMatchupResults\Bloodsport.Tools.SeedPlayoffMatchupResults.csproj"
 
 $dotnetArgs = @(
     "run", "--project", $projectPath, "--",
-    "--season",   $SeasonId,
+    "--playoff",  $PlayoffId,
     "--server",   $ServerInstance,
     "--database", $Database,
     "--url",      $FunctionUrl,
