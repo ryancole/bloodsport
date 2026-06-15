@@ -4,6 +4,7 @@ using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
 using Bloodsport.Entity.RiotApi;
 using Bloodsport.Entity.ServiceBus;
+using BloodsportFunctions.Services;
 using Camille.Enums;
 using Camille.RiotGames;
 using Microsoft.Azure.Functions.Worker;
@@ -21,13 +22,15 @@ public class StartRegularSeason
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
     private readonly RiotGamesApi _riotApi;
     private readonly IConfiguration _config;
+    private readonly EmailService _emailService;
 
-    public StartRegularSeason(ILogger<StartRegularSeason> logger, IDbContextFactory<SqlDbContext> dbFactory, RiotGamesApi riotApi, IConfiguration config)
+    public StartRegularSeason(ILogger<StartRegularSeason> logger, IDbContextFactory<SqlDbContext> dbFactory, RiotGamesApi riotApi, IConfiguration config, EmailService emailService)
     {
         _logger = logger;
         _dbFactory = dbFactory;
         _riotApi = riotApi;
         _config = config;
+        _emailService = emailService;
     }
 
     [Function(nameof(StartRegularSeason))]
@@ -76,6 +79,7 @@ public class StartRegularSeason
             .Include(r => r.Team)
                 .ThenInclude(t => t.TeamMemberships)
                     .ThenInclude(m => m.RiotAccount)
+                        .ThenInclude(a => a.User)
             .ToListAsync();
 
         foreach (var registration in registeredTeams)
@@ -116,6 +120,13 @@ public class StartRegularSeason
         await db.SaveChangesAsync();
 
         _logger.LogInformation("Season {seasonId} status set to Active with {count} team rosters snapshotted.", seasonId, registeredTeams.Count);
+
+        var members = registeredTeams
+            .SelectMany(r => r.Team.TeamMemberships)
+            .Select(m => m.RiotAccount.User)
+            .DistinctBy(u => u.Id);
+
+        await _emailService.SendSeasonStartedAsync(season, members);
 
         // Provision a Riot provider and tournament for this season
         try

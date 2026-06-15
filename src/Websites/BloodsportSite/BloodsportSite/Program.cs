@@ -1,3 +1,4 @@
+using Azure.Communication.Email;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using Bloodsport.Data.Sql;
@@ -67,6 +68,12 @@ namespace BloodsportSite
                 .AddSingleton(new BlobServiceClient(
                     builder.Configuration.GetConnectionString("BlobStorage")
                         ?? throw new InvalidOperationException("ConnectionStrings:BlobStorage is not configured.")));
+
+            builder
+                .Services
+                .AddSingleton(new EmailClient(
+                    builder.Configuration.GetConnectionString("EmailCommunicationService")
+                        ?? throw new InvalidOperationException("ConnectionStrings:EmailCommunicationService is not configured.")));
 
             builder
                 .Services

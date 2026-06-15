@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.29.0" />
     <PackageReference Include="Camille.RiotGames" Version="3.0.0-nightly-2025-06-24-d2b94715b7" />
