@@ -2,10 +2,16 @@ using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.RiotApi;
 using Bloodsport.Entity.ServiceBus;
+using Camille.Enums;
+using Camille.RiotGames;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StubNs = Camille.RiotGames.TournamentStubV5;
+using TournNs = Camille.RiotGames.TournamentV5;
 
 namespace BloodsportFunctions.Functions;
 
@@ -13,11 +19,15 @@ public class StartPlayoff
 {
     private readonly ILogger<StartPlayoff> _logger;
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
+    private readonly RiotGamesApi _riotApi;
+    private readonly IConfiguration _config;
 
-    public StartPlayoff(ILogger<StartPlayoff> logger, IDbContextFactory<SqlDbContext> dbFactory)
+    public StartPlayoff(ILogger<StartPlayoff> logger, IDbContextFactory<SqlDbContext> dbFactory, RiotGamesApi riotApi, IConfiguration config)
     {
         _logger = logger;
         _dbFactory = dbFactory;
+        _riotApi = riotApi;
+        _config = config;
     }
 
     [Function(nameof(StartPlayoff))]
@@ -32,6 +42,7 @@ public class StartPlayoff
         await using var db = _dbFactory.CreateDbContext();
 
         var playoff = await db.Playoffs
+            .Include(p => p.Season)
             .Include(p => p.PlayoffRounds)
                 .ThenInclude(r => r.PlayoffMatchups)
             .FirstOrDefaultAsync(p => p.Id == payload.PlayoffId);
@@ -61,6 +72,44 @@ public class StartPlayoff
 
         playoff.Status = PlayoffStatus.Active;
         await db.SaveChangesAsync();
+
+        // Provision a fresh Riot provider + tournament for the playoff
+        try
+        {
+            var callbackUrl = _config["RiotApi:CallbackUrl"]
+                ?? throw new InvalidOperationException("RiotApi:CallbackUrl is not configured.");
+
+            var region = _config["RiotApi:Region"] ?? "NA";
+            var route = Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
+
+            long providerId;
+            long tournamentId;
+
+            if (RiotApiEndpoints.UseStub)
+            {
+                providerId = await _riotApi.TournamentStubV5().RegisterProviderDataAsync(route,
+                    new StubNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
+                tournamentId = await _riotApi.TournamentStubV5().RegisterTournamentAsync(route,
+                    new StubNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = playoff.Name });
+            }
+            else
+            {
+                providerId = await _riotApi.TournamentV5().RegisterProviderDataAsync(route,
+                    new TournNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
+                tournamentId = await _riotApi.TournamentV5().RegisterTournamentAsync(route,
+                    new TournNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = playoff.Name });
+            }
+
+            playoff.Season.RiotProviderId = providerId;
+            playoff.Season.RiotTournamentId = tournamentId;
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("Provisioned Riot tournament {tournamentId} for playoff {playoffId}", tournamentId, payload.PlayoffId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to provision Riot tournament for playoff {playoffId}. Tournament codes will be unavailable until IDs are set.", payload.PlayoffId);
+        }
 
         await messageActions.CompleteMessageAsync(message);
     }

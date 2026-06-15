@@ -2,10 +2,16 @@ using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.RiotApi;
 using Bloodsport.Entity.ServiceBus;
+using Camille.Enums;
+using Camille.RiotGames;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StubNs = Camille.RiotGames.TournamentStubV5;
+using TournNs = Camille.RiotGames.TournamentV5;
 
 namespace BloodsportFunctions.Functions;
 
@@ -13,11 +19,15 @@ public class StartRegularSeason
 {
     private readonly ILogger<StartRegularSeason> _logger;
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
+    private readonly RiotGamesApi _riotApi;
+    private readonly IConfiguration _config;
 
-    public StartRegularSeason(ILogger<StartRegularSeason> logger, IDbContextFactory<SqlDbContext> dbFactory)
+    public StartRegularSeason(ILogger<StartRegularSeason> logger, IDbContextFactory<SqlDbContext> dbFactory, RiotGamesApi riotApi, IConfiguration config)
     {
         _logger = logger;
         _dbFactory = dbFactory;
+        _riotApi = riotApi;
+        _config = config;
     }
 
     [Function(nameof(StartRegularSeason))]
@@ -106,6 +116,44 @@ public class StartRegularSeason
         await db.SaveChangesAsync();
 
         _logger.LogInformation("Season {seasonId} status set to Active with {count} team rosters snapshotted.", seasonId, registeredTeams.Count);
+
+        // Provision a Riot provider and tournament for this season
+        try
+        {
+            var callbackUrl = _config["RiotApi:CallbackUrl"]
+                ?? throw new InvalidOperationException("RiotApi:CallbackUrl is not configured.");
+
+            var region = _config["RiotApi:Region"] ?? "NA";
+            var route = Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
+
+            long providerId;
+            long tournamentId;
+
+            if (RiotApiEndpoints.UseStub)
+            {
+                providerId = await _riotApi.TournamentStubV5().RegisterProviderDataAsync(route,
+                    new StubNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
+                tournamentId = await _riotApi.TournamentStubV5().RegisterTournamentAsync(route,
+                    new StubNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = season.Name });
+            }
+            else
+            {
+                providerId = await _riotApi.TournamentV5().RegisterProviderDataAsync(route,
+                    new TournNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
+                tournamentId = await _riotApi.TournamentV5().RegisterTournamentAsync(route,
+                    new TournNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = season.Name });
+            }
+
+            season.RiotProviderId = providerId;
+            season.RiotTournamentId = tournamentId;
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("Provisioned Riot tournament {tournamentId} for season {seasonId}", tournamentId, seasonId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to provision Riot tournament for season {seasonId}. Tournament codes will be unavailable until IDs are set.", seasonId);
+        }
 
         await messageActions.CompleteMessageAsync(message);
     }
