@@ -171,9 +171,11 @@ namespace BloodsportSite
 
                 var exists = await db.Users.AnyAsync(u => u.EntraObjectId == oid);
 
+                var email = context.Principal?.FindFirst("email")?.Value;
+
                 if (!exists)
                 {
-                    db.Users.Add(new User { EntraObjectId = oid, DisplayName = GenerateRandomDisplayName() });
+                    db.Users.Add(new User { EntraObjectId = oid, DisplayName = GenerateRandomDisplayName(), Email = email });
                     await db.SaveChangesAsync();
                 }
             };
