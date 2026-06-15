@@ -14,46 +14,11 @@
 }
 else
 {
-    <h2 class="mb-3">Seasons</h2>
+    <h2 class="mb-3">Recent Seasons</h2>
 
-    @if (seasons.Count == 0)
-    {
-        <p class="text-muted">No seasons yet.</p>
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 g-3 mb-5">
-            @foreach (var season in seasons)
-            {
-                <div class="col">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">
-                                    <a href="/seasons/@season.Id">@season.Name</a>
-                                </h5>
-                                <div class="d-flex gap-1">
-                                    <span class="badge @StatusBadgeClass(season.Status)">@season.Status</span>
-                                    @if (season.RegistrationOpen)
-                                    {
-                                        <span class="badge bg-success">Registration Open</span>
-                                    }
-                                </div>
-                            </div>
-                            <p class="card-text text-muted small mb-2">
-                                @(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD") – @(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")
-                            </p>
-                            <p class="card-text small">
-                                <strong>@season.SeasonRegistrations.Count</strong> team@(season.SeasonRegistrations.Count == 1 ? "" : "s") registered
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
+    <SeasonsTable Seasons="seasons" />
 
-    <h2 class="mb-3">Playoffs</h2>
+    <h2 class="mb-3">Recent Playoffs</h2>
 
     <PlayoffsTable Playoffs="activePlayoffs" />
 
@@ -121,17 +86,23 @@ else
     {
         await using var db = await DbFactory.CreateDbContextAsync();
 
+        var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
+
         seasons = await db.Seasons
             .Include(s => s.SeasonRegistrations)
-            .Where(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming || s.Status == SeasonStatus.PreSeason)
-            .OrderBy(s => s.EstimatedDateStart)
+            .Where(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming || s.Status == SeasonStatus.PreSeason
+                || s.DateCreated >= sixMonthsAgo)
+            .OrderBy(s => s.Status)
+            .ThenBy(s => s.Name)
             .ToListAsync();
 
         activePlayoffs = await db.Playoffs
             .Include(p => p.Season)
             .Include(p => p.PlayoffTeams)
-            .Where(p => p.Status == PlayoffStatus.Active || p.Status == PlayoffStatus.Upcoming)
-            .OrderByDescending(p => p.DateCreated)
+            .Where(p => p.Status == PlayoffStatus.Active || p.Status == PlayoffStatus.Upcoming
+                || p.DateCreated >= sixMonthsAgo)
+            .OrderBy(p => p.Status)
+            .ThenBy(p => p.Name)
             .ToListAsync();
 
         recentResults = await db.SeasonWeekMatchupResults
@@ -144,12 +115,4 @@ else
             .ToListAsync();
     }
 
-    private static string StatusBadgeClass(SeasonStatus status) => status switch
-    {
-        SeasonStatus.Active => "bg-primary",
-        SeasonStatus.PreSeason => "bg-info text-dark",
-        SeasonStatus.Upcoming => "bg-secondary",
-        SeasonStatus.Completed => "bg-dark",
-        _ => "bg-secondary"
-    };
 }

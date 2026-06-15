@@ -1,0 +1,51 @@
+@using Bloodsport.Entity.Database
+
+@if (Seasons.Count == 0)
+{
+    <p class="text-muted">No seasons yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Teams</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var season in Seasons)
+            {
+                <tr>
+                    <td>
+                        <a href="/seasons/@season.Id">@season.Name</a>
+                        @if (season.RegistrationOpen)
+                        {
+                            <span class="badge bg-success ms-2">Registration Open</span>
+                        }
+                    </td>
+                    <td><span class="badge @StatusBadgeClass(season.Status)">@season.Status</span></td>
+                    <td>@(season.EstimatedDateStart?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
+                    <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
+                    <td>@season.SeasonRegistrations.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter, EditorRequired] public List<Season> Seasons { get; set; } = [];
+
+    private static string StatusBadgeClass(SeasonStatus status) => status switch
+    {
+        SeasonStatus.Active => "bg-primary",
+        SeasonStatus.PreSeason => "bg-info text-dark",
+        SeasonStatus.Upcoming => "bg-secondary",
+        SeasonStatus.Completed => "bg-dark",
+        _ => "bg-secondary"
+    };
+}
