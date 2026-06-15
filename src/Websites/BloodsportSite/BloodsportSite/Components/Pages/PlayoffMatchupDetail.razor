@@ -24,6 +24,7 @@ else
     var teamTwoName = matchup.TeamTwo?.Team?.Name ?? "TBD";
     var round = matchup.PlayoffRound;
     var playoff = round.Playoff;
+    var isGrandFinal = round.PlayoffMatchups.Count == 1;
 
     <nav class="small mb-2">
         <a href="/playoffs">Playoffs</a> /
@@ -31,8 +32,25 @@ else
         @round.Name / @teamOneName vs @teamTwoName
     </nav>
 
-    <h1 class="mb-1">@teamOneName vs @teamTwoName</h1>
-    <p class="text-muted mb-1">@round.Name &mdash; @playoff.Name</p>
+    @if (isGrandFinal)
+    {
+        <div class="grand-final-banner mb-3">
+            <span class="grand-final-trophy">🏆</span>
+            <div>
+                <div class="grand-final-title">Grand Final</div>
+                <div class="grand-final-subtitle">@playoff.Name</div>
+            </div>
+            <span class="grand-final-trophy">🏆</span>
+        </div>
+
+        <h1 class="mb-1 grand-final-matchup-title">@teamOneName vs @teamTwoName</h1>
+    }
+    else
+    {
+        <h1 class="mb-1">@teamOneName vs @teamTwoName</h1>
+        <p class="text-muted mb-1">@round.Name &mdash; @playoff.Name</p>
+    }
+
     @if (round.DateEnd.HasValue)
     {
         <p class="text-muted small mb-4">Round ends @round.DateEnd.Value.ToLocalTime().ToString("MMMM d, yyyy")</p>

@@ -1,0 +1,61 @@
+@using Bloodsport.Entity.Database
+
+@{
+    var sorted = Users.OrderBy(u => u.DisplayName).ToList();
+    var totalPages = (int)Math.Ceiling(sorted.Count / (double)PageSize);
+    var page = CurrentPage < 1 ? 1 : CurrentPage;
+    var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
+}
+
+<Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex justify-content-end mb-2" />
+
+@if (Users.Count == 0)
+{
+    <p class="text-muted">No users yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Teams</th>
+                <th>Member Since</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in pageItems)
+            {
+                var teamNames = string.Join(", ", user.RiotAccounts
+                    .SelectMany(a => a.TeamMemberships)
+                    .Select(m => m.Team.Name)
+                    .Distinct()
+                    .OrderBy(n => n));
+
+                <tr>
+                    <td><a href="/users/@user.Id">@user.DisplayName</a></td>
+                    <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        @if (string.IsNullOrEmpty(teamNames))
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                        else
+                        {
+                            @teamNames
+                        }
+                    </td>
+                    <td>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private const int PageSize = 20;
+
+    [Parameter, EditorRequired] public ICollection<User> Users { get; set; } = [];
+    [Parameter] public int CurrentPage { get; set; } = 1;
+
+    private string PageUrl(int p) => $"/users?page={p}";
+}

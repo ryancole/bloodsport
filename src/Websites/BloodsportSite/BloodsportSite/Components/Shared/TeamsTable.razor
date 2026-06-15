@@ -1,0 +1,48 @@
+@using Bloodsport.Entity.Database
+
+@{
+    var sorted = Teams.OrderBy(t => t.Name).ToList();
+    var totalPages = (int)Math.Ceiling(sorted.Count / (double)PageSize);
+    var page = CurrentPage < 1 ? 1 : CurrentPage;
+    var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
+}
+
+<Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex justify-content-end mb-2" />
+
+@if (Teams.Count == 0)
+{
+    <p class="text-muted">No teams yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Manager</th>
+                <th>Members</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var team in pageItems)
+            {
+                <tr>
+                    <td><a href="/teams/@team.Id">@team.Name</a></td>
+                    <td><a href="/users/@team.Manager.Id">@team.Manager.DisplayName</a></td>
+                    <td>@team.TeamMemberships.Count</td>
+                    <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private const int PageSize = 20;
+
+    [Parameter, EditorRequired] public ICollection<Team> Teams { get; set; } = [];
+    [Parameter] public int CurrentPage { get; set; } = 1;
+
+    private string PageUrl(int p) => $"/teams?page={p}";
+}
