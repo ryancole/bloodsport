@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upcoming Matchup</title>
+</head>
+<body style="font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; padding: 40px;">
+          <tr>
+            <td>
+              <h1 style="color: #1a1a1a; margin-top: 0;">Your next matchup is scheduled!</h1>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                <strong>{{ week_name }}</strong> is now underway for <strong>{{ season_name }}</strong>.
+              </p>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                <strong>{{ team_name }}</strong> vs <strong>{{ opponent_name }}</strong>
+              </p>
+              <p style="color: #444; font-size: 16px; line-height: 1.6;">
+                You have until <strong>{{ date_end }}</strong> to complete your match. Head to the site to get your tournament code.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

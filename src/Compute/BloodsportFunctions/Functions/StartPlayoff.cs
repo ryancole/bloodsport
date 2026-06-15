@@ -4,6 +4,7 @@ using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
 using Bloodsport.Entity.RiotApi;
 using Bloodsport.Entity.ServiceBus;
+using BloodsportFunctions.Services;
 using Camille.Enums;
 using Camille.RiotGames;
 using Microsoft.Azure.Functions.Worker;
@@ -21,13 +22,15 @@ public class StartPlayoff
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
     private readonly RiotGamesApi _riotApi;
     private readonly IConfiguration _config;
+    private readonly EmailService _emailService;
 
-    public StartPlayoff(ILogger<StartPlayoff> logger, IDbContextFactory<SqlDbContext> dbFactory, RiotGamesApi riotApi, IConfiguration config)
+    public StartPlayoff(ILogger<StartPlayoff> logger, IDbContextFactory<SqlDbContext> dbFactory, RiotGamesApi riotApi, IConfiguration config, EmailService emailService)
     {
         _logger = logger;
         _dbFactory = dbFactory;
         _riotApi = riotApi;
         _config = config;
+        _emailService = emailService;
     }
 
     [Function(nameof(StartPlayoff))]
@@ -71,6 +74,21 @@ public class StartPlayoff
 
         playoff.Status = PlayoffStatus.Active;
         await db.SaveChangesAsync();
+
+        var playoffTeams = await db.PlayoffTeams
+            .Where(pt => pt.PlayoffId == payload.PlayoffId)
+            .Include(pt => pt.Team)
+                .ThenInclude(t => t.TeamMemberships)
+                    .ThenInclude(m => m.RiotAccount)
+                        .ThenInclude(a => a.User)
+            .ToListAsync();
+
+        var teamsWithMembers = playoffTeams.Select(pt => (
+            pt.Team,
+            pt.Team.TeamMemberships.Select(m => m.RiotAccount.User).DistinctBy(u => u.Id)
+        ));
+
+        await _emailService.SendPlayoffStartedAsync(playoff, teamsWithMembers);
 
         // Provision a fresh Riot provider + tournament for the playoff
         try

@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using BloodsportFunctions.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,11 +11,13 @@ public class EndPlayoffRound
 {
     private readonly ILogger<EndPlayoffRound> _logger;
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
+    private readonly EmailService _emailService;
 
-    public EndPlayoffRound(ILoggerFactory loggerFactory, IDbContextFactory<SqlDbContext> dbFactory)
+    public EndPlayoffRound(ILoggerFactory loggerFactory, IDbContextFactory<SqlDbContext> dbFactory, EmailService emailService)
     {
         _logger = loggerFactory.CreateLogger<EndPlayoffRound>();
         _dbFactory = dbFactory;
+        _emailService = emailService;
     }
 
     [Function("EndPlayoffRound")]
@@ -29,6 +32,17 @@ public class EndPlayoffRound
         var expiredRounds = await db.PlayoffRounds
             .Include(r => r.Playoff)
             .Include(r => r.PlayoffMatchups)
+                .ThenInclude(m => m.TeamOne)
+                    .ThenInclude(pt => pt.Team)
+                        .ThenInclude(t => t.TeamMemberships)
+                            .ThenInclude(tm => tm.RiotAccount)
+                                .ThenInclude(a => a.User)
+            .Include(r => r.PlayoffMatchups)
+                .ThenInclude(m => m.TeamTwo)
+                    .ThenInclude(pt => pt.Team)
+                        .ThenInclude(t => t.TeamMemberships)
+                            .ThenInclude(tm => tm.RiotAccount)
+                                .ThenInclude(a => a.User)
             .Where(r =>
                 r.Playoff.Status == PlayoffStatus.Active &&
                 r.DateEnd != null && r.DateEnd < now &&
@@ -75,5 +89,17 @@ public class EndPlayoffRound
         _logger.LogInformation(
             "EndPlayoffRound complete. Checked {roundCount} expired rounds, defaulted {matchupCount} unresolved matchups.",
             expiredRounds.Count, defaultedCount);
+
+        foreach (var round in expiredRounds)
+        {
+            var members = round.PlayoffMatchups
+                .SelectMany(m => new[] { m.TeamOne, m.TeamTwo })
+                .Where(pt => pt is not null)
+                .SelectMany(pt => pt!.Team.TeamMemberships)
+                .Select(tm => tm.RiotAccount.User)
+                .DistinctBy(u => u.Id);
+
+            await _emailService.SendPlayoffRoundEndedAsync(round, members);
+        }
     }
 }
