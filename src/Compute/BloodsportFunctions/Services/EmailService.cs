@@ -10,12 +10,14 @@ public class EmailService
     private const int BatchSize = 100;
 
     private readonly EmailClient _emailClient;
+    private readonly EmailTemplateRenderer _templateRenderer;
     private readonly IConfiguration _config;
     private readonly ILogger<EmailService> _logger;
 
-    public EmailService(EmailClient emailClient, IConfiguration config, ILogger<EmailService> logger)
+    public EmailService(EmailClient emailClient, EmailTemplateRenderer templateRenderer, IConfiguration config, ILogger<EmailService> logger)
     {
         _emailClient = emailClient;
+        _templateRenderer = templateRenderer;
         _config = config;
         _logger = logger;
     }
@@ -36,13 +38,12 @@ public class EmailService
             return;
         }
 
+        var html = await _templateRenderer.RenderAsync("SeasonStarted.html", new { season_name = season.Name });
+
         var content = new EmailContent($"Season \"{season.Name}\" has started!")
         {
             PlainText = $"The season \"{season.Name}\" is now underway. Good luck to your team!",
-            Html = $"""
-                <p>The season <strong>{season.Name}</strong> is now underway.</p>
-                <p>Good luck to your team!</p>
-                """
+            Html = html
         };
 
         var batches = recipients

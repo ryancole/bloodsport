@@ -41,6 +41,10 @@ public class Program
 
         builder
             .Services
+            .AddSingleton<EmailTemplateRenderer>();
+
+        builder
+            .Services
             .AddTransient<EmailService>();
 
         RiotApiEndpoints.UseStub = builder.Configuration.GetValue<bool>("RiotApi:UseStub");
