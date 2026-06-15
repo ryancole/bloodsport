@@ -1,0 +1,42 @@
+@{
+    var windowStart = Math.Max(1, Math.Min(CurrentPage - Window / 2, TotalPages - Window + 1));
+    var windowEnd = Math.Min(TotalPages, windowStart + Window - 1);
+}
+
+@if (TotalPages > 1)
+{
+    <nav class="@NavClass">
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@PageUrl(CurrentPage - 1)">Previous</a>
+            </li>
+            @if (windowStart > 1)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+            @for (var p = windowStart; p <= windowEnd; p++)
+            {
+                var pageNum = p;
+                <li class="page-item @(CurrentPage == pageNum ? "active" : "")">
+                    <a class="page-link" href="@PageUrl(pageNum)">@pageNum</a>
+                </li>
+            }
+            @if (windowEnd < TotalPages)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@PageUrl(CurrentPage + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
+
+@code {
+    private const int Window = 5;
+
+    [Parameter, EditorRequired] public int CurrentPage { get; set; }
+    [Parameter, EditorRequired] public int TotalPages { get; set; }
+    [Parameter, EditorRequired] public Func<int, string> PageUrl { get; set; } = _ => "#";
+    [Parameter] public string NavClass { get; set; } = "";
+}

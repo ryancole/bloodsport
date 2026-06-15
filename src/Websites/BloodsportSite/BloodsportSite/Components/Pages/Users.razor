@@ -11,49 +11,14 @@
 {
     <p><em>Loading...</em></p>
 }
-else if (users.Count == 0)
-{
-    <p class="text-muted">No users yet.</p>
-}
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Teams</th>
-                <th>Member Since</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in users)
-            {
-                var teamNames = string.Join(", ", user.RiotAccounts
-                    .SelectMany(a => a.TeamMemberships)
-                    .Select(m => m.Team.Name)
-                    .Distinct()
-                    .OrderBy(n => n));
-
-                <tr>
-                    <td><a href="/users/@user.Id">@user.DisplayName</a></td>
-                    <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        @if (string.IsNullOrEmpty(teamNames))
-                        {
-                            <span class="text-muted">—</span>
-                        }
-                        else
-                        {
-                            @teamNames
-                        }
-                    </td>
-                    <td>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <UsersTable Users="users" CurrentPage="Page" />
 }
 
 @code {
+    [SupplyParameterFromQuery(Name = "page")] public int Page { get; set; } = 1;
+
     private List<Bloodsport.Entity.Database.User>? users;
 
     protected override async Task OnInitializedAsync()
@@ -63,7 +28,6 @@ else
             .Include(u => u.RiotAccounts)
                 .ThenInclude(a => a.TeamMemberships)
                     .ThenInclude(m => m.Team)
-            .OrderBy(u => u.DisplayName)
             .ToListAsync();
     }
 }

@@ -12,26 +12,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-2">
     <h2 class="mb-0">Team Standings</h2>
-    @if (totalPages > 1)
-    {
-        <nav>
-            <ul class="pagination pagination-sm mb-0">
-                <li class="page-item @(page == 1 ? "disabled" : "")">
-                    <a class="page-link" href="@PageUrl(page - 1)">Previous</a>
-                </li>
-                @for (var p = 1; p <= totalPages; p++)
-                {
-                    var pageNum = p;
-                    <li class="page-item @(page == pageNum ? "active" : "")">
-                        <a class="page-link" href="@PageUrl(pageNum)">@pageNum</a>
-                    </li>
-                }
-                <li class="page-item @(page == totalPages ? "disabled" : "")">
-                    <a class="page-link" href="@PageUrl(page + 1)">Next</a>
-                </li>
-            </ul>
-        </nav>
-    }
+    <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" />
 </div>
 
 @if (Results.Count == 0)

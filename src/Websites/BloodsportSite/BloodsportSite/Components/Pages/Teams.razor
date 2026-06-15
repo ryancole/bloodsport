@@ -18,36 +18,14 @@
 {
     <p><em>Loading...</em></p>
 }
-else if (teams.Count == 0)
-{
-    <p class="text-muted">No teams yet.</p>
-}
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Manager</th>
-                <th>Members</th>
-                <th>Created</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var team in teams)
-            {
-                <tr>
-                    <td><a href="/teams/@team.Id">@team.Name</a></td>
-                    <td><a href="/users/@team.Manager.Id">@team.Manager.DisplayName</a></td>
-                    <td>@team.TeamMemberships.Count</td>
-                    <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <TeamsTable Teams="teams" CurrentPage="Page" />
 }
 
 @code {
+    [SupplyParameterFromQuery(Name = "page")] public int Page { get; set; } = 1;
+
     private List<Bloodsport.Entity.Database.Team>? teams;
 
     protected override async Task OnInitializedAsync()
@@ -56,7 +34,6 @@ else
         teams = await db.Teams
             .Include(t => t.Manager)
             .Include(t => t.TeamMemberships)
-            .OrderBy(t => t.Name)
             .ToListAsync();
     }
 }
