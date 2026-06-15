@@ -71,7 +71,7 @@ namespace BloodsportSite.Api
             var matchup = await db.PlayoffMatchups
                 .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
                 .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
-                .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff).ThenInclude(p => p.Season)
+                .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (matchup is null)
@@ -89,14 +89,14 @@ namespace BloodsportSite.Api
             if (matchup.PlayoffRound.DateEnd.HasValue && matchup.PlayoffRound.DateEnd.Value < DateTime.UtcNow)
                 return Results.Redirect($"{MatchupUrl(matchup)}?error=round_ended");
 
-            var season = matchup.PlayoffRound.Playoff.Season;
+            var playoff = matchup.PlayoffRound.Playoff;
 
-            if (season.RiotTournamentId is null)
+            if (playoff.RiotTournamentId is null)
                 return Results.Redirect($"{MatchupUrl(matchup)}?error=tournament_not_configured");
 
             try
             {
-                matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(season.RiotTournamentId.Value);
+                matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(playoff.RiotTournamentId.Value);
                 await db.SaveChangesAsync();
             }
             catch (HttpRequestException)

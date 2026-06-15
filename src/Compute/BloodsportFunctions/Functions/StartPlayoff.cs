@@ -42,7 +42,6 @@ public class StartPlayoff
         await using var db = _dbFactory.CreateDbContext();
 
         var playoff = await db.Playoffs
-            .Include(p => p.Season)
             .Include(p => p.PlayoffRounds)
                 .ThenInclude(r => r.PlayoffMatchups)
             .FirstOrDefaultAsync(p => p.Id == payload.PlayoffId);
@@ -100,8 +99,8 @@ public class StartPlayoff
                     new TournNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = playoff.Name });
             }
 
-            playoff.Season.RiotProviderId = providerId;
-            playoff.Season.RiotTournamentId = tournamentId;
+            playoff.RiotProviderId = providerId;
+            playoff.RiotTournamentId = tournamentId;
             await db.SaveChangesAsync();
 
             _logger.LogInformation("Provisioned Riot tournament {tournamentId} for playoff {playoffId}", tournamentId, payload.PlayoffId);
