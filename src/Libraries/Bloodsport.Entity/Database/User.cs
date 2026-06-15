@@ -12,6 +12,8 @@ namespace Bloodsport.Entity.Database
 
         public required string EntraObjectId { get; init; }
 
+        public string? Email { get; set; }
+
         public DateTime DateCreated { get; private set; }
 
         #endregion

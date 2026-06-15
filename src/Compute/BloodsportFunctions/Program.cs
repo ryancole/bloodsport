@@ -1,6 +1,8 @@
+using Azure.Communication.Email;
 using Azure.Storage.Blobs;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.RiotApi;
+using BloodsportFunctions.Services;
 using Camille.RiotGames;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,20 @@ public class Program
             .AddSingleton(new BlobServiceClient(
                 builder.Configuration.GetConnectionString("AzureWebJobsStorage")
                     ?? throw new InvalidOperationException("AzureWebJobsStorage is not configured.")));
+
+        builder
+            .Services
+            .AddSingleton(new EmailClient(
+                builder.Configuration.GetConnectionString("EmailCommunicationService")
+                    ?? throw new InvalidOperationException("ConnectionStrings:EmailCommunicationService is not configured.")));
+
+        builder
+            .Services
+            .AddSingleton<EmailTemplateRenderer>();
+
+        builder
+            .Services
+            .AddTransient<EmailService>();
 
         RiotApiEndpoints.UseStub = builder.Configuration.GetValue<bool>("RiotApi:UseStub");
 

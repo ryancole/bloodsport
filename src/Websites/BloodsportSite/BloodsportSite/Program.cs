@@ -1,3 +1,4 @@
+using Azure.Communication.Email;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using Bloodsport.Data.Sql;
@@ -67,6 +68,12 @@ namespace BloodsportSite
                 .AddSingleton(new BlobServiceClient(
                     builder.Configuration.GetConnectionString("BlobStorage")
                         ?? throw new InvalidOperationException("ConnectionStrings:BlobStorage is not configured.")));
+
+            builder
+                .Services
+                .AddSingleton(new EmailClient(
+                    builder.Configuration.GetConnectionString("EmailCommunicationService")
+                        ?? throw new InvalidOperationException("ConnectionStrings:EmailCommunicationService is not configured.")));
 
             builder
                 .Services
@@ -171,9 +178,11 @@ namespace BloodsportSite
 
                 var exists = await db.Users.AnyAsync(u => u.EntraObjectId == oid);
 
+                var email = context.Principal?.FindFirst("email")?.Value;
+
                 if (!exists)
                 {
-                    db.Users.Add(new User { EntraObjectId = oid, DisplayName = GenerateRandomDisplayName() });
+                    db.Users.Add(new User { EntraObjectId = oid, DisplayName = GenerateRandomDisplayName(), Email = email });
                     await db.SaveChangesAsync();
                 }
             };
