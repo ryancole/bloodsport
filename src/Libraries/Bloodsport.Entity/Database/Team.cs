@@ -12,6 +12,8 @@ namespace Bloodsport.Entity.Database
 
         public required string Name { get; set; }
 
+        public string? LogoUrl { get; set; }
+
         public DateTime DateCreated { get; private set; }
 
         #endregion

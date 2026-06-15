@@ -33,7 +33,7 @@ else
             @foreach (var result in pageItems)
             {
                 <tr>
-                    <td><a href="/teams/@result.Team.Id">@result.Team.Name</a></td>
+                    <td><a href="/teams/@result.Team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@result.Team.LogoUrl" />@result.Team.Name</a></td>
                     <td>@result.WinCount</td>
                     <td>@result.LoseCount</td>
                 </tr>

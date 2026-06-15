@@ -50,8 +50,8 @@ else
                     var result = matchup.SeasonWeekMatchupResult;
                     <tr>
                         <td><a href="/seasons/@week.Season.Id/weeks/@week.Id/matchups/@matchup.Id">@matchup.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamOneId">@matchup.TeamOne.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamTwoId">@matchup.TeamTwo.Name</a></td>
+                        <td><a href="/teams/@matchup.TeamOneId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamOne.LogoUrl" />@matchup.TeamOne.Name</a></td>
+                        <td><a href="/teams/@matchup.TeamTwoId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamTwo.LogoUrl" />@matchup.TeamTwo.Name</a></td>
                         <td>
                             @if (result is not null)
                             {

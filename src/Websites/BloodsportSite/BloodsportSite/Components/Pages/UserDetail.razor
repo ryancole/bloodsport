@@ -69,7 +69,7 @@ else
                 @foreach (var team in user.ManagedTeams.OrderBy(t => t.Name))
                 {
                     <tr>
-                        <td><a href="/teams/@team.Id">@team.Name</a></td>
+                        <td><a href="/teams/@team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@team.LogoUrl" />@team.Name</a></td>
                         <td>@team.TeamMemberships.Count</td>
                         <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>
@@ -98,7 +98,7 @@ else
                 @foreach (var membership in memberships.OrderBy(m => m.Team.Name))
                 {
                     <tr>
-                        <td><a href="/teams/@membership.Team.Id">@membership.Team.Name</a></td>
+                        <td><a href="/teams/@membership.Team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@membership.Team.LogoUrl" />@membership.Team.Name</a></td>
                         <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
                         <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>

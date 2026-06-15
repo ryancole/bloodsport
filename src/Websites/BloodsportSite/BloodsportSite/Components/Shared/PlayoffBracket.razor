@@ -79,6 +79,7 @@ else
             @if (team is not null)
             {
                 <span class="bracket-seed">@team.Seed</span>
+                <TeamFlag LogoUrl="@team.Team?.LogoUrl" />
                 <span class="bracket-name">@(team.Team?.Name ?? "Unknown")</span>
             }
             else

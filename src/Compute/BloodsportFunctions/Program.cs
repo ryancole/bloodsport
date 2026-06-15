@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.RiotApi;
 using Camille.RiotGames;
@@ -23,6 +24,12 @@ public class Program
         builder
             .Services
             .AddDbContextFactory<SqlDbContext>(options => options.UseSqlServer(builder.Configuration["SqlConnectionString"]));
+
+        builder
+            .Services
+            .AddSingleton(new BlobServiceClient(
+                builder.Configuration.GetConnectionString("AzureWebJobsStorage")
+                    ?? throw new InvalidOperationException("AzureWebJobsStorage is not configured.")));
 
         RiotApiEndpoints.UseStub = builder.Configuration.GetValue<bool>("RiotApi:UseStub");
 

@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using BloodsportSite.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodsportSite.Api
@@ -51,8 +52,10 @@ namespace BloodsportSite.Api
         private static async Task<IResult> EditAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
+            TeamLogoService teamLogoService,
             long id,
-            [Microsoft.AspNetCore.Mvc.FromForm] string name)
+            [Microsoft.AspNetCore.Mvc.FromForm] string name,
+            IFormFile? logo)
         {
             name = name.Trim();
 
@@ -71,6 +74,15 @@ namespace BloodsportSite.Api
                 return Results.Redirect("/teams");
 
             team.Name = name;
+
+            if (logo is not null && logo.Length > 0)
+            {
+                var logoUrl = await teamLogoService.UploadLogoAsync(id, logo);
+                if (logoUrl is null)
+                    return Results.Redirect($"/teams/{id}/edit?error=invalid_logo");
+                team.LogoUrl = logoUrl;
+            }
+
             await db.SaveChangesAsync();
 
             return Results.Redirect("/teams");

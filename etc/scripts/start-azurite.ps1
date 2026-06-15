@@ -9,4 +9,4 @@ if (-not (Test-Path $dataFolder)) {
     New-Item -ItemType Directory -Path $dataFolder | Out-Null
 }
 
-Start-Process -FilePath $azurite -ArgumentList "--location `"$dataFolder`""
+Start-Process -FilePath $azurite -ArgumentList "--skipApiVersionCheck --location `"$dataFolder`""

@@ -46,7 +46,7 @@ else
                     @foreach (var invite in pendingInvites)
                     {
                         <tr>
-                            <td><a href="/teams/@invite.TeamId">@invite.Team.Name</a></td>
+                            <td><a href="/teams/@invite.TeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@invite.Team.LogoUrl" />@invite.Team.Name</a></td>
                             <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(invite.RiotAccount.GameName)-@Uri.EscapeDataString(invite.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@invite.RiotAccount.GameName#@invite.RiotAccount.TagLine</strong></a></td>
                             <td>@invite.DateCreated.ToLocalTime().ToString("MMM d, yyyy")</td>
                             <td class="d-flex gap-2">
