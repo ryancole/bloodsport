@@ -33,6 +33,9 @@ namespace Bloodsport.Entity.Database
         [JsonIgnore]
         public virtual ICollection<PlayoffRound> PlayoffRounds { get; set; } = [];
 
+        [JsonIgnore]
+        public virtual ICollection<TeamPlayoffRoster> TeamPlayoffRosters { get; set; } = [];
+
         #endregion
     }
 

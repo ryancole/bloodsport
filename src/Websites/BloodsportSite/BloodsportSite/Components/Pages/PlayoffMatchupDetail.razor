@@ -111,7 +111,7 @@ else
             <strong>@matchup.WinningTeam.Team?.Name</strong> wins this matchup.
         </div>
     }
-    else if (matchup.TournamentCode is not null && !RoundEnded)
+    else if (matchup.TournamentCode is not null && RoundEnded)
     {
         <MatchupPendingResultAlert />
     }
