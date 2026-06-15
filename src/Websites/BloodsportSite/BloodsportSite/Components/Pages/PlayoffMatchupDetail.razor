@@ -1,0 +1,168 @@
+@page "/playoffs/{playoffId:long}/matchups/{matchupId:long}"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.EntityFrameworkCore
+@using System.Text.Json
+@inject IDbContextFactory<SqlDbContext> DbFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(matchup is not null && matchup.TeamOne is not null && matchup.TeamTwo is not null ? $"{matchup.TeamOne.Team?.Name} vs {matchup.TeamTwo.Team?.Name}" : "Matchup")</PageTitle>
+
+@if (notFound)
+{
+    <p class="text-muted">Matchup not found.</p>
+}
+else if (matchup is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    var teamOneName = matchup.TeamOne?.Team?.Name ?? "TBD";
+    var teamTwoName = matchup.TeamTwo?.Team?.Name ?? "TBD";
+    var round = matchup.PlayoffRound;
+    var playoff = round.Playoff;
+
+    <nav class="small mb-2">
+        <a href="/playoffs">Playoffs</a> /
+        <a href="/playoffs/@playoff.Id">@playoff.Name</a> /
+        @round.Name / @teamOneName vs @teamTwoName
+    </nav>
+
+    <h1 class="mb-1">@teamOneName vs @teamTwoName</h1>
+    <p class="text-muted mb-1">@round.Name &mdash; @playoff.Name</p>
+    @if (round.DateEnd.HasValue)
+    {
+        <p class="text-muted small mb-4">Round ends @round.DateEnd.Value.ToLocalTime().ToString("MMMM d, yyyy")</p>
+    }
+    else
+    {
+        <p class="text-muted small mb-4">Round end date not yet set</p>
+    }
+
+    @* Tournament Lobby *@
+    @if (playoff.Status == PlayoffStatus.Active && (isManager || isMember))
+    {
+        <PlayoffLobbyCode MatchupId="matchup.Id" IsManager="isManager" RoundEnded="RoundEnded" TournamentCode="@matchup.TournamentCode" Error="@error" />
+    }
+
+    @* Result *@
+    @if (matchup.WinningTeam is not null)
+    {
+        <div class="alert alert-success mb-4">
+            <strong>@matchup.WinningTeam.Team?.Name</strong> wins this matchup.
+        </div>
+    }
+    else if (matchup.TournamentCode is not null && RoundEnded)
+    {
+        <MatchupPendingResultAlert />
+    }
+
+    @* Teams *@
+    @if (matchup.WinningTeam is null)
+    {
+        <div class="alert alert-warning small mb-4">
+            <strong>Roster verification required.</strong>
+            Each team is allowed up to 7 players (5 starters + 2 bench) whose Riot IDs are locked in at the start of the season.
+            Before play begins, both teams must manually verify that every player in the custom lobby matches the allowed roster listed below.
+            Players not on a team's season roster are not eligible to compete and must be removed from the lobby.
+        </div>
+    }
+    <div class="row g-0 mb-4 align-items-stretch">
+        <div class="col-md-5">
+            <TeamSeasonRosterCard TeamId="@(matchup.TeamOne?.TeamId ?? 0)" TeamName="@teamOneName" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-primary-subtle text-primary-emphasis" UserIds="@rosterUserIds" />
+        </div>
+
+        <div class="col-md-2 d-flex align-items-center justify-content-center py-4">
+            <div class="fw-black fs-2 text-muted lh-1">VS</div>
+        </div>
+
+        <div class="col-md-5">
+            <TeamSeasonRosterCard TeamId="@(matchup.TeamTwo?.TeamId ?? 0)" TeamName="@teamTwoName" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-danger-subtle text-danger-emphasis" UserIds="@rosterUserIds" />
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public long PlayoffId { get; set; }
+    [Parameter] public long MatchupId { get; set; }
+
+    private PlayoffMatchup? matchup;
+    private bool notFound;
+    private bool isManager;
+    private bool isMember;
+    private string? error;
+    private ICollection<string> teamOneRoster = [];
+    private ICollection<string> teamTwoRoster = [];
+    private Dictionary<string, long> rosterUserIds = [];
+
+    private bool RoundEnded => matchup?.PlayoffRound.DateEnd.HasValue == true
+                            && matchup.PlayoffRound.DateEnd!.Value < DateTime.UtcNow;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        query.TryGetValue("error", out var errorVal);
+        error = errorVal;
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        matchup = await db.PlayoffMatchups
+            .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
+            .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
+            .Include(m => m.WinningTeam).ThenInclude(pt => pt!.Team)
+            .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
+            .FirstOrDefaultAsync(m => m.Id == MatchupId && m.PlayoffRound.PlayoffId == PlayoffId);
+
+        if (matchup is null)
+        {
+            notFound = true;
+            return;
+        }
+
+        var teamOneId = matchup.TeamOne?.TeamId;
+        var teamTwoId = matchup.TeamTwo?.TeamId;
+
+        var rosters = await db.TeamPlayoffRosters
+            .Where(r => r.PlayoffId == PlayoffId && (r.TeamId == teamOneId || r.TeamId == teamTwoId))
+            .ToListAsync();
+
+        static ICollection<string> ParseRoster(TeamPlayoffRoster? roster) =>
+            roster is null ? [] :
+            JsonSerializer.Deserialize<TeamPlayoffRosterJson>(roster.RosterJson)?.AllowedSummonerNames ?? [];
+
+        teamOneRoster = ParseRoster(rosters.FirstOrDefault(r => r.TeamId == teamOneId));
+        teamTwoRoster = ParseRoster(rosters.FirstOrDefault(r => r.TeamId == teamTwoId));
+
+        var allSummonerNames = teamOneRoster.Concat(teamTwoRoster).ToHashSet();
+        var accounts = await db.RiotAccounts
+            .Where(a => allSummonerNames.Contains(a.GameName + "#" + a.TagLine))
+            .ToListAsync();
+        rosterUserIds = accounts.ToDictionary(a => $"{a.GameName}#{a.TagLine}", a => a.UserId);
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is not null)
+        {
+            var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+            if (user is not null)
+            {
+                isManager = matchup.TeamOne?.Team?.ManagerId == user.Id
+                         || matchup.TeamTwo?.Team?.ManagerId == user.Id;
+
+                var teamOneTeamId = matchup.TeamOne?.TeamId;
+                var teamTwoTeamId = matchup.TeamTwo?.TeamId;
+
+                isMember = await db.TeamMemberships
+                    .Include(m => m.RiotAccount)
+                    .AnyAsync(m => m.RiotAccount.UserId == user.Id &&
+                                   (m.TeamId == teamOneTeamId || m.TeamId == teamTwoTeamId));
+            }
+        }
+    }
+}

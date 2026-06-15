@@ -12,6 +12,10 @@ namespace Bloodsport.Entity.Database
 
         public required string Name { get; set; }
 
+        public long? RiotProviderId { get; set; }
+
+        public long? RiotTournamentId { get; set; }
+
         public required PlayoffStatus Status { get; set; } = PlayoffStatus.Upcoming;
 
         public DateTime DateCreated { get; private set; }
@@ -28,6 +32,9 @@ namespace Bloodsport.Entity.Database
 
         [JsonIgnore]
         public virtual ICollection<PlayoffRound> PlayoffRounds { get; set; } = [];
+
+        [JsonIgnore]
+        public virtual ICollection<TeamPlayoffRoster> TeamPlayoffRosters { get; set; } = [];
 
         #endregion
     }

@@ -4,6 +4,7 @@ using Bloodsport.Data.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    partial class SqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260615010207_PlayoffTournamentId")]
+    partial class PlayoffTournamentId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -487,39 +490,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.ToTable("TeamMemberships");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.TeamPlayoffRoster", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<long>("PlayoffId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("RosterJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("TeamId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlayoffId");
-
-                    b.HasIndex("TeamId", "PlayoffId")
-                        .IsUnique();
-
-                    b.ToTable("TeamPlayoffRosters");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.TeamSeasonResult", b =>
                 {
                     b.Property<long>("Id")
@@ -828,25 +798,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.TeamPlayoffRoster", b =>
-                {
-                    b.HasOne("Bloodsport.Entity.Database.Playoff", "Playoff")
-                        .WithMany("TeamPlayoffRosters")
-                        .HasForeignKey("PlayoffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bloodsport.Entity.Database.Team", "Team")
-                        .WithMany("TeamPlayoffRosters")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Playoff");
-
-                    b.Navigation("Team");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.TeamSeasonResult", b =>
                 {
                     b.HasOne("Bloodsport.Entity.Database.Season", "Season")
@@ -890,8 +841,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("PlayoffRounds");
 
                     b.Navigation("PlayoffTeams");
-
-                    b.Navigation("TeamPlayoffRosters");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.PlayoffRound", b =>
@@ -946,8 +895,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("TeamInvites");
 
                     b.Navigation("TeamMemberships");
-
-                    b.Navigation("TeamPlayoffRosters");
 
                     b.Navigation("TeamSeasonResults");
 

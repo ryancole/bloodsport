@@ -42,11 +42,7 @@ else
                 {
                     @if (isMember || isManager)
                     {
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="font-monospace fs-3 fw-bold lh-1">@matchup.TournamentCode</div>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy lobby code" onclick="navigator.clipboard.writeText('@matchup.TournamentCode').then(() => { this.textContent = '✓ Copied'; setTimeout(() => this.textContent = 'Copy', 2000); })">Copy</button>
-                        </div>
-                        <div class="small text-success mt-1">&#10003; Lobby code ready</div>
+                        <LobbyCodeDisplay Code="@matchup.TournamentCode" />
                     }
                     else
                     {

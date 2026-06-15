@@ -111,6 +111,40 @@ public class BuildPlayoffBracket
             "Inserted {count} PlayoffTeam records for playoff {playoffId}.",
             playoffTeams.Count, playoff.Id);
 
+        // --- Snapshot rosters from the associated season ---
+
+        var teamIds = qualifiedTeams.Select(r => r.TeamId).ToHashSet();
+
+        var seasonRosters = await db.TeamSeasonRosters
+            .Where(r => r.SeasonId == playoff.SeasonId && teamIds.Contains(r.TeamId))
+            .ToListAsync();
+
+        foreach (var seasonRoster in seasonRosters)
+        {
+            var existing = await db.TeamPlayoffRosters
+                .FirstOrDefaultAsync(r => r.TeamId == seasonRoster.TeamId && r.PlayoffId == playoff.Id);
+
+            if (existing is not null)
+            {
+                existing.RosterJson = seasonRoster.RosterJson;
+            }
+            else
+            {
+                db.TeamPlayoffRosters.Add(new TeamPlayoffRoster
+                {
+                    TeamId = seasonRoster.TeamId,
+                    PlayoffId = playoff.Id,
+                    RosterJson = seasonRoster.RosterJson,
+                });
+            }
+        }
+
+        await db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Snapshotted {count} team rosters for playoff {playoffId}.",
+            seasonRosters.Count, playoff.Id);
+
         // --- Build PlayoffRound records ---
         // Round 1 = grand final (1 matchup). Round roundCount = first round played (bracketSize/2 matchups).
 

@@ -140,7 +140,7 @@ else
                 .ThenInclude(m => m.SeasonWeek)
                     .ThenInclude(w => w.Season)
             .OrderByDescending(r => r.DateCreated)
-            .Take(20)
+            .Take(5)
             .ToListAsync();
     }
 

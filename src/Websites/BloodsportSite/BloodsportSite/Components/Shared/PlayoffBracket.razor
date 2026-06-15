@@ -41,11 +41,12 @@ else
                     @foreach (var matchup in matchups)
                     {
                         <div class="bracket-slot @(isFirstRound ? "" : "has-left-stub")">
-                            <div class="bracket-card">
+                            <a class="bracket-card text-decoration-none" href="/playoffs/@PlayoffId/matchups/@matchup.Id">
                                 @TeamRow(matchup.TeamOne, matchup.WinningTeamId.HasValue && matchup.WinningTeamId == matchup.TeamOneId)
                                 @TeamRow(matchup.TeamTwo, matchup.WinningTeamId.HasValue && matchup.WinningTeamId == matchup.TeamTwoId)
-                            </div>
+                            </a>
                         </div>
+
                     }
                 </div>
 
@@ -70,6 +71,7 @@ else
 
 @code {
     [Parameter] public List<PlayoffRound> Rounds { get; set; } = [];
+    [Parameter] public long PlayoffId { get; set; }
 
     private RenderFragment TeamRow(PlayoffTeam? team, bool isWinner) => __builder =>
     {
@@ -77,7 +79,7 @@ else
             @if (team is not null)
             {
                 <span class="bracket-seed">@team.Seed</span>
-                <a class="bracket-name" href="/teams/@team.TeamId">@(team.Team?.Name ?? "Unknown")</a>
+                <span class="bracket-name">@(team.Team?.Name ?? "Unknown")</span>
             }
             else
             {

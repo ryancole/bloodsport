@@ -133,6 +133,7 @@ else
                 <tr>
                     <th>Season</th>
                     <th>Status</th>
+                    <th>Record</th>
                     <th>Registered</th>
                     @if (isManager)
                     {
@@ -150,6 +151,18 @@ else
                             @if (reg.Season.RegistrationOpen)
                             {
                                 <span class="badge bg-success ms-2">Registration Open</span>
+                            }
+                        </td>
+                        <td>
+                            @if (seasonResults.TryGetValue(reg.Season.Id, out var result))
+                            {
+                                <span class="text-success fw-semibold">@result.WinCount W</span>
+                                <span class="text-muted mx-1">/</span>
+                                <span class="text-danger fw-semibold">@result.LoseCount L</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
                             }
                         </td>
                         <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
@@ -172,14 +185,55 @@ else
         </table>
     }
 
+    <h2 class="mt-4">Playoffs</h2>
+
+    @if (playoffEntries.Count == 0)
+    {
+        <p class="text-muted">This team has not participated in any playoffs.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Playoff</th>
+                    <th>Season</th>
+                    <th>Seed</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in playoffEntries)
+                {
+                    <tr>
+                        <td><a href="/playoffs/@entry.PlayoffId">@entry.Playoff.Name</a></td>
+                        <td><a href="/seasons/@entry.Playoff.SeasonId">@entry.Playoff.Season.Name</a></td>
+                        <td>@entry.Seed</td>
+                        <td><span class="badge @StatusBadgeClass(entry.Playoff.Status)">@entry.Playoff.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
 }
 
 @code {
+    private static string StatusBadgeClass(PlayoffStatus status) => status switch
+    {
+        PlayoffStatus.Upcoming => "bg-secondary",
+        PlayoffStatus.Active => "bg-success",
+        PlayoffStatus.Completed => "bg-dark",
+        _ => "bg-secondary"
+    };
+
     [Parameter] public long Id { get; set; }
 
     private Bloodsport.Entity.Database.Team? team;
     private List<TeamInvite> pendingInvites = [];
     private List<SeasonWeekMatchup> matchups = [];
+    private Dictionary<long, TeamSeasonResult> seasonResults = [];
+    private List<PlayoffTeam> playoffEntries = [];
     private bool notFound;
     private bool isManager;
     private string? inviteError;
@@ -216,6 +270,20 @@ else
             .Include(t => t.SeasonRegistrations)
                 .ThenInclude(r => r.Season)
             .FirstOrDefaultAsync(t => t.Id == Id);
+
+        if (team is not null)
+        {
+            seasonResults = await db.TeamSeasonResults
+                .Where(r => r.TeamId == Id)
+                .ToDictionaryAsync(r => r.SeasonId);
+
+            playoffEntries = await db.PlayoffTeams
+                .Include(pt => pt.Playoff)
+                    .ThenInclude(p => p.Season)
+                .Where(pt => pt.TeamId == Id)
+                .OrderByDescending(pt => pt.Playoff.DateCreated)
+                .ToListAsync();
+        }
 
         if (team is null)
         {
