@@ -77,6 +77,9 @@ namespace BloodsportSite.Api
 
             if (logo is not null && logo.Length > 0)
             {
+                if (logo.Length > 5 * 1024 * 1024)
+                    return Results.Redirect($"/teams/{id}/edit?error=logo_too_large");
+
                 var logoUrl = await teamLogoService.UploadLogoAsync(id, logo);
                 if (logoUrl is null)
                     return Results.Redirect($"/teams/{id}/edit?error=invalid_logo");
