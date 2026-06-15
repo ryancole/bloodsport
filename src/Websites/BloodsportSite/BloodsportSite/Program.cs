@@ -1,4 +1,5 @@
 using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
 using Bloodsport.Entity.RiotApi;
@@ -60,6 +61,16 @@ namespace BloodsportSite
                 .AddSingleton(new ServiceBusClient(
                     builder.Configuration.GetConnectionString("ServiceBus")
                         ?? throw new InvalidOperationException("ConnectionStrings:ServiceBus is not configured.")));
+
+            builder
+                .Services
+                .AddSingleton(new BlobServiceClient(
+                    builder.Configuration.GetConnectionString("BlobStorage")
+                        ?? throw new InvalidOperationException("ConnectionStrings:BlobStorage is not configured.")));
+
+            builder
+                .Services
+                .AddTransient<TeamLogoService>();
 
             builder
                 .Services

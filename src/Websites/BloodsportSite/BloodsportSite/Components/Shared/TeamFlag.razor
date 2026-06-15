@@ -1,0 +1,16 @@
+@using Bloodsport.Entity.Database
+
+@if (flagUrl is not null)
+{
+    <img src="@flagUrl" width="28" height="18" style="object-fit:cover;flex-shrink:0;border-radius:2px;" alt="" />
+}
+else
+{
+    <span style="display:inline-block;width:28px;height:18px;flex-shrink:0;background:#dee2e6;border-radius:2px;"></span>
+}
+
+@code {
+    [Parameter, EditorRequired] public string? LogoUrl { get; set; }
+
+    private string? flagUrl => LogoUrl?.Replace("/original.", "/flag.");
+}

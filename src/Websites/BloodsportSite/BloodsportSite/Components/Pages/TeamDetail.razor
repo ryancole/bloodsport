@@ -22,7 +22,13 @@ else
     <nav class="small mb-2"><a href="/teams">Teams</a> / @team.Name</nav>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">@team.Name</h1>
+        <div class="d-flex align-items-center gap-3">
+            @if (team.LogoUrl is not null)
+            {
+                <img src="@team.LogoUrl" alt="@team.Name logo" style="width: 72px; height: 72px; object-fit: contain;" />
+            }
+            <h1 class="mb-0">@team.Name</h1>
+        </div>
         @if (isManager)
         {
             <div class="d-flex gap-2">
@@ -111,8 +117,8 @@ else
                         <td><a href="/seasons/@matchup.SeasonWeek.Season.Id/weeks/@matchup.SeasonWeek.Id/matchups/@matchup.Id">@matchup.Name</a></td>
                         <td><a href="/seasons/@matchup.SeasonWeek.Season.Id">@matchup.SeasonWeek.Season.Name</a></td>
                         <td><a href="/seasons/@matchup.SeasonWeek.Season.Id/weeks/@matchup.SeasonWeek.Id">@matchup.SeasonWeek.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamOne.Id">@matchup.TeamOne.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamTwo.Id">@matchup.TeamTwo.Name</a></td>
+                        <td><a href="/teams/@matchup.TeamOne.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamOne.LogoUrl" />@matchup.TeamOne.Name</a></td>
+                        <td><a href="/teams/@matchup.TeamTwo.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamTwo.LogoUrl" />@matchup.TeamTwo.Name</a></td>
                         <td>@matchup.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>
                 }
