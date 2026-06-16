@@ -13,11 +13,15 @@
 }
 else
 {
-    <UsersTable Users="users" CurrentPage="Page" />
+    var filtered = string.IsNullOrWhiteSpace(Search)
+        ? users
+        : users.Where(u => u.DisplayName.Contains(Search, StringComparison.OrdinalIgnoreCase)).ToList();
+    <UsersTable Users="filtered" CurrentPage="Page" Search="@Search" />
 }
 
 @code {
     [SupplyParameterFromQuery(Name = "page")] public int Page { get; set; } = 1;
+    [SupplyParameterFromQuery(Name = "search")] public string? Search { get; set; }
 
     private List<Bloodsport.Entity.Database.User>? users;
 

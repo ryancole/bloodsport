@@ -7,11 +7,26 @@
     var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
 }
 
-<Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex justify-content-end mb-2" />
+<div class="d-flex align-items-center justify-content-between mb-2">
+    <div class="d-flex align-items-center gap-3">
+        <form method="get" class="d-flex gap-2">
+            <input type="search" name="search" class="form-control w-auto" placeholder="Search by name…" />
+            <button type="submit" class="btn btn-secondary">Search</button>
+        </form>
+        @if (!string.IsNullOrWhiteSpace(Search))
+        {
+            <span class="text-muted">
+                Filtering by &ldquo;@Search&rdquo;
+                <a href="/users" class="ms-1 text-decoration-none" title="Clear filter">&times;</a>
+            </span>
+        }
+    </div>
+    <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex" />
+</div>
 
-@if (Users.Count == 0)
+@if (!sorted.Any())
 {
-    <p class="text-muted">No users yet.</p>
+    <p class="text-center text-muted fs-5 py-4">No users found.</p>
 }
 else
 {
@@ -56,6 +71,9 @@ else
 
     [Parameter, EditorRequired] public ICollection<User> Users { get; set; } = [];
     [Parameter] public int CurrentPage { get; set; } = 1;
+    [Parameter] public string? Search { get; set; }
 
-    private string PageUrl(int p) => $"/users?page={p}";
+    private string PageUrl(int p) => string.IsNullOrWhiteSpace(Search)
+        ? $"/users?page={p}"
+        : $"/users?search={Uri.EscapeDataString(Search)}&page={p}";
 }
