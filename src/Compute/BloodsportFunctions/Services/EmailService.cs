@@ -37,10 +37,7 @@ public class EmailService
             .ToList();
 
         if (recipients.Count == 0)
-        {
-            _logger.LogWarning("No recipients with email addresses found for season {seasonId} start notification.", season.Id);
             return;
-        }
 
         var html = await _templateRenderer.RenderAsync("SeasonStarted.html", new { season_name = season.Name });
 
@@ -74,10 +71,7 @@ public class EmailService
                 .ToList();
 
             if (recipients.Count == 0)
-            {
-                _logger.LogWarning("No recipients with email addresses found for team {teamId} in playoff {playoffId} notification.", team.Id, playoff.Id);
                 continue;
-            }
 
             var html = await _templateRenderer.RenderAsync("PlayoffStarted.html", new { team_name = team.Name, playoff_name = playoff.Name });
 
@@ -110,10 +104,7 @@ public class EmailService
             .ToList();
 
         if (recipients.Count == 0)
-        {
-            _logger.LogWarning("No recipients with email addresses found for playoff round {roundId} end notification.", round.Id);
             return;
-        }
 
         var html = await _templateRenderer.RenderAsync("PlayoffRoundEnded.html", new
         {
@@ -151,10 +142,7 @@ public class EmailService
                 .ToList();
 
             if (recipients.Count == 0)
-            {
-                _logger.LogWarning("No recipients with email addresses found for team {teamId} in season {seasonId} end notification.", team.Id, season.Id);
                 continue;
-            }
 
             var html = await _templateRenderer.RenderAsync("SeasonEnded.html", new
             {
@@ -179,6 +167,46 @@ public class EmailService
         }
     }
 
+    public async Task SendPlayoffEndedAsync(Playoff playoff, IEnumerable<(Team Team, string Finish, IEnumerable<User> Members)> teamResults)
+    {
+        if (_config["Email:SenderAddress"] is null)
+        {
+            _logger.LogError("Email:SenderAddress is not configured. Skipping playoff ended email.");
+            return;
+        }
+
+        foreach (var (team, finish, members) in teamResults)
+        {
+            var recipients = members
+                .Where(u => !string.IsNullOrEmpty(u.Email))
+                .Select(u => new EmailAddress(u.Email!))
+                .ToList();
+
+            if (recipients.Count == 0)
+                continue;
+
+            var html = await _templateRenderer.RenderAsync("PlayoffEnded.html", new
+            {
+                playoff_name = playoff.Name,
+                team_name = team.Name,
+                finish
+            });
+
+            var content = new EmailContent($"{playoff.Name} is over — {team.Name} finished {finish}")
+            {
+                PlainText = $"The {playoff.Name} playoff has concluded. {team.Name} finished {finish}. Head to the site to view the final bracket.",
+                Html = html
+            };
+
+            var batches = recipients
+                .Select((r, i) => (r, i))
+                .GroupBy(x => x.i / BatchSize)
+                .Select(g => g.Select(x => x.r).ToList());
+
+            await SendInBatchesAsync(batches, content, logContext: $"team {team.Id} in playoff {playoff.Id}");
+        }
+    }
+
     public async Task SendMatchupScheduledAsync(SeasonWeek week, SeasonWeekMatchup matchup, Team team, Team opponent, IEnumerable<User> members)
     {
         if (_config["Email:SenderAddress"] is null)
@@ -193,10 +221,7 @@ public class EmailService
             .ToList();
 
         if (recipients.Count == 0)
-        {
-            _logger.LogWarning("No recipients with email addresses found for matchup {matchupId} notification.", matchup.Id);
             return;
-        }
 
         var html = await _templateRenderer.RenderAsync("MatchupScheduled.html", new
         {

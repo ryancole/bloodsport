@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using BloodsportFunctions.Services;
 using Camille.RiotGames.TournamentV5;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,13 @@ public class HandlePlayoffMatchup
 {
     private readonly ILogger<HandlePlayoffMatchup> _logger;
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
+    private readonly EmailService _emailService;
 
-    public HandlePlayoffMatchup(ILogger<HandlePlayoffMatchup> logger, IDbContextFactory<SqlDbContext> dbFactory)
+    public HandlePlayoffMatchup(ILogger<HandlePlayoffMatchup> logger, IDbContextFactory<SqlDbContext> dbFactory, EmailService emailService)
     {
         _logger = logger;
         _dbFactory = dbFactory;
+        _emailService = emailService;
     }
 
     [Function("HandlePlayoffMatchup")]
@@ -163,6 +166,11 @@ public class HandlePlayoffMatchup
 
         await db.SaveChangesAsync();
 
+        if (matchup.NextMatchupId is null)
+        {
+            await SendPlayoffEndedEmailsAsync(db, matchup);
+        }
+
         _logger.LogInformation(
             "Playoff matchup {matchupId} (tournament code {shortCode}): winner {teamName} (team {teamId}, playoff team {playoffTeamId}). RosterMismatch={rosterMismatch}.",
             matchup.Id, payload.ShortCode,
@@ -170,5 +178,66 @@ public class HandlePlayoffMatchup
             rosterMismatch);
 
         return new OkResult();
+    }
+
+    private async Task SendPlayoffEndedEmailsAsync(SqlDbContext db, PlayoffMatchup finalMatchup)
+    {
+        var playoff = finalMatchup.PlayoffRound.Playoff;
+
+        var allMatchups = await db.PlayoffMatchups
+            .Include(m => m.PlayoffRound)
+            .Include(m => m.TeamOne)
+                .ThenInclude(pt => pt!.Team)
+                    .ThenInclude(t => t.TeamMemberships)
+                        .ThenInclude(tm => tm.RiotAccount)
+                            .ThenInclude(a => a.User)
+            .Include(m => m.TeamTwo)
+                .ThenInclude(pt => pt!.Team)
+                    .ThenInclude(t => t.TeamMemberships)
+                        .ThenInclude(tm => tm.RiotAccount)
+                            .ThenInclude(a => a.User)
+            .Where(m => m.PlayoffRound.PlayoffId == playoff.Id)
+            .ToListAsync();
+
+        // Build a lookup of PlayoffTeam.Id → the round name in which they were eliminated.
+        var eliminatedInRound = new Dictionary<long, string>();
+        foreach (var m in allMatchups.Where(m => m.WinningTeamId is not null))
+        {
+            var loserId = m.TeamOneId == m.WinningTeamId ? m.TeamTwoId : m.TeamOneId;
+            if (loserId is not null)
+                eliminatedInRound[loserId.Value] = m.PlayoffRound.Name;
+        }
+
+        // The final matchup has no NextMatchupId; its winner is 1st, loser is 2nd.
+        var winnerId = finalMatchup.WinningTeamId!.Value;
+        var loserId2nd = finalMatchup.TeamOneId == winnerId ? finalMatchup.TeamTwoId : finalMatchup.TeamOneId;
+
+        var allPlayoffTeams = allMatchups
+            .SelectMany(m => new[] { m.TeamOne, m.TeamTwo })
+            .Where(pt => pt is not null)
+            .DistinctBy(pt => pt!.Id)
+            .Select(pt => pt!)
+            .ToList();
+
+        var teamResults = allPlayoffTeams.Select(pt =>
+        {
+            string finish;
+            if (pt.Id == winnerId)
+                finish = "1st place";
+            else if (pt.Id == loserId2nd)
+                finish = "2nd place";
+            else if (eliminatedInRound.TryGetValue(pt.Id, out var roundName))
+                finish = $"eliminated in the {roundName}";
+            else
+                finish = "eliminated";
+
+            var members = pt.Team.TeamMemberships
+                .Select(tm => tm.RiotAccount.User)
+                .DistinctBy(u => u.Id);
+
+            return (pt.Team, finish, members);
+        });
+
+        await _emailService.SendPlayoffEndedAsync(playoff, teamResults);
     }
 }
