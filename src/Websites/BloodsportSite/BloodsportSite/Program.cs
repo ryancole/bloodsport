@@ -154,6 +154,8 @@ namespace BloodsportSite
 
         private static void ConfigureOpenIdConnect(OpenIdConnectOptions options)
         {
+            options.Scope.Add("email");
+
             var existingHandler = options.Events?.OnTokenValidated;
 
             options.Events ??= new OpenIdConnectEvents();
@@ -176,15 +178,21 @@ namespace BloodsportSite
                 var dbFactory = context.HttpContext.RequestServices.GetRequiredService<IDbContextFactory<SqlDbContext>>();
                 await using var db = dbFactory.CreateDbContext();
 
-                var exists = await db.Users.AnyAsync(u => u.EntraObjectId == oid);
+                var email = context.Principal?.FindFirst("email")?.Value
+                         ?? context.Principal?.FindFirst("preferred_username")?.Value;
 
-                var email = context.Principal?.FindFirst("email")?.Value;
+                var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
 
-                if (!exists)
+                if (user is null)
                 {
                     db.Users.Add(new User { EntraObjectId = oid, DisplayName = GenerateRandomDisplayName(), Email = email });
-                    await db.SaveChangesAsync();
                 }
+                else if (email is not null && user.Email != email)
+                {
+                    user.Email = email;
+                }
+
+                await db.SaveChangesAsync();
             };
         }
     }

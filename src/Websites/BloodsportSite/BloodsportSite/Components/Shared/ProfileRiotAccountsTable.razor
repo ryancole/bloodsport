@@ -56,6 +56,6 @@ else
 }
 
 @code {
-    [Parameter, EditorRequired] public List<RiotAccount> Accounts { get; set; } = [];
+    [Parameter, EditorRequired] public ICollection<RiotAccount> Accounts { get; set; } = [];
     [Parameter] public string? RiotError { get; set; }
 }
