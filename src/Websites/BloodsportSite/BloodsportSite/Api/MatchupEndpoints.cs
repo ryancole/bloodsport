@@ -1,3 +1,4 @@
+using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
 using BloodsportSite.Services;
@@ -10,6 +11,9 @@ namespace BloodsportSite.Api
         public static IEndpointRouteBuilder MapMatchups(this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapPost("/matchups/{id}/tournament-code", RequestTournamentCodeAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/matchups/{id}/fetch-lobby-events", FetchLobbyEventsAsync)
                 .RequireAuthorization();
 
             return endpoints;
@@ -71,6 +75,45 @@ namespace BloodsportSite.Api
             }
 
             return Results.Redirect(MatchupUrl(matchup));
+        }
+
+        private static async Task<IResult> FetchLobbyEventsAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            ServiceBusClient serviceBusClient,
+            long id)
+        {
+            await using var db = dbFactory.CreateDbContext();
+
+            var oid = context.User.FindFirst("oid")?.Value
+                   ?? context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+            if (oid is null)
+                return Results.Redirect("?error=not_authenticated");
+
+            var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+            if (user is null)
+                return Results.Redirect("?error=not_authenticated");
+
+            var matchup = await db.SeasonWeekMatchups
+                .Include(m => m.TeamOne)
+                .Include(m => m.TeamTwo)
+                .Include(m => m.SeasonWeek)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (matchup is null)
+                return Results.Redirect("?error=not_found");
+
+            if (matchup.TeamOne.ManagerId != user.Id && matchup.TeamTwo.ManagerId != user.Id)
+                return Results.Forbid();
+
+            if (matchup.TournamentCode is null)
+                return Results.Redirect($"{MatchupUrl(matchup)}?error=no_tournament_code");
+
+            await using var sender = serviceBusClient.CreateSender("fetch-riot-lobby-events");
+            await sender.SendMessageAsync(new ServiceBusMessage(matchup.TournamentCode));
+
+            return Results.Redirect($"{MatchupUrl(matchup)}?info=lobby_events_requested");
         }
 
         private static string MatchupUrl(SeasonWeekMatchup matchup) =>
