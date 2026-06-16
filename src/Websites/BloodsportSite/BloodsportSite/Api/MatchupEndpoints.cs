@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
@@ -64,9 +65,24 @@ namespace BloodsportSite.Api
             if (season.RiotTournamentId is null)
                 return Results.Redirect($"{MatchupUrl(matchup)}?error=tournament_not_configured");
 
+            var rosters = await db.TeamSeasonRosters
+                .Where(r => r.SeasonId == season.Id && (r.TeamId == matchup.TeamOneId || r.TeamId == matchup.TeamTwoId))
+                .ToListAsync();
+
+            var allowedSummonerNames = rosters
+                .SelectMany(r => JsonSerializer.Deserialize<TeamSeasonRosterJson>(r.RosterJson)?.AllowedSummonerNames ?? [])
+                .ToHashSet();
+
+            var allowedPuuids = await db.RiotAccounts
+                .Where(a => allowedSummonerNames.Contains(a.GameName + "#" + a.TagLine))
+                .Select(a => a.Puuid)
+                .ToArrayAsync();
+
             try
             {
-                matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(season.RiotTournamentId.Value);
+                matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(
+                    season.RiotTournamentId.Value,
+                    allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null);
                 await db.SaveChangesAsync();
             }
             catch (HttpRequestException)

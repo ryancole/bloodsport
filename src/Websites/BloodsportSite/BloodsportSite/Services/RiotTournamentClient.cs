@@ -20,7 +20,7 @@ namespace BloodsportSite.Services
         private RegionalRoute Route =>
             Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
 
-        public async Task<string> CreateTournamentCodeAsync(long tournamentId, int teamSize = 5)
+        public async Task<string> CreateTournamentCodeAsync(long tournamentId, string[]? allowedParticipants = null, int teamSize = 5)
         {
             string[] codes;
 
@@ -34,6 +34,7 @@ namespace BloodsportSite.Services
                         MapType = "SUMMONERS_RIFT",
                         SpectatorType = "ALL",
                         EnoughPlayers = false,
+                        AllowedParticipants = allowedParticipants,
                     },
                     tournamentId, count: 1);
             }
@@ -47,6 +48,7 @@ namespace BloodsportSite.Services
                         MapType = "SUMMONERS_RIFT",
                         SpectatorType = "ALL",
                         EnoughPlayers = false,
+                        AllowedParticipants = allowedParticipants,
                     },
                     tournamentId, count: 1);
             }

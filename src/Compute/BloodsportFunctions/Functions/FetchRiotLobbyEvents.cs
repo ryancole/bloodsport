@@ -36,7 +36,7 @@ public class FetchRiotLobbyEvents
 
     [Function(nameof(FetchRiotLobbyEvents))]
     public async Task Run(
-        [ServiceBusTrigger("fetch-riot-lobby-events")]
+        [ServiceBusTrigger("fetch-riot-lobby-events", Connection = "ServiceBusConnection")]
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
