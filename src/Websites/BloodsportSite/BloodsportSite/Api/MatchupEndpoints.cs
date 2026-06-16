@@ -74,7 +74,7 @@ namespace BloodsportSite.Api
                 .ToHashSet();
 
             var allowedPuuids = await db.RiotAccounts
-                .Where(a => allowedSummonerNames.Contains(a.GameName + "#" + a.TagLine))
+                .Where(a => allowedSummonerNames.Contains(a.GameName + "#" + a.TagLine) && a.Puuid != null && a.Puuid != "" && !a.Puuid.StartsWith("FAKE-"))
                 .Select(a => a.Puuid)
                 .ToArrayAsync();
 

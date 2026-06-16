@@ -57,6 +57,7 @@ namespace BloodsportSite.Api
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
             RiotTournamentClient riotClient,
+            ILoggerFactory loggerFactory,
             long id)
         {
             await using var db = dbFactory.CreateDbContext();
@@ -109,9 +110,11 @@ namespace BloodsportSite.Api
                 .ToHashSet();
 
             var allowedPuuids = await db.RiotAccounts
-                .Where(a => allowedSummonerNames.Contains(a.GameName + "#" + a.TagLine))
+                .Where(a => allowedSummonerNames.Contains(a.GameName + "#" + a.TagLine) && a.Puuid != null && a.Puuid != "" && !a.Puuid.StartsWith("FAKE-"))
                 .Select(a => a.Puuid)
                 .ToArrayAsync();
+
+            var logger = loggerFactory.CreateLogger("PlayoffEndpoints");
 
             try
             {
@@ -120,8 +123,10 @@ namespace BloodsportSite.Api
                     allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null);
                 await db.SaveChangesAsync();
             }
-            catch (HttpRequestException)
+            catch (Exception ex)
             {
+                logger.LogError(ex, "Failed to generate tournament code for playoff matchup {MatchupId}. AllowedPuuids: [{Puuids}]",
+                    matchup.Id, string.Join(", ", allowedPuuids));
                 return Results.Redirect($"{MatchupUrl(matchup)}?error=riot_api_error");
             }
 
