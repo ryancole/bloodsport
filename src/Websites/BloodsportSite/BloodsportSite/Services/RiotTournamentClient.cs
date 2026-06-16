@@ -20,28 +20,6 @@ namespace BloodsportSite.Services
         private RegionalRoute Route =>
             Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
 
-        public async Task<long> CreateProviderAsync(string callbackUrl)
-        {
-            var region = _config["RiotApi:Region"] ?? "NA";
-
-            if (RiotApiEndpoints.UseStub)
-                return await _api.TournamentStubV5().RegisterProviderDataAsync(Route,
-                    new StubNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
-
-            return await _api.TournamentV5().RegisterProviderDataAsync(Route,
-                new TournNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
-        }
-
-        public async Task<long> CreateTournamentAsync(long providerId, string name)
-        {
-            if (RiotApiEndpoints.UseStub)
-                return await _api.TournamentStubV5().RegisterTournamentAsync(Route,
-                    new StubNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = name });
-
-            return await _api.TournamentV5().RegisterTournamentAsync(Route,
-                new TournNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = name });
-        }
-
         public async Task<string> CreateTournamentCodeAsync(long tournamentId, int teamSize = 5)
         {
             string[] codes;

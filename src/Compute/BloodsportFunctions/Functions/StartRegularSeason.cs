@@ -131,8 +131,8 @@ public class StartRegularSeason
         // Provision a Riot provider and tournament for this season
         try
         {
-            var callbackUrl = _config["RiotApi:CallbackUrl"]
-                ?? throw new InvalidOperationException("RiotApi:CallbackUrl is not configured.");
+            var callbackUrl = _config["RiotApi:RegularSeasonCallback"]
+                ?? throw new InvalidOperationException("RiotApi:RegularSeasonCallback is not configured.");
 
             var region = _config["RiotApi:Region"] ?? "NA";
             var route = Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);

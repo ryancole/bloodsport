@@ -93,8 +93,8 @@ public class StartPlayoff
         // Provision a fresh Riot provider + tournament for the playoff
         try
         {
-            var callbackUrl = _config["RiotApi:CallbackUrl"]
-                ?? throw new InvalidOperationException("RiotApi:CallbackUrl is not configured.");
+            var callbackUrl = _config["RiotApi:PlayoffCallback"]
+                ?? throw new InvalidOperationException("RiotApi:PlayoffCallback is not configured.");
 
             var region = _config["RiotApi:Region"] ?? "NA";
             var route = Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
