@@ -23,7 +23,7 @@ else
     var filtered = string.IsNullOrWhiteSpace(Search)
         ? teams
         : teams.Where(t => t.Name.Contains(Search, StringComparison.OrdinalIgnoreCase)).ToList();
-    <TeamsTable Teams="filtered" CurrentPage="Page" Search="Search" />
+    <TeamsTable Teams="filtered" CurrentPage="Page" Search="@Search" />
 }
 
 @code {

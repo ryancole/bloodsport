@@ -8,16 +8,25 @@
 }
 
 <div class="d-flex align-items-center justify-content-between mb-2">
-    <form method="get" class="d-flex gap-2">
-        <input type="search" name="search" class="form-control w-auto" placeholder="Search by team name…" value="@Search" />
-        <button type="submit" class="btn btn-secondary">Search</button>
-    </form>
+    <div class="d-flex align-items-center gap-3">
+        <form method="get" class="d-flex gap-2">
+            <input type="search" name="search" class="form-control w-auto" placeholder="Search by team name…" />
+            <button type="submit" class="btn btn-secondary">Search</button>
+        </form>
+        @if (!string.IsNullOrWhiteSpace(Search))
+        {
+            <span class="text-muted">
+                Filtering by &ldquo;@Search&rdquo;
+                <a href="/teams" class="ms-1 text-decoration-none" title="Clear filter">&times;</a>
+            </span>
+        }
+    </div>
     <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex" />
 </div>
 
 @if (!sorted.Any())
 {
-    <p class="text-muted">No teams found.</p>
+    <p class="text-center text-muted fs-5 py-4">No teams found.</p>
 }
 else
 {
