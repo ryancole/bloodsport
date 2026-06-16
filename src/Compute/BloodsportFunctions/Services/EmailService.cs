@@ -24,8 +24,12 @@ public class EmailService
 
     public async Task SendSeasonStartedAsync(Season season, IEnumerable<User> members)
     {
-        var sender = _config["Email:SenderAddress"]
-            ?? throw new InvalidOperationException("Email:SenderAddress is not configured.");
+        var sender = _config["Email:SenderAddress"];
+        if (sender is null)
+        {
+            _logger.LogError("Email:SenderAddress is not configured. Skipping season started email.");
+            return;
+        }
 
         var recipients = members
             .Where(u => !string.IsNullOrEmpty(u.Email))
@@ -56,8 +60,11 @@ public class EmailService
 
     public async Task SendPlayoffStartedAsync(Playoff playoff, IEnumerable<(Team Team, IEnumerable<User> Members)> teamsWithMembers)
     {
-        var sender = _config["Email:SenderAddress"]
-            ?? throw new InvalidOperationException("Email:SenderAddress is not configured.");
+        if (_config["Email:SenderAddress"] is null)
+        {
+            _logger.LogError("Email:SenderAddress is not configured. Skipping playoff started email.");
+            return;
+        }
 
         foreach (var (team, members) in teamsWithMembers)
         {
@@ -91,8 +98,11 @@ public class EmailService
 
     public async Task SendPlayoffRoundEndedAsync(PlayoffRound round, IEnumerable<User> members)
     {
-        var sender = _config["Email:SenderAddress"]
-            ?? throw new InvalidOperationException("Email:SenderAddress is not configured.");
+        if (_config["Email:SenderAddress"] is null)
+        {
+            _logger.LogError("Email:SenderAddress is not configured. Skipping playoff round ended email.");
+            return;
+        }
 
         var recipients = members
             .Where(u => !string.IsNullOrEmpty(u.Email))
@@ -127,8 +137,11 @@ public class EmailService
 
     public async Task SendSeasonEndedAsync(Season season, IEnumerable<(Team Team, int WinCount, int LoseCount, IEnumerable<User> Members)> teamResults)
     {
-        var sender = _config["Email:SenderAddress"]
-            ?? throw new InvalidOperationException("Email:SenderAddress is not configured.");
+        if (_config["Email:SenderAddress"] is null)
+        {
+            _logger.LogError("Email:SenderAddress is not configured. Skipping season ended email.");
+            return;
+        }
 
         foreach (var (team, winCount, loseCount, members) in teamResults)
         {
@@ -168,8 +181,11 @@ public class EmailService
 
     public async Task SendMatchupScheduledAsync(SeasonWeek week, SeasonWeekMatchup matchup, Team team, Team opponent, IEnumerable<User> members)
     {
-        var sender = _config["Email:SenderAddress"]
-            ?? throw new InvalidOperationException("Email:SenderAddress is not configured.");
+        if (_config["Email:SenderAddress"] is null)
+        {
+            _logger.LogError("Email:SenderAddress is not configured. Skipping matchup scheduled email.");
+            return;
+        }
 
         var recipients = members
             .Where(u => !string.IsNullOrEmpty(u.Email))
@@ -207,8 +223,7 @@ public class EmailService
 
     private async Task SendInBatchesAsync(IEnumerable<List<EmailAddress>> batches, EmailContent content, string logContext)
     {
-        var sender = _config["Email:SenderAddress"]
-            ?? throw new InvalidOperationException("Email:SenderAddress is not configured.");
+        var sender = _config["Email:SenderAddress"]!;
 
         foreach (var batch in batches)
         {
