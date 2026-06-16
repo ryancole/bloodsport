@@ -18,11 +18,11 @@ else
 
     <SeasonsTable Seasons="seasons" />
 
-    <h2 class="mb-3">Recent Playoffs</h2>
+    <h2 class="mt-4 mb-3">Recent Playoffs</h2>
 
     <PlayoffsTable Playoffs="activePlayoffs" />
 
-    <h2 class="mb-3">Recent Results</h2>
+    <h2 class="mt-4 mb-3">Recent Results</h2>
 
     @if (recentResults.Count == 0)
     {
@@ -62,7 +62,7 @@ else
                         <td>
                             @if (result.WinnerTeam is not null)
                             {
-                                <a href="/teams/@result.WinnerTeamId">@result.WinnerTeam.Name</a>
+                                <a href="/teams/@result.WinnerTeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@result.WinnerTeam.LogoUrl" />@result.WinnerTeam.Name</a>
                             }
                             else
                             {

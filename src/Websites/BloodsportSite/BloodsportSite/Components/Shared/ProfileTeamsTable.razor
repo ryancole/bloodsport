@@ -13,7 +13,6 @@ else
             <tr>
                 <th>Team</th>
                 <th>Role</th>
-                <th>Members</th>
                 <th>Created</th>
             </tr>
         </thead>
@@ -23,7 +22,6 @@ else
                 <tr>
                     <td><a href="/teams/@row.Team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@row.Team.LogoUrl" />@row.Team.Name</a></td>
                     <td>@row.Role</td>
-                    <td>@row.Team.TeamMemberships.Count</td>
                     <td>@row.Team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                 </tr>
             }

@@ -35,7 +35,6 @@ else
             <tr>
                 <th>Name</th>
                 <th>Manager</th>
-                <th>Members</th>
                 <th>Created</th>
             </tr>
         </thead>
@@ -45,7 +44,6 @@ else
                 <tr>
                     <td><a href="/teams/@team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@team.LogoUrl" />@team.Name</a></td>
                     <td><a href="/users/@team.Manager.Id">@team.Manager.DisplayName</a></td>
-                    <td>@team.TeamMemberships.Count</td>
                     <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                 </tr>
             }
