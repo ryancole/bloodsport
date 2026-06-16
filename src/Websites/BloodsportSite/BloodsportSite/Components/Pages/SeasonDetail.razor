@@ -62,6 +62,9 @@ else
             <SeasonRegistrationBadge IsOpen="season.RegistrationOpen" />
         </dd>
 
+        <dt class="col-sm-2">Length</dt>
+        <dd class="col-sm-10">@season.Length weeks</dd>
+
         <dt class="col-sm-2">Estimated Start</dt>
         <dd class="col-sm-10">@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
 
