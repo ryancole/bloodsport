@@ -1,0 +1,61 @@
+@using Bloodsport.Entity.Database
+
+<div class="d-flex justify-content-between align-items-start mt-4 mb-2">
+    <h2 class="mb-0">Riot Accounts</h2>
+    <form method="post" action="/api/riot/link">
+        <AntiforgeryToken />
+        @if (RiotError is not null)
+        {
+            <div class="alert alert-danger py-1 px-2 small mb-2">@RiotError</div>
+        }
+        <div class="d-flex gap-2 align-items-end">
+            <div>
+                <label class="form-label small mb-1">Game Name</label>
+                <input type="text" name="gameName" class="form-control form-control-sm" placeholder="HideOnBush" required />
+            </div>
+            <div>
+                <label class="form-label small mb-1">Tag</label>
+                <input type="text" name="tagLine" class="form-control form-control-sm" placeholder="NA1" required />
+            </div>
+            <button type="submit" class="btn btn-sm btn-outline-secondary">Link Riot Account</button>
+        </div>
+    </form>
+</div>
+
+@if (Accounts.Count == 0)
+{
+    <p class="text-muted">No linked accounts.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Riot ID</th>
+                <th>Linked</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in Accounts.OrderBy(a => a.GameName))
+            {
+                <tr>
+                    <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(account.GameName)-@Uri.EscapeDataString(account.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@account.GameName#@account.TagLine</strong></a></td>
+                    <td>@account.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <td>
+                        <form method="post" action="/api/riot/unlink">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="riotAccountId" value="@account.Id" />
+                            <button type="submit" class="btn btn-link btn-sm text-danger p-0">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter, EditorRequired] public List<RiotAccount> Accounts { get; set; } = [];
+    [Parameter] public string? RiotError { get; set; }
+}

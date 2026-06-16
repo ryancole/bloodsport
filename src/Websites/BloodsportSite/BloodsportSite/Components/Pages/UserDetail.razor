@@ -18,8 +18,6 @@ else
     <h1 class="mb-4">@user.DisplayName</h1>
 
     <dl class="row mb-4">
-        <dt class="col-sm-3">Email</dt>
-        <dd class="col-sm-9">@(user.Email ?? "—")</dd>
         <dt class="col-sm-3">Member Since</dt>
         <dd class="col-sm-9">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
@@ -51,40 +49,11 @@ else
         </table>
     }
 
-    <h2>Managed Teams</h2>
+    <h2>Teams</h2>
 
-    @if (user.ManagedTeams.Count == 0)
+    @if (teamRows.Count == 0)
     {
-        <p class="text-muted">No managed teams.</p>
-    }
-    else
-    {
-        <table class="table mb-4">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Members</th>
-                    <th>Created</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var team in user.ManagedTeams.OrderBy(t => t.Name))
-                {
-                    <tr>
-                        <td><a href="/teams/@team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@team.LogoUrl" />@team.Name</a></td>
-                        <td>@team.TeamMemberships.Count</td>
-                        <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-
-    <h2>Team Memberships</h2>
-
-    @if (memberships.Count == 0)
-    {
-        <p class="text-muted">No team memberships.</p>
+        <p class="text-muted">No teams.</p>
     }
     else
     {
@@ -92,17 +61,19 @@ else
             <thead>
                 <tr>
                     <th>Team</th>
-                    <th>Riot ID</th>
-                    <th>Joined</th>
+                    <th>Role</th>
+                    <th>Members</th>
+                    <th>Created</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var membership in memberships.OrderBy(m => m.Team.Name))
+                @foreach (var row in teamRows)
                 {
                     <tr>
-                        <td><a href="/teams/@membership.Team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@membership.Team.LogoUrl" />@membership.Team.Name</a></td>
-                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
-                        <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        <td><a href="/teams/@row.Team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@row.Team.LogoUrl" />@row.Team.Name</a></td>
+                        <td>@row.Role</td>
+                        <td>@row.Team.TeamMemberships.Count</td>
+                        <td>@row.Team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                     </tr>
                 }
             </tbody>
@@ -114,7 +85,7 @@ else
     [Parameter] public long Id { get; set; }
 
     private Bloodsport.Entity.Database.User? user;
-    private List<Bloodsport.Entity.Database.TeamMembership> memberships = [];
+    private List<(Bloodsport.Entity.Database.Team Team, string Role)> teamRows = [];
     private bool notFound;
 
     protected override async Task OnInitializedAsync()
@@ -126,6 +97,7 @@ else
             .Include(u => u.RiotAccounts)
                 .ThenInclude(a => a.TeamMemberships)
                     .ThenInclude(m => m.Team)
+                        .ThenInclude(t => t.TeamMemberships)
             .FirstOrDefaultAsync(u => u.Id == Id);
 
         if (user is null)
@@ -134,6 +106,16 @@ else
             return;
         }
 
-        memberships = user.RiotAccounts.SelectMany(a => a.TeamMemberships).ToList();
+        var managedTeamIds = user.ManagedTeams.Select(t => t.Id).ToHashSet();
+        var memberTeams = user.RiotAccounts.SelectMany(a => a.TeamMemberships).Select(m => m.Team).DistinctBy(t => t.Id);
+
+        teamRows = memberTeams
+            .Select(t => (Team: t, IsManager: managedTeamIds.Contains(t.Id), IsMember: true))
+            .Concat(user.ManagedTeams
+                .Where(t => !user.RiotAccounts.SelectMany(a => a.TeamMemberships).Any(m => m.Team.Id == t.Id))
+                .Select(t => (Team: t, IsManager: true, IsMember: false)))
+            .OrderBy(r => r.Team.Name)
+            .Select(r => (r.Team, Role: r.IsManager && r.IsMember ? "Manager, Member" : r.IsManager ? "Manager" : "Member"))
+            .ToList();
     }
 }

@@ -87,80 +87,18 @@ else
         <dt class="col-sm-3">Account ID</dt>
         <dd class="col-sm-9"><code>@user.EntraObjectId</code></dd>
 
-        <dt class="col-sm-3">Managed Teams</dt>
-        <dd class="col-sm-9">
-            @if (user.ManagedTeams.Count == 0)
-            {
-                <span class="text-muted">No managed teams</span>
-            }
-            else
-            {
-                <div class="d-flex flex-wrap gap-2">
-                    @foreach (var team in user.ManagedTeams.OrderBy(t => t.Name))
-                    {
-                        <a href="/teams/@team.Id" class="text-decoration-none">
-                            <div class="card" style="min-width: 160px;">
-                                <div class="card-body py-2 px-3">
-                                    <div class="fw-semibold">@team.Name</div>
-                                    <div class="text-muted small">@team.TeamMemberships.Count member@(team.TeamMemberships.Count == 1 ? "" : "s")</div>
-                                </div>
-                            </div>
-                        </a>
-                    }
-                </div>
-            }
-        </dd>
-
-        <dt class="col-sm-3">Riot Accounts</dt>
-        <dd class="col-sm-9">
-            @if (user.RiotAccounts.Count == 0)
-            {
-                <span class="text-muted">No linked accounts</span>
-            }
-            else
-            {
-                <ul class="list-unstyled mb-0">
-                    @foreach (var account in user.RiotAccounts)
-                    {
-                        <li class="d-flex align-items-center gap-2 mb-1">
-                            <a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(account.GameName)-@Uri.EscapeDataString(account.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@account.GameName#@account.TagLine</strong></a>
-                            <span class="text-muted small">(linked @account.DateCreated.ToLocalTime().ToShortDateString())</span>
-                            <form method="post" action="/api/riot/unlink">
-                                <AntiforgeryToken />
-                                <input type="hidden" name="riotAccountId" value="@account.Id" />
-                                <button type="submit" class="btn btn-link btn-sm text-danger p-0">Remove</button>
-                            </form>
-                        </li>
-                    }
-                </ul>
-            }
-
-            <form method="post" action="/api/riot/link" class="mt-3">
-                <AntiforgeryToken />
-                @if (riotError is not null)
-                {
-                    <div class="alert alert-danger py-1 px-2 small mb-2">@riotError</div>
-                }
-                <div class="d-flex gap-2 align-items-end">
-                    <div>
-                        <label class="form-label small mb-1">Game Name</label>
-                        <input type="text" name="gameName" class="form-control form-control-sm" placeholder="HideOnBush" required />
-                    </div>
-                    <div>
-                        <label class="form-label small mb-1">Tag</label>
-                        <input type="text" name="tagLine" class="form-control form-control-sm" placeholder="NA1" required />
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-outline-secondary">Link Riot Account</button>
-                </div>
-            </form>
-        </dd>
     </dl>
+
+    <ProfileRiotAccountsTable Accounts="user.RiotAccounts" RiotError="riotError" />
+
+    <ProfileTeamsTable TeamRows="teamRows" />
 
 }
 
 @code {
     private Bloodsport.Entity.Database.User? user;
     private List<TeamInvite> pendingInvites = [];
+    private List<(Bloodsport.Entity.Database.Team Team, string Role)> teamRows = [];
     private string? riotError;
     private string? displayNameError;
     private bool inviteAccepted;
@@ -200,12 +138,27 @@ else
 
             user = await db.Users
                 .Include(u => u.RiotAccounts)
+                    .ThenInclude(a => a.TeamMemberships)
+                        .ThenInclude(m => m.Team)
+                            .ThenInclude(t => t.TeamMemberships)
                 .Include(u => u.ManagedTeams)
                     .ThenInclude(t => t.TeamMemberships)
                 .FirstOrDefaultAsync(u => u.EntraObjectId == oid);
 
             if (user is not null)
             {
+                var managedTeamIds = user.ManagedTeams.Select(t => t.Id).ToHashSet();
+                var memberTeams = user.RiotAccounts.SelectMany(a => a.TeamMemberships).Select(m => m.Team).DistinctBy(t => t.Id);
+
+                teamRows = memberTeams
+                    .Select(t => (Team: t, IsManager: managedTeamIds.Contains(t.Id), IsMember: true))
+                    .Concat(user.ManagedTeams
+                        .Where(t => !user.RiotAccounts.SelectMany(a => a.TeamMemberships).Any(m => m.Team.Id == t.Id))
+                        .Select(t => (Team: t, IsManager: true, IsMember: false)))
+                    .OrderBy(r => r.Team.Name)
+                    .Select(r => (r.Team, Role: r.IsManager && r.IsMember ? "Manager, Member" : r.IsManager ? "Manager" : "Member"))
+                    .ToList();
+
                 var riotAccountIds = user.RiotAccounts.Select(r => r.Id).ToList();
                 pendingInvites = await db.TeamInvites
                     .Include(i => i.Team)
