@@ -20,6 +20,15 @@
         <input type="text" name="name" class="form-control" placeholder="Season 1" required autofocus />
     </div>
     <div class="mb-3" style="max-width: 400px;">
+        <label class="form-label">Season Length</label>
+        <select name="length" class="form-select">
+            @for (int i = 3; i <= 8; i++)
+            {
+                <option value="@i" selected="@(i == 6)">@i weeks</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3" style="max-width: 400px;">
         <label class="form-label">Estimated Start Date <span class="text-muted">(optional)</span></label>
         <input type="date" name="startDate" class="form-control" />
     </div>

@@ -8,6 +8,8 @@ namespace Bloodsport.Entity.Database
 
         public long Id { get; private set; }
 
+        public int Length { get; set; }
+
         public bool RegistrationOpen { get; set; }
 
         public long? RiotProviderId { get; set; }

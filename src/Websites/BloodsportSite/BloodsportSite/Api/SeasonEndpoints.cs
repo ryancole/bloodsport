@@ -40,6 +40,7 @@ namespace BloodsportSite.Api
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
             [Microsoft.AspNetCore.Mvc.FromForm] string name,
+            [Microsoft.AspNetCore.Mvc.FromForm] int length = 6,
             [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
         {
             if (!context.User.IsInRole("Bloodsport.Admin"))
@@ -54,9 +55,13 @@ namespace BloodsportSite.Api
 
             await using var db = dbFactory.CreateDbContext();
 
+            if (length < 3 || length > 8)
+                length = 6;
+
             var season = new Season
             {
                 Name = name,
+                Length = length,
                 EstimatedDateStart = parsedStartDate,
             };
 
