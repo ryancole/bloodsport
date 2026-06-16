@@ -21,6 +21,11 @@ main {
     align-items: center;
 }
 
+.top-row-breadcrumbs {
+    flex: 1;
+    font-size: 0.875rem;
+}
+
     .top-row ::deep a, .top-row ::deep .btn-link {
         white-space: nowrap;
         margin-left: 1.5rem;
@@ -34,6 +39,15 @@ main {
     .top-row ::deep a:first-child {
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .top-row-breadcrumbs ::deep a {
+        margin-left: 0;
+    }
+
+    .top-row-breadcrumbs ::deep a:first-child {
+        overflow: visible;
+        text-overflow: unset;
     }
 
 @media (max-width: 640.98px) {

@@ -11,6 +11,9 @@
 
     <main>
         <div class="top-row px-4">
+            <div class="top-row-breadcrumbs">
+                <SectionOutlet SectionName="breadcrumbs" />
+            </div>
             <AuthorizeView>
                 <Authorized>
                     <a href="/profile">@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)</a>

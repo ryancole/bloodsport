@@ -20,12 +20,9 @@ else if (matchup is null)
 }
 else
 {
-    <nav class="small mb-2">
-        <a href="/seasons">Seasons</a> /
-        <a href="/seasons/@matchup.SeasonWeek.Season.Id">@matchup.SeasonWeek.Season.Name</a> /
-        <a href="/seasons/@matchup.SeasonWeek.Season.Id/weeks/@matchup.SeasonWeek.Id">@matchup.SeasonWeek.Name</a> /
-        @matchup.TeamOne.Name vs @matchup.TeamTwo.Name
-    </nav>
+    <SectionContent SectionName="breadcrumbs">
+        <nav class="small"><a href="/seasons">Seasons</a> / <a href="/seasons/@matchup.SeasonWeek.Season.Id">@matchup.SeasonWeek.Season.Name</a> / <a href="/seasons/@matchup.SeasonWeek.Season.Id/weeks/@matchup.SeasonWeek.Id">@matchup.SeasonWeek.Name</a> / @matchup.TeamOne.Name vs @matchup.TeamTwo.Name</nav>
+    </SectionContent>
 
     <h1 class="mb-1">@matchup.TeamOne.Name vs @matchup.TeamTwo.Name</h1>
     <p class="text-muted mb-1">@matchup.SeasonWeek.Name &mdash; @matchup.SeasonWeek.Season.Name</p>

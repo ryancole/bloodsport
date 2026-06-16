@@ -26,11 +26,9 @@ else
     var playoff = round.Playoff;
     var isGrandFinal = round.PlayoffMatchups.Count == 1;
 
-    <nav class="small mb-2">
-        <a href="/playoffs">Playoffs</a> /
-        <a href="/playoffs/@playoff.Id">@playoff.Name</a> /
-        @round.Name / @teamOneName vs @teamTwoName
-    </nav>
+    <SectionContent SectionName="breadcrumbs">
+        <nav class="small"><a href="/playoffs">Playoffs</a> / <a href="/playoffs/@playoff.Id">@playoff.Name</a> / @round.Name / @teamOneName vs @teamTwoName</nav>
+    </SectionContent>
 
     @if (isGrandFinal)
     {

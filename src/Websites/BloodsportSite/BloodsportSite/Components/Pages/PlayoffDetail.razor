@@ -17,9 +17,9 @@ else if (playoff is null)
 }
 else
 {
-    <nav class="small mb-2">
-        <a href="/playoffs">Playoffs</a> / @playoff.Name
-    </nav>
+    <SectionContent SectionName="breadcrumbs">
+        <nav class="small"><a href="/playoffs">Playoffs</a> / @playoff.Name</nav>
+    </SectionContent>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">@playoff.Name</h1>
