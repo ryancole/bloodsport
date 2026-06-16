@@ -11,8 +11,6 @@ namespace BloodsportFunctions.Functions
 {
     public class BuildRegularSeason
     {
-        private const int WeekCount = 8;
-
         private readonly ILogger<BuildRegularSeason> _logger;
         private readonly IDbContextFactory<SqlDbContext> _dbFactory;
 
@@ -94,7 +92,7 @@ namespace BloodsportFunctions.Functions
                 return;
             }
 
-            _logger.LogInformation("Building {weekCount} weeks for season {seasonId}.", WeekCount, seasonId);
+            _logger.LogInformation("Building {weekCount} weeks for season {seasonId}.", season.Length, seasonId);
             var weeks = BuildWeeks(season);
             db.SeasonWeeks.AddRange(weeks);
             await db.SaveChangesAsync(); // flush so weeks get their DB-generated IDs
@@ -116,7 +114,7 @@ namespace BloodsportFunctions.Functions
 
             await db.SaveChangesAsync();
 
-            _logger.LogInformation("Built {weekCount} weeks and {matchupCount} matchups for season {seasonId} across {teamCount} teams.", WeekCount, matchups.Count, seasonId, teamCount);
+            _logger.LogInformation("Built {weekCount} weeks and {matchupCount} matchups for season {seasonId} across {teamCount} teams.", season.Length, matchups.Count, seasonId, teamCount);
 
             await messageActions.CompleteMessageAsync(message);
         }
@@ -172,7 +170,7 @@ namespace BloodsportFunctions.Functions
 
             var weeks = new List<SeasonWeek>();
 
-            for (int i = 0; i < WeekCount; i++)
+            for (int i = 0; i < season.Length; i++)
             {
                 var weekStart = dateStart.AddDays(7 * i);
                 var weekEnd = weekStart.AddDays(7);
