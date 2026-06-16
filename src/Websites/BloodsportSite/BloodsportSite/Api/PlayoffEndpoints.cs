@@ -21,6 +21,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/playoff-matchups/{id}/tournament-code", RequestTournamentCodeAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/playoff-matchups/{id}/fetch-lobby-events", FetchLobbyEventsAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -94,9 +97,27 @@ namespace BloodsportSite.Api
             if (playoff.RiotTournamentId is null)
                 return Results.Redirect($"{MatchupUrl(matchup)}?error=tournament_not_configured");
 
+            var teamOneId = matchup.TeamOne?.TeamId;
+            var teamTwoId = matchup.TeamTwo?.TeamId;
+
+            var rosters = await db.TeamPlayoffRosters
+                .Where(r => r.PlayoffId == playoff.Id && (r.TeamId == teamOneId || r.TeamId == teamTwoId))
+                .ToListAsync();
+
+            var allowedSummonerNames = rosters
+                .SelectMany(r => JsonSerializer.Deserialize<TeamPlayoffRosterJson>(r.RosterJson)?.AllowedSummonerNames ?? [])
+                .ToHashSet();
+
+            var allowedPuuids = await db.RiotAccounts
+                .Where(a => allowedSummonerNames.Contains(a.GameName + "#" + a.TagLine))
+                .Select(a => a.Puuid)
+                .ToArrayAsync();
+
             try
             {
-                matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(playoff.RiotTournamentId.Value);
+                matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(
+                    playoff.RiotTournamentId.Value,
+                    allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null);
                 await db.SaveChangesAsync();
             }
             catch (HttpRequestException)
@@ -105,6 +126,45 @@ namespace BloodsportSite.Api
             }
 
             return Results.Redirect(MatchupUrl(matchup));
+        }
+
+        private static async Task<IResult> FetchLobbyEventsAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            ServiceBusClient serviceBusClient,
+            long id)
+        {
+            await using var db = dbFactory.CreateDbContext();
+
+            var oid = context.User.FindFirst("oid")?.Value
+                   ?? context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+            if (oid is null)
+                return Results.Redirect("?error=not_authenticated");
+
+            var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+            if (user is null)
+                return Results.Redirect("?error=not_authenticated");
+
+            var matchup = await db.PlayoffMatchups
+                .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
+                .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
+                .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (matchup is null)
+                return Results.Redirect("?error=not_found");
+
+            if (matchup.TeamOne?.Team?.ManagerId != user.Id && matchup.TeamTwo?.Team?.ManagerId != user.Id)
+                return Results.Forbid();
+
+            if (matchup.TournamentCode is null)
+                return Results.Redirect($"{MatchupUrl(matchup)}?error=no_tournament_code");
+
+            await using var sender = serviceBusClient.CreateSender("fetch-riot-lobby-events");
+            await sender.SendMessageAsync(new ServiceBusMessage(matchup.TournamentCode));
+
+            return Results.Redirect($"{MatchupUrl(matchup)}?info=lobby_events_requested");
         }
 
         private static string MatchupUrl(PlayoffMatchup matchup) =>
