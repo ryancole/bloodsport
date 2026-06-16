@@ -20,11 +20,15 @@
 }
 else
 {
-    <TeamsTable Teams="teams" CurrentPage="Page" />
+    var filtered = string.IsNullOrWhiteSpace(Search)
+        ? teams
+        : teams.Where(t => t.Name.Contains(Search, StringComparison.OrdinalIgnoreCase)).ToList();
+    <TeamsTable Teams="filtered" CurrentPage="Page" Search="Search" />
 }
 
 @code {
     [SupplyParameterFromQuery(Name = "page")] public int Page { get; set; } = 1;
+    [SupplyParameterFromQuery(Name = "search")] public string? Search { get; set; }
 
     private List<Bloodsport.Entity.Database.Team>? teams;
 

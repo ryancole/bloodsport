@@ -7,11 +7,17 @@
     var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
 }
 
-<Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex justify-content-end mb-2" />
+<div class="d-flex align-items-center justify-content-between mb-2">
+    <form method="get" class="d-flex gap-2">
+        <input type="search" name="search" class="form-control w-auto" placeholder="Search by team name…" value="@Search" />
+        <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+    <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex" />
+</div>
 
-@if (Teams.Count == 0)
+@if (!sorted.Any())
 {
-    <p class="text-muted">No teams yet.</p>
+    <p class="text-muted">No teams found.</p>
 }
 else
 {
@@ -43,6 +49,9 @@ else
 
     [Parameter, EditorRequired] public ICollection<Team> Teams { get; set; } = [];
     [Parameter] public int CurrentPage { get; set; } = 1;
+    [Parameter] public string? Search { get; set; }
 
-    private string PageUrl(int p) => $"/teams?page={p}";
+    private string PageUrl(int p) => string.IsNullOrWhiteSpace(Search)
+        ? $"/teams?page={p}"
+        : $"/teams?search={Uri.EscapeDataString(Search)}&page={p}";
 }
