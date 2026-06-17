@@ -1,5 +1,6 @@
 using Azure.Communication.Email;
 using Azure.Storage.Blobs;
+using Bloodsport.Common.Email;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.RiotApi;
 using BloodsportFunctions.Services;

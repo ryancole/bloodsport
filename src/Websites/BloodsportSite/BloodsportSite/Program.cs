@@ -6,6 +6,7 @@ using Bloodsport.Entity.Database;
 using Bloodsport.Entity.RiotApi;
 using BloodsportSite.Api;
 using BloodsportSite.Components;
+using Bloodsport.Common.Email;
 using BloodsportSite.Services;
 using Camille.RiotGames;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;

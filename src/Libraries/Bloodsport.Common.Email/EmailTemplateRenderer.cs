@@ -1,6 +1,6 @@
 using Scriban;
 
-namespace BloodsportSite.Services;
+namespace Bloodsport.Common.Email;
 
 public class EmailTemplateRenderer
 {
