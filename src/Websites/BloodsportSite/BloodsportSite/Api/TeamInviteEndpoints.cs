@@ -1,7 +1,7 @@
 using Azure.Communication.Email;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
-using BloodsportSite.Services;
+using Bloodsport.Common.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
