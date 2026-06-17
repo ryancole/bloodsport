@@ -88,3 +88,35 @@ az rest --method POST `
 | `app-role-id` | App registrations → BloodsportSite → App roles → Bloodsport Admin → ID |
 
 After assigning, the user must sign out and back in for the `roles` claim to appear in their token.
+
+## Deployment
+
+Two manual GitHub Actions workflows handle deployment:
+
+- `.github/workflows/deploy-functions.yml` — Azure Functions app
+- `.github/workflows/deploy-site.yml` — Blazor site (App Service)
+
+Both use OIDC (federated identity) to authenticate with Azure — no publish profiles required.
+
+### GitHub secrets
+
+Add these to the repo under **Settings → Secrets and variables → Actions**:
+
+| Secret | Where to find it |
+|---|---|
+| `AZURE_CLIENT_ID` | App Registration → Overview → Application (client) ID |
+| `AZURE_TENANT_ID` | App Registration → Overview → Directory (tenant) ID |
+| `AZURE_SUBSCRIPTION_ID` | Azure Portal → Subscriptions |
+| `AZURE_FUNCTION_APP_NAME` | Name of the Azure Function App resource |
+| `AZURE_SITE_APP_NAME` | Name of the Azure App Service resource |
+
+### Azure App Registration setup
+
+1. Create (or reuse) an **App Registration** in Entra ID.
+2. Add a **Federated credential** for each branch you'll deploy from:
+   - Go to the App Registration → **Certificates & secrets → Federated credentials → Add credential**
+   - Choose **GitHub Actions**
+   - Set **Organization** to `ryancole`, **Repository** to `bloodsport`, **Entity type** to `Branch`, and **Branch** to `master`
+3. Grant the App Registration **Website Contributor** role on both the Function App and the App Service:
+   - Go to each resource → **Access control (IAM) → Add role assignment**
+   - Role: `Website Contributor`, assign to the App Registration (search by name)
