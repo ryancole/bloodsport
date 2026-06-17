@@ -61,7 +61,7 @@ else
     @* Tournament Lobby *@
     @if (playoff.Status == PlayoffStatus.Active && (isManager || isMember))
     {
-        <PlayoffLobbyCode MatchupId="matchup.Id" IsManager="isManager" RoundEnded="RoundEnded" TournamentCode="@matchup.TournamentCode" Error="@error" />
+        <PlayoffLobbyCode MatchupId="matchup.Id" IsManager="isManager" RoundEnded="RoundEnded" TournamentCode="@matchup.TournamentCode" Error="@error" Info="@info" />
     }
 
     @* Result *@
@@ -76,14 +76,45 @@ else
         <MatchupPendingResultAlert />
     }
 
+    @* Lobby Events *@
+    @if (isManager && lobbyEvents.Count > 0)
+    {
+        <div class="card border-0 bg-body-secondary rounded-3 mb-4 p-4">
+            <div class="text-uppercase fw-semibold small text-muted letter-spacing-1 mb-3">Lobby Events (@lobbyEvents.Count)</div>
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-muted fw-normal small">Time</th>
+                        <th class="text-muted fw-normal small">Event</th>
+                        <th class="text-muted fw-normal small">Player</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var evt in lobbyEvents)
+                    {
+                        var displayName = evt.Puuid is not null && puuidToSummonerName.TryGetValue(evt.Puuid, out var name)
+                            ? name
+                            : (evt.Puuid?[..8] ?? "unknown") + "…";
+                        var time = long.TryParse(evt.Timestamp, out var ms)
+                            ? DateTimeOffset.FromUnixTimeMilliseconds(ms).LocalDateTime.ToString("MMM d, h:mm:ss tt")
+                            : evt.Timestamp;
+                        <tr>
+                            <td class="small text-muted text-nowrap">@time</td>
+                            <td class="small font-monospace">@evt.EventType</td>
+                            <td class="small">@displayName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
     @* Teams *@
     @if (matchup.WinningTeam is null)
     {
         <div class="alert alert-warning small mb-4">
-            <strong>Roster verification required.</strong>
-            Each team is allowed up to 7 players (5 starters + 2 bench) whose Riot IDs are locked in at the start of the season.
-            Before play begins, both teams must manually verify that every player in the custom lobby matches the allowed roster listed below.
-            Players not on a team's season roster are not eligible to compete and must be removed from the lobby.
+            <strong>Locked-in rosters enforced.</strong>
+            Only Riot IDs on each team's locked-in roster are permitted in the tournament lobby. Players not on the roster below will be blocked from joining.
         </div>
     }
     <div class="row g-0 mb-4 align-items-stretch">
@@ -105,14 +136,21 @@ else
     [Parameter] public long PlayoffId { get; set; }
     [Parameter] public long MatchupId { get; set; }
 
+    private record LobbyEvent(string? EventType, string? Puuid, string? Timestamp);
+
+    private static readonly JsonSerializerOptions _caseInsensitive = new() { PropertyNameCaseInsensitive = true };
+
     private PlayoffMatchup? matchup;
     private bool notFound;
     private bool isManager;
     private bool isMember;
     private string? error;
+    private string? info;
     private ICollection<string> teamOneRoster = [];
     private ICollection<string> teamTwoRoster = [];
     private Dictionary<string, long> rosterUserIds = [];
+    private List<LobbyEvent> lobbyEvents = [];
+    private Dictionary<string, string> puuidToSummonerName = [];
 
     private bool RoundEnded => matchup?.PlayoffRound.DateEnd.HasValue == true
                             && matchup.PlayoffRound.DateEnd!.Value < DateTime.UtcNow;
@@ -123,6 +161,9 @@ else
         var query = QueryHelpers.ParseQuery(uri.Query);
         query.TryGetValue("error", out var errorVal);
         error = errorVal;
+
+        query.TryGetValue("info", out var infoVal);
+        info = infoVal;
 
         await using var db = await DbFactory.CreateDbContextAsync();
 
@@ -138,6 +179,26 @@ else
         {
             notFound = true;
             return;
+        }
+
+        if (matchup.TournamentCode is not null)
+        {
+            var rawEvents = await db.RiotLobbyEvents
+                .Where(e => e.TournamentCode == matchup.TournamentCode)
+                .OrderBy(e => e.Id)
+                .ToListAsync();
+
+            lobbyEvents = rawEvents
+                .Select(e => JsonSerializer.Deserialize<LobbyEvent>(e.EventJson, _caseInsensitive))
+                .Where(e => e is not null)
+                .Select(e => e!)
+                .ToList();
+
+            var eventPuuids = lobbyEvents.Select(e => e.Puuid).Where(p => p is not null).Distinct().ToHashSet();
+            var eventAccounts = await db.RiotAccounts
+                .Where(a => eventPuuids.Contains(a.Puuid))
+                .ToListAsync();
+            puuidToSummonerName = eventAccounts.ToDictionary(a => a.Puuid, a => $"{a.GameName}#{a.TagLine}");
         }
 
         var teamOneId = matchup.TeamOne?.TeamId;

@@ -2,3 +2,4 @@
 -- Safe to re-run. Does NOT affect SeasonWeekMatchups or any other season data.
 
 DELETE FROM [dbo].[SeasonWeekMatchupResults];
+DELETE FROM TeamSeasonResults;

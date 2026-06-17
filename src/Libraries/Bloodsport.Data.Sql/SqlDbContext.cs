@@ -21,7 +21,6 @@ namespace Bloodsport.Data.Sql
 
             new TeamEntityConfiguration().Configure(modelBuilder.Entity<Team>());
             new UserEntityConfiguration().Configure(modelBuilder.Entity<User>());
-            new RiotAccountEntityConfiguration().Configure(modelBuilder.Entity<RiotAccount>());
             new TeamMembershipEntityConfiguration().Configure(modelBuilder.Entity<TeamMembership>());
             new TeamInviteEntityConfiguration().Configure(modelBuilder.Entity<TeamInvite>());
             new SeasonEntityConfiguration().Configure(modelBuilder.Entity<Season>());
@@ -38,6 +37,9 @@ namespace Bloodsport.Data.Sql
             new PlayoffMatchupEntityConfiguration().Configure(modelBuilder.Entity<PlayoffMatchup>());
 
             new TeamPlayoffRosterEntityConfiguration().Configure(modelBuilder.Entity<TeamPlayoffRoster>());
+
+            new RiotAccountEntityConfiguration().Configure(modelBuilder.Entity<RiotAccount>());
+            new RiotLobbyEventEntityConfiguration().Configure(modelBuilder.Entity<RiotLobbyEvent>());
         }
 
         #endregion
@@ -77,6 +79,8 @@ namespace Bloodsport.Data.Sql
         public DbSet<PlayoffMatchup> PlayoffMatchups { get; set; }
 
         public DbSet<TeamPlayoffRoster> TeamPlayoffRosters { get; set; }
+
+        public DbSet<RiotLobbyEvent> RiotLobbyEvents { get; set; }
 
         #endregion
     }
