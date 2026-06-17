@@ -9,11 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="EmailTemplates\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.29.0" />
     <PackageReference Include="Camille.RiotGames" Version="3.0.0-nightly-2025-06-24-d2b94715b7" />
     <PackageReference Include="Microsoft.Identity.Web" Version="4.10.0" />
+    <PackageReference Include="Scriban" Version="7.2.4" />
     <ProjectReference Include="..\..\..\Libraries\Bloodsport.Data.Sql\Bloodsport.Data.Sql.csproj" />
     <ProjectReference Include="..\..\..\Libraries\Bloodsport.Entity\Bloodsport.Entity.csproj" />
     <ProjectReference Include="..\BloodsportSite.Client\BloodsportSite.Client.csproj" />

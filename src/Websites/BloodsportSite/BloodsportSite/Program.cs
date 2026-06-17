@@ -77,6 +77,10 @@ namespace BloodsportSite
 
             builder
                 .Services
+                .AddSingleton<EmailTemplateRenderer>();
+
+            builder
+                .Services
                 .AddTransient<TeamLogoService>();
 
             builder

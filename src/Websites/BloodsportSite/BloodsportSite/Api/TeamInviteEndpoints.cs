@@ -1,6 +1,10 @@
+using Azure.Communication.Email;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using BloodsportSite.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BloodsportSite.Api
 {
@@ -23,6 +27,10 @@ namespace BloodsportSite.Api
         private static async Task<IResult> InviteAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
+            EmailClient emailClient,
+            EmailTemplateRenderer templateRenderer,
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory,
             long teamId,
             [Microsoft.AspNetCore.Mvc.FromForm] string gameName,
             [Microsoft.AspNetCore.Mvc.FromForm] string tagLine)
@@ -43,6 +51,7 @@ namespace BloodsportSite.Api
                 return Results.Redirect("/teams");
 
             var riotAccount = await db.RiotAccounts
+                .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.GameName == gameName && r.TagLine == tagLine);
 
             if (riotAccount is null)
@@ -74,7 +83,38 @@ namespace BloodsportSite.Api
 
             await db.SaveChangesAsync();
 
+            await TrySendInviteEmailAsync(emailClient, templateRenderer, configuration, loggerFactory.CreateLogger(nameof(TeamInviteEndpoints)), riotAccount.User, team, user);
+
             return Results.Redirect($"/teams/{teamId}?invite_sent=1");
+        }
+
+        private static async Task TrySendInviteEmailAsync(EmailClient emailClient, EmailTemplateRenderer templateRenderer, IConfiguration configuration, ILogger logger, User invitee, Team team, User manager)
+        {
+            var senderAddress = configuration["Email:SenderAddress"];
+            if (senderAddress is null || string.IsNullOrEmpty(invitee.Email))
+                return;
+
+            var html = await templateRenderer.RenderAsync("TeamInvite.html", new { manager_name = manager.DisplayName, team_name = team.Name });
+
+            var content = new EmailContent($"You've been invited to join {team.Name}")
+            {
+                PlainText = $"{manager.DisplayName} has invited you to join {team.Name}. Head to the site and check your profile to accept or decline.",
+                Html = html
+            };
+
+            var message = new EmailMessage(
+                senderAddress: senderAddress,
+                recipients: new EmailRecipients([new EmailAddress(invitee.Email)]),
+                content: content);
+
+            try
+            {
+                await emailClient.SendAsync(Azure.WaitUntil.Started, message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to send team invite email to user {UserId}.", invitee.Id);
+            }
         }
 
         private static async Task<IResult> AcceptAsync(
