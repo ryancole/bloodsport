@@ -1,0 +1,27 @@
+name: Deploy Blazor Site
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Publish
+        run: dotnet publish src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj --configuration Release --output ./publish
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_SITE_APP_NAME }}
+          publish-profile: ${{ secrets.AZURE_SITE_PUBLISH_PROFILE }}
+          package: ./publish
