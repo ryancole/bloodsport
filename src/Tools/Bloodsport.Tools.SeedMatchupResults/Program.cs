@@ -1,17 +1,22 @@
 using System.Net.Http.Json;
 using Camille.RiotGames.TournamentV5;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
-    Console.WriteLine("Usage: SeedMatchupResults --season <id> --server <instance> --database <name> [--url <functionUrl>] [--key <functionKey>] [--skip <0-100>]");
+    Console.WriteLine("Usage: SeedMatchupResults --season <id> [--url <functionUrl>] [--key <functionKey>] [--skip <0-100>]");
+    Console.WriteLine("Connection string is read from appsettings.json or user secrets (ConnectionStrings:Default).");
     Console.WriteLine("Default --url: http://localhost:7071/api/HandleSeasonWeekMatchup");
     return;
 }
 
+var config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: true)
+    .AddUserSecrets<Program>()
+    .Build();
+
 long seasonId = 0;
-string server = "";
-string database = "";
 string functionUrl = "http://localhost:7071/api/HandleSeasonWeekMatchup";
 string functionKey = "";
 int skipPercent = 20;
@@ -20,28 +25,20 @@ for (int i = 0; i < args.Length - 1; i++)
 {
     switch (args[i])
     {
-        case "--season":   seasonId    = long.Parse(args[++i]); break;
-        case "--server":   server      = args[++i]; break;
-        case "--database": database    = args[++i]; break;
-        case "--url":      functionUrl = args[++i]; break;
-        case "--key":      functionKey = args[++i]; break;
-        case "--skip":     skipPercent = int.Parse(args[++i]); break;
+        case "--season": seasonId    = long.Parse(args[++i]); break;
+        case "--url":    functionUrl = args[++i]; break;
+        case "--key":    functionKey = args[++i]; break;
+        case "--skip":   skipPercent = int.Parse(args[++i]); break;
     }
 }
 
-if (seasonId == 0 || string.IsNullOrEmpty(server) || string.IsNullOrEmpty(database))
+var connString = config.GetConnectionString("Default");
+
+if (seasonId == 0 || string.IsNullOrEmpty(connString))
 {
-    Console.Error.WriteLine("--season, --server, and --database are required.");
+    Console.Error.WriteLine("--season is required and ConnectionStrings:Default must be set in appsettings.json or user secrets.");
     Environment.Exit(1);
 }
-
-var connString = new SqlConnectionStringBuilder
-{
-    DataSource = server,
-    InitialCatalog = database,
-    IntegratedSecurity = true,
-    TrustServerCertificate = true,
-}.ConnectionString;
 
 await using var conn = new SqlConnection(connString);
 await conn.OpenAsync();

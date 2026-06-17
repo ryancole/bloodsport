@@ -5,11 +5,14 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>0a55ba9f-e3a0-4ca4-ba4e-668d3e9a4734</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Camille.RiotGames" Version="3.0.0-nightly-2025-06-24-d2b94715b7" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
 
 </Project>
