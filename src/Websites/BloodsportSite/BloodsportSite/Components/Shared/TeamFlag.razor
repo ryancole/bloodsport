@@ -1,4 +1,5 @@
 @using Bloodsport.Entity.Database
+@inject BloodsportSite.Services.TeamLogoService TeamLogoService
 
 @if (flagUrl is not null)
 {
@@ -12,5 +13,5 @@ else
 @code {
     [Parameter, EditorRequired] public string? LogoUrl { get; set; }
 
-    private string? flagUrl => LogoUrl?.Replace("/original.", "/flag.");
+    private string? flagUrl => TeamLogoService.GetSasUrl(LogoUrl?.Replace("/original.", "/flag."));
 }

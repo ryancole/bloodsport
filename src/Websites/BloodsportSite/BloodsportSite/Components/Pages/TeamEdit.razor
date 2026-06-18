@@ -7,6 +7,7 @@
 @inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject BloodsportSite.Services.TeamLogoService TeamLogoService
 
 <PageTitle>Edit Team</PageTitle>
 
@@ -38,7 +39,7 @@ else
             @if (team.LogoUrl is not null)
             {
                 <div class="mb-2">
-                    <img src="@team.LogoUrl" alt="Current team logo" style="max-height: 80px; max-width: 200px; object-fit: contain;" />
+                    <img src="@TeamLogoService.GetSasUrl(team.LogoUrl)" alt="Current team logo" style="max-height: 80px; max-width: 200px; object-fit: contain;" />
                 </div>
             }
             <input type="file" name="logo" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp" />

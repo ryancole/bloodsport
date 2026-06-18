@@ -89,6 +89,32 @@ az rest --method POST `
 
 After assigning, the user must sign out and back in for the `roles` claim to appear in their token.
 
+## Azure SQL managed identity setup
+
+Each Azure service that connects to SQL uses its **system-assigned managed identity** rather than a SQL login. After enabling the managed identity on a service (App Service or Function App), connect to the SQL database as an Entra admin and run:
+
+```sql
+-- Blazor App Service
+CREATE USER [bloodsport-app] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [bloodsport-app];
+ALTER ROLE db_datawriter ADD MEMBER [bloodsport-app];
+
+-- Function App (if it also needs SQL access)
+CREATE USER [bloodsport-functions] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [bloodsport-functions];
+ALTER ROLE db_datawriter ADD MEMBER [bloodsport-functions];
+```
+
+```sql
+-- GitHub Actions deploy identity (needs DDL access to run migrations)
+CREATE USER [bloodsport-github-deploy] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [bloodsport-github-deploy];
+ALTER ROLE db_datawriter ADD MEMBER [bloodsport-github-deploy];
+ALTER ROLE db_ddladmin ADD MEMBER [bloodsport-github-deploy];
+```
+
+Replace the bracketed names with the exact names of your App Service, Function App, and Entra app registration resources. These commands must be run against the target **database** (not `master`) while connected as an Entra admin.
+
 ## Deployment
 
 Two manual GitHub Actions workflows handle deployment:
