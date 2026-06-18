@@ -37,7 +37,7 @@ jobs:
         run: az sql server update --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_SQL_SERVER_NAME }} --enable-public-network true
 
       - name: Wait for public network access to propagate
-        run: Start-Sleep -Seconds 30
+        run: Start-Sleep -Seconds 10
 
       - name: Run migrations
         env:
