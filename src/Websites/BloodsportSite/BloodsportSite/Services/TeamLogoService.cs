@@ -23,8 +23,6 @@ namespace BloodsportSite.Services
             var blobName = $"{teamId}/original{extension}";
 
             var container = blobServiceClient.GetBlobContainerClient(ContainerName);
-            await container.CreateIfNotExistsAsync(PublicAccessType.None);
-
             var blob = container.GetBlobClient(blobName);
             await using var stream = file.OpenReadStream();
             await blob.UploadAsync(stream, new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders { ContentType = contentType } });
