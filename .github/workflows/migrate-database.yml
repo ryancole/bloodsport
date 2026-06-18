@@ -1,0 +1,53 @@
+name: Migrate Database
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Enable public network access
+        run: |
+          az sql server update `
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} `
+            --name ${{ secrets.AZURE_SQL_SERVER_NAME }} `
+            --enable-public-network true
+
+      - name: Run migrations
+        run: |
+          dotnet ef database update `
+            --project src/Libraries/Bloodsport.Data.Sql `
+            --startup-project src/Websites/BloodsportSite/BloodsportSite `
+            --connection "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+
+      - name: Disable public network access
+        if: always()
+        run: |
+          az sql server update `
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} `
+            --name ${{ secrets.AZURE_SQL_SERVER_NAME }} `
+            --enable-public-network false
