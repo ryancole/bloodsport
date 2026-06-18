@@ -21,7 +21,7 @@ jobs:
           dotnet-version: '10.x'
 
       - name: Install EF Core tools
-        run: dotnet tool install --global dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 10.0.8
 
       - name: Azure Login
         uses: azure/login@v2
