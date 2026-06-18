@@ -34,23 +34,11 @@ jobs:
         run: dotnet restore src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj
 
       - name: Enable public network access
-        run: |
-          az sql server update `
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} `
-            --name ${{ secrets.AZURE_SQL_SERVER_NAME }} `
-            --enable-public-network true
+        run: az sql server update --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_SQL_SERVER_NAME }} --enable-public-network true
 
       - name: Run migrations
-        run: |
-          dotnet ef database update `
-            --project src/Libraries/Bloodsport.Data.Sql `
-            --startup-project src/Websites/BloodsportSite/BloodsportSite `
-            --connection "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+        run: dotnet ef database update --project src/Libraries/Bloodsport.Data.Sql --startup-project src/Websites/BloodsportSite/BloodsportSite --connection "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
 
       - name: Disable public network access
         if: always()
-        run: |
-          az sql server update `
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} `
-            --name ${{ secrets.AZURE_SQL_SERVER_NAME }} `
-            --enable-public-network false
+        run: az sql server update --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_SQL_SERVER_NAME }} --enable-public-network false
