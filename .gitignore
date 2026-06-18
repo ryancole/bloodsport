@@ -5,3 +5,6 @@ bin/
 obj/
 
 publish-test/
+PublishProfiles/
+
+*.csproj.user
