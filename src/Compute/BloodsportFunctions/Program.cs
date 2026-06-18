@@ -31,7 +31,7 @@ public class Program
         builder
             .Services
             .AddSingleton(new BlobServiceClient(
-                builder.Configuration.GetConnectionString("AzureWebJobsStorage")
+                builder.Configuration["AzureWebJobsStorage"]
                     ?? throw new InvalidOperationException("AzureWebJobsStorage is not configured.")));
 
         builder
