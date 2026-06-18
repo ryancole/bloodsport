@@ -30,6 +30,9 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Restore dependencies
+        run: dotnet restore src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj
+
       - name: Enable public network access
         run: |
           az sql server update `
