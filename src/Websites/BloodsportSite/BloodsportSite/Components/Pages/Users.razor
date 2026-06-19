@@ -1,37 +1,7 @@
 @page "/users"
-@using Bloodsport.Data.Sql
-@using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<SqlDbContext> DbFactory
 
 <PageTitle>Users | BSAL</PageTitle>
 
 <h1 class="mb-3">Users</h1>
 
-@if (users is null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    var filtered = string.IsNullOrWhiteSpace(Search)
-        ? users
-        : users.Where(u => u.DisplayName.Contains(Search, StringComparison.OrdinalIgnoreCase)).ToList();
-    <UsersTable Users="filtered" CurrentPage="Page" Search="@Search" />
-}
-
-@code {
-    [SupplyParameterFromQuery(Name = "page")] public int Page { get; set; } = 1;
-    [SupplyParameterFromQuery(Name = "search")] public string? Search { get; set; }
-
-    private List<Bloodsport.Entity.Database.User>? users;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await using var db = await DbFactory.CreateDbContextAsync();
-        users = await db.Users
-            .Include(u => u.RiotAccounts)
-                .ThenInclude(a => a.TeamMemberships)
-                    .ThenInclude(m => m.Team)
-            .ToListAsync();
-    }
-}
+<BloodsportSite.Client.Components.UsersIndex />

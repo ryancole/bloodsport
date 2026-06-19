@@ -8,10 +8,45 @@ namespace BloodsportSite.Api
     {
         public static IEndpointRouteBuilder MapUsers(this IEndpointRouteBuilder endpoints)
         {
+            endpoints.MapGet("/users", ListAsync);
+
             endpoints.MapPost("/users/update-display-name", UpdateDisplayNameAsync)
                 .RequireAuthorization();
 
             return endpoints;
+        }
+
+        private static async Task<IResult> ListAsync(
+            IDbContextFactory<SqlDbContext> dbFactory,
+            BloodsportSite.Services.TeamLogoService teamLogoService)
+        {
+            await using var db = await dbFactory.CreateDbContextAsync();
+            var users = await db.Users
+                .Include(u => u.RiotAccounts)
+                    .ThenInclude(a => a.TeamMemberships)
+                        .ThenInclude(m => m.Team)
+                .OrderBy(u => u.DisplayName)
+                .ToListAsync();
+
+            var result = users.Select(u => new
+            {
+                u.Id,
+                u.DisplayName,
+                u.DateCreated,
+                Teams = u.RiotAccounts
+                    .SelectMany(a => a.TeamMemberships)
+                    .Select(m => m.Team)
+                    .DistinctBy(t => t.Id)
+                    .OrderBy(t => t.Name)
+                    .Select(t => new
+                    {
+                        t.Id,
+                        t.Name,
+                        FlagUrl = teamLogoService.GetSasUrl(t.LogoUrl?.Replace("/original.", "/flag.")),
+                    }),
+            });
+
+            return Results.Ok(result);
         }
 
         private static async Task<IResult> UpdateDisplayNameAsync(

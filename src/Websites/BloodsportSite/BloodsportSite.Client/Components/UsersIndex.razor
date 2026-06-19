@@ -1,0 +1,156 @@
+@rendermode InteractiveWebAssembly
+@using BloodsportSite.Client.Models
+@inject HttpClient Http
+
+@if (users is null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    var filtered = string.IsNullOrWhiteSpace(search)
+        ? users
+        : users.Where(u => u.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    var totalPages = (int)Math.Ceiling(filtered.Count / (double)PageSize);
+    var page = currentPage < 1 ? 1 : currentPage;
+    var pageItems = filtered.Skip((page - 1) * PageSize).Take(PageSize).ToList();
+
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex gap-2">
+                <input type="search" class="form-control w-auto" placeholder="Search by name…"
+                       @bind="searchInput" @bind:event="oninput" @onkeydown="HandleSearchKey" />
+                <button class="btn btn-secondary" @onclick="ApplySearch">Search</button>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <span class="text-muted">
+                    Filtering by &ldquo;@search&rdquo;
+                    <button class="btn btn-link btn-sm p-0 ms-1 text-decoration-none" @onclick="ClearSearch">&times;</button>
+                </span>
+            }
+        </div>
+        @if (totalPages > 1)
+        {
+            var windowStart = Math.Max(1, Math.Min(page - 2, totalPages - 4));
+            var windowEnd = Math.Min(totalPages, windowStart + 4);
+
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(page == 1 ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => GoToPage(page - 1)">Previous</button>
+                    </li>
+                    @if (windowStart > 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    }
+                    @for (var p = windowStart; p <= windowEnd; p++)
+                    {
+                        var pageNum = p;
+                        <li class="page-item @(page == pageNum ? "active" : "")">
+                            <button class="page-link" @onclick="() => GoToPage(pageNum)">@pageNum</button>
+                        </li>
+                    }
+                    @if (windowEnd < totalPages)
+                    {
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    }
+                    <li class="page-item @(page == totalPages ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => GoToPage(page + 1)">Next</button>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+
+    @if (!filtered.Any())
+    {
+        <p class="text-center text-muted fs-5 py-4">No users found.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Teams</th>
+                    <th>Member Since</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in pageItems)
+                {
+                    <tr>
+                        <td><a href="/users/@user.Id">@user.DisplayName</a></td>
+                        <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            @if (user.Teams.Count == 0)
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                            else
+                            {
+                                @for (var i = 0; i < user.Teams.Count; i++)
+                                {
+                                    var team = user.Teams[i];
+                                    <a href="/teams/@team.Id" class="d-inline-flex align-items-center gap-1">
+                                        @if (team.FlagUrl is not null)
+                                        {
+                                            <img src="@team.FlagUrl" width="28" height="18" style="object-fit:cover;flex-shrink:0;border-radius:2px;" alt="" />
+                                        }
+                                        else
+                                        {
+                                            <span style="display:inline-block;width:28px;height:18px;flex-shrink:0;background:#dee2e6;border-radius:2px;"></span>
+                                        }
+                                        @team.Name
+                                    </a>@(i < user.Teams.Count - 1 ? ", " : "")
+                                }
+                            }
+                        </td>
+                        <td>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private const int PageSize = 20;
+
+    private List<UserListItem>? users;
+    private string? search;
+    private string searchInput = "";
+    private int currentPage = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OperatingSystem.IsBrowser())
+        {
+            users = await Http.GetFromJsonAsync<List<UserListItem>>("/api/users");
+        }
+    }
+
+    private void ApplySearch()
+    {
+        search = string.IsNullOrWhiteSpace(searchInput) ? null : searchInput.Trim();
+        currentPage = 1;
+    }
+
+    private void ClearSearch()
+    {
+        search = null;
+        searchInput = "";
+        currentPage = 1;
+    }
+
+    private void HandleSearchKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") ApplySearch();
+    }
+
+    private void GoToPage(int page)
+    {
+        currentPage = page;
+    }
+}
