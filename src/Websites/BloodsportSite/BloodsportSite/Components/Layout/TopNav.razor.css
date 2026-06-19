@@ -1,5 +1,5 @@
 .top-nav {
-    background-image: linear-gradient(90deg, rgb(5, 39, 103) 0%, #3a0647 100%);
+    background-color: #2a2a2a;
     display: flex;
     align-items: center;
     height: 3.5rem;
