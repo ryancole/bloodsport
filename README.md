@@ -115,6 +115,51 @@ ALTER ROLE db_ddladmin ADD MEMBER [bloodsport-github-deploy];
 
 Replace the bracketed names with the exact names of your App Service, Function App, and Entra app registration resources. These commands must be run against the target **database** (not `master`) while connected as an Entra admin.
 
+## App Service Certificate + Key Vault setup
+
+App Service Certificates are stored in Key Vault as **secrets** (not certificates), and two separate service principals must have access to the vault for the end-to-end flow to work. Both are Microsoft first-party apps that won't appear in normal portal identity searches — assign by object ID via CLI.
+
+### 1. Allow App Service Certificate to store the cert
+
+This lets the App Service Certificate service write the issued cert into Key Vault as a secret.
+
+```powershell
+az role assignment create `
+  --role "Key Vault Secrets Officer" `
+  --assignee-object-id "4ec31381-1387-4062-8046-a058864eda34" `
+  --assignee-principal-type ServicePrincipal `
+  --scope "/subscriptions/<subscription-id>/resourcegroups/<resource-group>/providers/microsoft.keyvault/vaults/<vault-name>"
+```
+
+| Value | App ID |
+|---|---|
+| App Service Certificate SP | `f3c21649-0979-4721-ac85-b0216b2cf413` |
+
+### 2. Allow the App Service resource provider to read the cert
+
+This is the one that's easy to miss. Without it, importing the cert into an App Service via "Bring your own certificate" will fail with a generic error. The App Service RP needs to read the secret from Key Vault during import.
+
+```powershell
+# Get the object ID of the App Service RP in your tenant
+az ad sp show --id "abfa0a7c-a6b6-4736-8310-5855508787cd" --query "id" --output tsv
+
+az role assignment create `
+  --role "Key Vault Secrets User" `
+  --assignee-object-id "<id-from-above>" `
+  --assignee-principal-type ServicePrincipal `
+  --scope "/subscriptions/<subscription-id>/resourcegroups/<resource-group>/providers/microsoft.keyvault/vaults/<vault-name>"
+```
+
+| Value | App ID |
+|---|---|
+| App Service RP | `abfa0a7c-a6b6-4736-8310-5855508787cd` |
+
+### Notes
+
+- Your own account also needs an explicit Key Vault data plane role (e.g. **Key Vault Certificates Officer** or **Key Vault Administrator**) to view secrets/certs in the portal — subscription Owner does not grant data plane access.
+- If Key Vault has public network access disabled, temporarily enable it during the certificate import step. The App Service Certificate service is not on the trusted Microsoft services bypass list and cannot reach a private-only vault.
+- After any role assignment, wait 2–3 minutes for propagation before retrying.
+
 ## Deployment
 
 Two manual GitHub Actions workflows handle deployment:
