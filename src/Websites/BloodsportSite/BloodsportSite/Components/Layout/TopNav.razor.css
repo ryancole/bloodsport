@@ -8,6 +8,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .top-nav-brand {
@@ -17,8 +18,8 @@
     flex-shrink: 0;
 }
 
-.top-nav-brand:hover {
-    opacity: 0.85;
+.top-nav-brand:hover .top-nav-logo {
+    filter: sepia(1) saturate(3) hue-rotate(350deg) brightness(0.95);
 }
 
 .top-nav-logo {
