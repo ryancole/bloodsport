@@ -7,7 +7,7 @@
 @inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>@(season?.Name ?? "Season")</PageTitle>
+<PageTitle>@(season?.Name ?? "Season") | BSAL</PageTitle>
 
 @if (notFound)
 {

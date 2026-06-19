@@ -8,7 +8,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
-<PageTitle>@(matchup is not null ? $"{matchup.TeamOne.Name} vs {matchup.TeamTwo.Name}" : "Matchup")</PageTitle>
+<PageTitle>@(matchup is not null ? $"{matchup.TeamOne.Name} vs {matchup.TeamTwo.Name}" : "Matchup") | BSAL</PageTitle>
 
 @if (notFound)
 {

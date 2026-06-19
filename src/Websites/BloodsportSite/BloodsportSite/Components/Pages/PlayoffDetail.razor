@@ -5,7 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
 
-<PageTitle>@(playoff?.Name ?? "Playoff")</PageTitle>
+<PageTitle>@(playoff?.Name ?? "Playoff") | BSAL</PageTitle>
 
 @if (notFound)
 {
