@@ -91,9 +91,9 @@ else
     {
         @if (season.RegistrationOpen)
         {
-            <div class="card border-success mb-4">
+            <div class="card mb-4" style="background-color: #2a2a2a; border-color: #3d3d3d; color: white;">
                 <div class="card-body">
-                    <h5 class="card-title text-success">Registration is Open</h5>
+                    <h5 class="card-title" style="color: rgba(255,255,255,0.9);">Registration is Open</h5>
 
                     @if (alreadyRegisteredTeams.Count > 0)
                     {
@@ -119,33 +119,33 @@ else
 
                     @if (eligibleTeams.Count > 0)
                     {
-                        <p class="card-text text-muted">Register one of your teams to compete in this season.</p>
+                        <p class="card-text" style="color: rgba(255,255,255,0.6);">Register one of your teams to compete in this season.</p>
                         <form method="post" action="/api/seasons/@season.Id/register">
                             <AntiforgeryToken />
                             <div class="d-flex gap-2 align-items-center">
                                 @if (eligibleTeams.Count == 1)
                                 {
                                     <input type="hidden" name="teamId" value="@eligibleTeams[0].Id" />
-                                    <button type="submit" class="btn btn-success btn-sm">
+                                    <button type="submit" class="btn btn-outline-light btn-sm">
                                         Register @eligibleTeams[0].Name
                                     </button>
                                 }
                                 else
                                 {
-                                    <select name="teamId" class="form-select form-select-sm" style="max-width: 250px;">
+                                    <select name="teamId" class="form-select form-select-sm" style="max-width: 250px; background-color: #3d3d3d; color: white; border-color: rgba(255,255,255,0.25);">
                                         @foreach (var team in eligibleTeams)
                                         {
                                             <option value="@team.Id">@team.Name</option>
                                         }
                                     </select>
-                                    <button type="submit" class="btn btn-success btn-sm">Register</button>
+                                    <button type="submit" class="btn btn-outline-light btn-sm">Register</button>
                                 }
                             </div>
                         </form>
                     }
                     else if (alreadyRegisteredTeams.Count == 0)
                     {
-                        <p class="card-text text-muted">You don't have any teams eligible to register.</p>
+                        <p class="card-text" style="color: rgba(255,255,255,0.6);">You don't have any teams eligible to register.</p>
                     }
                 </div>
             </div>
