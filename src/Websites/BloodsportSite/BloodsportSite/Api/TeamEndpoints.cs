@@ -9,6 +9,8 @@ namespace BloodsportSite.Api
     {
         public static IEndpointRouteBuilder MapTeams(this IEndpointRouteBuilder endpoints)
         {
+            endpoints.MapGet("/teams", ListAsync);
+
             endpoints.MapPost("/teams/create", CreateAsync)
                 .RequireAuthorization();
 
@@ -19,6 +21,29 @@ namespace BloodsportSite.Api
                 .RequireAuthorization();
 
             return endpoints;
+        }
+
+        private static async Task<IResult> ListAsync(
+            IDbContextFactory<SqlDbContext> dbFactory,
+            TeamLogoService teamLogoService)
+        {
+            await using var db = await dbFactory.CreateDbContextAsync();
+            var teams = await db.Teams
+                .Include(t => t.Manager)
+                .OrderBy(t => t.Name)
+                .ToListAsync();
+
+            var result = teams.Select(t => new
+            {
+                t.Id,
+                t.Name,
+                ManagerId = t.Manager.Id,
+                ManagerName = t.Manager.DisplayName,
+                t.DateCreated,
+                FlagUrl = teamLogoService.GetSasUrl(t.LogoUrl?.Replace("/original.", "/flag.")),
+            });
+
+            return Results.Ok(result);
         }
 
         private static async Task<IResult> CreateAsync(

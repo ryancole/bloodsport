@@ -1,7 +1,4 @@
 @page "/teams"
-@using Bloodsport.Data.Sql
-@using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<SqlDbContext> DbFactory
 
 <PageTitle>Teams | BSAL</PageTitle>
 
@@ -14,30 +11,4 @@
     </AuthorizeView>
 </div>
 
-@if (teams is null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    var filtered = string.IsNullOrWhiteSpace(Search)
-        ? teams
-        : teams.Where(t => t.Name.Contains(Search, StringComparison.OrdinalIgnoreCase)).ToList();
-    <TeamsTable Teams="filtered" CurrentPage="Page" Search="@Search" />
-}
-
-@code {
-    [SupplyParameterFromQuery(Name = "page")] public int Page { get; set; } = 1;
-    [SupplyParameterFromQuery(Name = "search")] public string? Search { get; set; }
-
-    private List<Bloodsport.Entity.Database.Team>? teams;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await using var db = await DbFactory.CreateDbContextAsync();
-        teams = await db.Teams
-            .Include(t => t.Manager)
-            .Include(t => t.TeamMemberships)
-            .ToListAsync();
-    }
-}
+<BloodsportSite.Client.Components.TeamsIndex />
