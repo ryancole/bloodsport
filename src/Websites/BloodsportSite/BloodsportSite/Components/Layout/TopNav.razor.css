@@ -59,6 +59,26 @@
     margin: 0 0.5rem;
 }
 
+.top-nav-breadcrumbs {
+    margin-left: 1rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.top-nav-breadcrumbs:not(:empty) {
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+    padding-left: 1rem;
+}
+
+.top-nav-breadcrumbs ::deep a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+}
+
+.top-nav-breadcrumbs ::deep a:hover {
+    color: white;
+}
+
 .top-nav-auth {
     display: flex;
     align-items: center;

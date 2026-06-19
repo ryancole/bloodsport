@@ -6,16 +6,9 @@
 
 main {
     flex: 1;
-}
-
-.breadcrumb-row {
-    padding-top: 0.75rem;
-    padding-bottom: 0.25rem;
-    font-size: 0.875rem;
-    border-bottom: 1px solid #d6d5d5;
-    min-height: 2.5rem;
-    display: flex;
-    align-items: center;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 #blazor-error-ui {
