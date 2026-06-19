@@ -1,52 +1,17 @@
 ﻿@inherits LayoutComponentBase
-@using Bloodsport.Data.Sql
-@using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<SqlDbContext> DbFactory
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    <TopNav />
 
     <main>
-        <div class="top-row px-4">
-            <div class="top-row-breadcrumbs">
-                <SectionOutlet SectionName="breadcrumbs" />
-            </div>
-            <AuthorizeView>
-                <Authorized>
-                    <a href="/profile">@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)</a>
-                </Authorized>
-                <NotAuthorized>
-                    <a href="/auth/login">Log in</a>
-                </NotAuthorized>
-            </AuthorizeView>
+        <div class="breadcrumb-row px-4">
+            <SectionOutlet SectionName="breadcrumbs" />
         </div>
-
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
-
-@code {
-    private string? displayName;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var oid = authState.User.FindFirst("oid")?.Value
-               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
-
-        if (oid is not null)
-        {
-            await using var db = await DbFactory.CreateDbContextAsync();
-            var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
-            displayName = user?.DisplayName;
-        }
-    }
-}
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
