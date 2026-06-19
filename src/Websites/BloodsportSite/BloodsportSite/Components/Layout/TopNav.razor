@@ -1,0 +1,55 @@
+@using Bloodsport.Data.Sql
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<header class="top-nav">
+    <a class="top-nav-brand" href="">
+        <img src="/image/logo/bloodsport-amateur-league-1x.png"
+             srcset="/image/logo/bloodsport-amateur-league-1x.png 1x,
+                     /image/logo/bloodsport-amateur-league-2x.png 2x,
+                     /image/logo/bloodsport-amateur-league-3x.png 3x,
+                     /image/logo/bloodsport-amateur-league-4x.png 4x"
+             alt="Bloodsport Amateur League"
+             class="top-nav-logo" />
+    </a>
+    <div class="top-nav-separator"></div>
+    <nav class="top-nav-links">
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Dashboard</NavLink>
+        <NavLink class="nav-link" href="teams">Teams</NavLink>
+        <NavLink class="nav-link" href="users">Users</NavLink>
+        <NavLink class="nav-link" href="seasons">Seasons</NavLink>
+        <NavLink class="nav-link" href="playoffs">Playoffs</NavLink>
+    </nav>
+    <div class="top-nav-breadcrumbs">
+        <SectionOutlet SectionName="breadcrumbs" />
+    </div>
+    <div class="top-nav-auth">
+        <AuthorizeView>
+            <Authorized>
+                <a href="/profile">@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)</a>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/auth/login">Log in</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</header>
+
+@code {
+    private string? displayName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is not null)
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+            displayName = user?.DisplayName;
+        }
+    }
+}
