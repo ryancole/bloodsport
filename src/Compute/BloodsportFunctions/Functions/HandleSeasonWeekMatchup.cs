@@ -171,7 +171,11 @@ public class HandleSeasonWeekMatchup
             .FirstOrDefaultAsync(r => r.TeamId == losingTeamId && r.SeasonId == seasonId);
 
         if (winnerResult is not null)
+        {
             winnerResult.WinCount++;
+            if (winnerTeamAverageGpm > 0)
+                winnerResult.WinnerTeamAverageGPM += (winnerTeamAverageGpm - winnerResult.WinnerTeamAverageGPM) / winnerResult.WinCount;
+        }
 
         if (loserResult is not null)
             loserResult.LoseCount++;

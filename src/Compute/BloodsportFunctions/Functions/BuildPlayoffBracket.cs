@@ -64,6 +64,7 @@ public class BuildPlayoffBracket
         var allTeams = playoff.Season.TeamSeasonResults
             .OrderByDescending(r => r.WinCount)
             .ThenBy(r => r.LoseCount)
+            .ThenByDescending(r => r.WinnerTeamAverageGPM)
             .ToList();
 
         int totalTeams = allTeams.Count;
