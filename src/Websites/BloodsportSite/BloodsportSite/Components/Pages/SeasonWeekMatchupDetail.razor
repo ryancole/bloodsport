@@ -106,7 +106,32 @@ else
     </div>
     }
 
+    @* Forfeit *@
+    @if (isManager && result is null && !matchup.SeasonWeek.HasBeenEnded)
+    {
+        <div class="card border-0 bg-body-secondary rounded-3 mb-4 p-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <div class="text-uppercase fw-semibold small text-muted letter-spacing-1 mb-1">Forfeit</div>
+                    <div class="small text-muted">Forfeit this matchup on behalf of your team. This cannot be undone.</div>
+                </div>
+                <form method="post" action="/api/matchups/@matchup.Id/forfeit" onsubmit="return confirm('Are you sure you want to forfeit this matchup? This cannot be undone.');">
+                    <AntiforgeryToken />
+                    <button type="submit" class="btn btn-outline-danger px-4">Forfeit Matchup</button>
+                </form>
+            </div>
+            @if (error == "result_exists")
+            {
+                <div class="alert alert-warning mb-0 mt-3 py-2 small">A result already exists for this matchup.</div>
+            }
+        </div>
+    }
+
     @* Result *@
+    @if (info == "forfeit_recorded")
+    {
+        <div class="alert alert-success mb-0 mb-4 py-2 small">Forfeit recorded. Your opponent has been awarded the win.</div>
+    }
     @if (result is not null)
     {
         <MatchupResultCard Result="result" />
