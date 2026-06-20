@@ -16,6 +16,8 @@ namespace Bloodsport.Entity.Database
 
         public required int LoseCount { get; set; }
 
+        public double WinnerTeamAverageGPM { get; set; }
+
         public DateTime DateCreated { get; private set; }
 
         #endregion
