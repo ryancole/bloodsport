@@ -1,6 +1,5 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Azure.Storage.Sas;
 
 namespace BloodsportSite.Services
 {
@@ -30,26 +29,5 @@ namespace BloodsportSite.Services
             return blob.Uri.ToString();
         }
 
-        public string? GetSasUrl(string? blobUrl)
-        {
-            if (blobUrl is null)
-                return null;
-
-            var blobUri = new Uri(blobUrl);
-            var blobName = string.Join("", blobUri.Segments[2..]);
-            var container = blobServiceClient.GetBlobContainerClient(ContainerName);
-            var blob = container.GetBlobClient(blobName);
-
-            var sasBuilder = new BlobSasBuilder
-            {
-                BlobContainerName = ContainerName,
-                BlobName = blobName,
-                Resource = "b",
-                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1),
-            };
-            sasBuilder.SetPermissions(BlobSasPermissions.Read);
-
-            return blob.GenerateSasUri(sasBuilder).ToString();
-        }
     }
 }

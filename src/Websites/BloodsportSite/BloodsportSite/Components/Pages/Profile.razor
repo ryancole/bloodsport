@@ -84,9 +84,6 @@ else
         <dt class="col-sm-3">Member Since</dt>
         <dd class="col-sm-9">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
 
-        <dt class="col-sm-3">Account ID</dt>
-        <dd class="col-sm-9"><code>@user.EntraObjectId</code></dd>
-
     </dl>
 
     <ProfileRiotAccountsTable Accounts="user.RiotAccounts" RiotError="@riotError" />

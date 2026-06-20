@@ -17,8 +17,7 @@ namespace BloodsportSite.Api
         }
 
         private static async Task<IResult> ListAsync(
-            IDbContextFactory<SqlDbContext> dbFactory,
-            BloodsportSite.Services.TeamLogoService teamLogoService)
+            IDbContextFactory<SqlDbContext> dbFactory)
         {
             await using var db = await dbFactory.CreateDbContextAsync();
             var users = await db.Users
@@ -42,7 +41,7 @@ namespace BloodsportSite.Api
                     {
                         t.Id,
                         t.Name,
-                        FlagUrl = teamLogoService.GetSasUrl(t.LogoUrl?.Replace("/original.", "/flag.")),
+                        FlagUrl = t.LogoUrl?.Replace("/original.", "/flag."),
                     }),
             });
 
