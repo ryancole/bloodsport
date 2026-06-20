@@ -4,7 +4,8 @@ public record UserListItem(
     long Id,
     string DisplayName,
     DateTime DateCreated,
-    List<UserTeamSummary> Teams
+    List<UserTeamSummary> Teams,
+    string? FlagUrl
 );
 
 public record UserTeamSummary(

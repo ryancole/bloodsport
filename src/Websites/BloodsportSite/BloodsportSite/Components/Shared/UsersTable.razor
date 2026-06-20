@@ -49,7 +49,7 @@ else
                     .ToList();
 
                 <tr>
-                    <td><a href="/users/@user.Id">@user.DisplayName</a></td>
+                    <td><a href="/users/@user.Id" class="d-flex align-items-center gap-2"><UserFlag LogoUrl="@user.LogoUrl" />@user.DisplayName</a></td>
                     <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         @if (teams.Count == 0)
                         {

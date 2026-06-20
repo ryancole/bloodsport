@@ -36,6 +36,7 @@ namespace BloodsportSite.Api
                 u.Id,
                 u.DisplayName,
                 u.DateCreated,
+                FlagUrl = u.LogoUrl?.Replace("/original.", "/flag."),
                 Teams = u.RiotAccounts
                     .SelectMany(a => a.TeamMemberships)
                     .Select(m => m.Team)

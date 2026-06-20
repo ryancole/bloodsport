@@ -43,7 +43,7 @@ else
             {
                 <tr>
                     <td><a href="/teams/@team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@team.LogoUrl" />@team.Name</a></td>
-                    <td><a href="/users/@team.Manager.Id">@team.Manager.DisplayName</a></td>
+                    <td><a href="/users/@team.Manager.Id" class="d-flex align-items-center gap-2"><UserFlag LogoUrl="@team.Manager.LogoUrl" />@team.Manager.DisplayName</a></td>
                     <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                 </tr>
             }
