@@ -81,6 +81,22 @@ else
             </form>
         </dd>
 
+        <dt class="col-sm-3">Logo</dt>
+        <dd class="col-sm-9">
+            @if (logoError is not null)
+            {
+                <div class="alert alert-danger py-1 px-2 small mb-2">@logoError</div>
+            }
+            <form method="post" action="/api/users/update-logo" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
+                <AntiforgeryToken />
+                <input type="file" name="logo" class="form-control form-control-sm" style="max-width: 240px;"
+                       accept="image/jpeg,image/png,image/gif,image/webp" required />
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Upload</button>
+                <UserFlag LogoUrl="@user.LogoUrl" />
+            </form>
+            <div class="form-text">PNG, JPG, GIF, or WebP. Max 5 MB.</div>
+        </dd>
+
         <dt class="col-sm-3">Member Since</dt>
         <dd class="col-sm-9">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
 
@@ -98,6 +114,7 @@ else
     private List<(Bloodsport.Entity.Database.Team Team, string Role)> teamRows = [];
     private string? riotError;
     private string? displayNameError;
+    private string? logoError;
     private bool inviteAccepted;
 
     protected override async Task OnInitializedAsync()
@@ -110,6 +127,16 @@ else
 
         if (query.TryGetValue("display_name_error", out _))
             displayNameError = "Display name cannot be empty.";
+
+        if (query.TryGetValue("logo_error", out var logoErrorCode))
+        {
+            logoError = (string?)logoErrorCode switch
+            {
+                "invalid_logo"   => "The logo must be a PNG, JPG, GIF, or WebP image.",
+                "logo_too_large" => "The logo must be under 5 MB.",
+                _                => "An unknown error occurred. Please try again.",
+            };
+        }
 
         if (query.TryGetValue("riot_error", out var errorCode))
         {

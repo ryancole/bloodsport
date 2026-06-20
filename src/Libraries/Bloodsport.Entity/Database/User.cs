@@ -14,6 +14,8 @@ namespace Bloodsport.Entity.Database
 
         public string? Email { get; set; }
 
+        public string? LogoUrl { get; set; }
+
         public DateTime DateCreated { get; private set; }
 
         #endregion

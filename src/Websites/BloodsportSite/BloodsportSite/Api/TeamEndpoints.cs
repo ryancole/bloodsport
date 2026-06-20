@@ -40,6 +40,7 @@ namespace BloodsportSite.Api
                 ManagerName = t.Manager.DisplayName,
                 t.DateCreated,
                 FlagUrl = t.LogoUrl?.Replace("/original.", "/flag."),
+                ManagerFlagUrl = t.Manager.LogoUrl?.Replace("/original.", "/flag."),
             });
 
             return Results.Ok(result);

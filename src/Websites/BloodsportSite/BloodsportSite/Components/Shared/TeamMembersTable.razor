@@ -19,7 +19,7 @@ else
             {
                 <tr>
                     <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
-                    <td><a href="/users/@membership.RiotAccount.User.Id">@membership.RiotAccount.User.DisplayName</a></td>
+                    <td><a href="/users/@membership.RiotAccount.User.Id" class="d-flex align-items-center gap-2"><UserFlag LogoUrl="@membership.RiotAccount.User.LogoUrl" />@membership.RiotAccount.User.DisplayName</a></td>
                     <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                 </tr>
             }

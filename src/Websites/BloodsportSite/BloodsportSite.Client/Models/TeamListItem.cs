@@ -6,5 +6,6 @@ public record TeamListItem(
     long ManagerId,
     string ManagerName,
     DateTime DateCreated,
-    string? FlagUrl
+    string? FlagUrl,
+    string? ManagerFlagUrl
 );

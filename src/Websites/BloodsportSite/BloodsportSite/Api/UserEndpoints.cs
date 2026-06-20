@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using BloodsportSite.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodsportSite.Api
@@ -11,6 +12,9 @@ namespace BloodsportSite.Api
             endpoints.MapGet("/users", ListAsync);
 
             endpoints.MapPost("/users/update-display-name", UpdateDisplayNameAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/users/update-logo", UpdateLogoAsync)
                 .RequireAuthorization();
 
             return endpoints;
@@ -32,6 +36,7 @@ namespace BloodsportSite.Api
                 u.Id,
                 u.DisplayName,
                 u.DateCreated,
+                FlagUrl = u.LogoUrl?.Replace("/original.", "/flag."),
                 Teams = u.RiotAccounts
                     .SelectMany(a => a.TeamMemberships)
                     .Select(m => m.Team)
@@ -65,6 +70,34 @@ namespace BloodsportSite.Api
                 return Results.Redirect("/profile");
 
             user.DisplayName = displayName;
+            await db.SaveChangesAsync();
+
+            return Results.Redirect("/profile");
+        }
+
+        private static async Task<IResult> UpdateLogoAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            UserLogoService userLogoService,
+            IFormFile? logo)
+        {
+            if (logo is null || logo.Length == 0)
+                return Results.Redirect("/profile?logo_error=invalid_logo");
+
+            if (logo.Length > 5 * 1024 * 1024)
+                return Results.Redirect("/profile?logo_error=logo_too_large");
+
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/profile");
+
+            var logoUrl = await userLogoService.UploadLogoAsync(user.Id, logo);
+            if (logoUrl is null)
+                return Results.Redirect("/profile?logo_error=invalid_logo");
+
+            user.LogoUrl = logoUrl;
             await db.SaveChangesAsync();
 
             return Results.Redirect("/profile");

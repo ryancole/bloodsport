@@ -82,7 +82,19 @@ else
                 @foreach (var user in pageItems)
                 {
                     <tr>
-                        <td><a href="/users/@user.Id">@user.DisplayName</a></td>
+                        <td>
+                            <a href="/users/@user.Id" class="d-flex align-items-center gap-2">
+                                @if (user.FlagUrl is not null)
+                                {
+                                    <img src="@user.FlagUrl" width="28" height="18" style="object-fit:cover;flex-shrink:0;border-radius:2px;border:2px solid #f0b429;box-shadow:1px 1px 2px rgba(0,0,0,0.2);" alt="" />
+                                }
+                                else
+                                {
+                                    <span style="display:inline-block;width:28px;height:18px;flex-shrink:0;background:#dee2e6;border-radius:2px;"></span>
+                                }
+                                @user.DisplayName
+                            </a>
+                        </td>
                         <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             @if (user.Teams.Count == 0)
                             {
@@ -96,7 +108,7 @@ else
                                     <a href="/teams/@team.Id" class="d-inline-flex align-items-center gap-1">
                                         @if (team.FlagUrl is not null)
                                         {
-                                            <img src="@team.FlagUrl" width="28" height="18" style="object-fit:cover;flex-shrink:0;border-radius:2px;" alt="" />
+                                            <img src="@team.FlagUrl" width="28" height="18" style="object-fit:cover;flex-shrink:0;border-radius:2px;border:2px solid #f0b429;box-shadow:1px 1px 2px rgba(0,0,0,0.2);" alt="" />
                                         }
                                         else
                                         {
