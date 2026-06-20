@@ -5,17 +5,87 @@
 <h1>Rules</h1>
 
 <section>
-    <h2>Regular Season</h2>
+    <h2>Roster Lock-In</h2>
     <p>
-        The regular season consists of weekly best-of-one matchups played across a single division containing all league teams.
-        Each week, teams are paired against an opponent — because all teams compete in one division, not every team will face
-        every other team over the course of the season.
+        Team rosters are locked in at the start of each season. Once the season officially begins, only the players listed
+        on a team's roster at that time are eligible to compete in any regular season or playoff match. No roster changes
+        are permitted after the season starts.
     </p>
-    <ul>
-        <li><strong>Format:</strong> Single elimination — a loss ends your run for that matchup.</li>
-        <li><strong>Schedule:</strong> One matchup per team per week.</li>
-        <li><strong>Division:</strong> All teams compete in a single division; there are no conferences or subdivisions.</li>
-        <li><strong>Opponents:</strong> The schedule does not guarantee that every team will play every other team in a given season.</li>
-        <li><strong>Season Length:</strong> The number of regular season weeks is variable, ranging from 3 to 6 weeks. The length is determined before each season based on the number of registered teams, with the goal of producing the most competitive and enjoyable experience possible.</li>
-    </ul>
+    <p>
+        A roster may contain up to 7 players. Any player on the roster is eligible to play in any given matchup — teams
+        are free to field whichever combination of their rostered players they choose from week to week.
+    </p>
+    <p>
+        Roster lock-in is enforced at the Riot API level. When a custom lobby is created for a match, only Riot IDs
+        registered on the team's locked roster will be permitted to enter. Any player whose Riot ID is not on the roster
+        will be unable to join the lobby.
+    </p>
+</section>
+
+<section>
+    <h2>League of Legends Tournament Lobby</h2>
+    <p>
+        A unique custom lobby is generated for each matchup, including both regular season and playoff matches. Each lobby
+        is protected by an auto-generated password. Teams should not share the lobby code or password outside of their
+        rostered players, as doing so could allow unauthorized individuals to attempt to join the match.
+    </p>
+    <p>
+        All matches are played on Summoner's Rift using the Draft Pick game mode.
+    </p>
+    <p>
+        Spectating is allowed in the custom lobby.
+    </p>
+</section>
+
+<section>
+    <h2>Playing Ahead</h2>
+    <p>
+        Teams are permitted to play ahead of the current week during both the regular season and playoffs. If both teams
+        are ready and willing, they may complete a matchup from the next upcoming week before it officially begins.
+        The same applies during playoffs — teams may complete a round early if both sides agree.
+    </p>
+    <p>
+        However, weeks and playoff rounds cannot be skipped. All matches must still occur in sequential order — a team
+        cannot play a future week's match until all prior weeks have been completed, and a playoff round cannot be played
+        until the preceding round is finished.
+    </p>
+</section>
+
+<section>
+    <h2>Automatic Forfeiture</h2>
+    <p>
+        Each regular season week has a set end date. When that date passes, the week is automatically marked as completed.
+        Any team that did not play their matchup before the deadline will receive an automatic forfeit loss for that week.
+    </p>
+    <p>
+        The same applies to playoff rounds — each round has a set end date, and if a match is not played before the deadline,
+        both teams are eliminated from the bracket.
+    </p>
+    <p>
+        An audit and appeal process is available for automatic forfeitures. If your team was present and ready to play but
+        your opponent did not show, you may appeal the result. If the appeal is upheld, the win will be awarded to the team
+        that showed up. Evidence considered during an audit may include lobby events retrieved from the Riot API, as well as
+        any supporting materials provided by the appealing team, such as screenshots, stream VODs, or other documentation.
+    </p>
+    <p>
+        If neither team appeals a playoff forfeiture, the opposing teams in subsequent rounds will receive byes and advance
+        automatically without playing a match.
+    </p>
+</section>
+
+<section>
+    <h2>Manual Forfeiture</h2>
+    <p>
+        A team manager may manually forfeit a regular season week or playoff round at any time. Forfeiting a regular season
+        week results in a loss for the forfeiting team and a win for their opponent. Forfeiting a playoff round results in
+        elimination from the playoff and awards the round victory to the opposing team.
+    </p>
+</section>
+
+<section>
+    <h2>Team and Player Logos</h2>
+    <p>
+        Teams and players may upload custom logos to represent themselves in the league. Logos containing illegal content
+        will not be permitted and are subject to removal.
+    </p>
 </section>
