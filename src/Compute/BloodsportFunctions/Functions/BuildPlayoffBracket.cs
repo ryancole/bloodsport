@@ -75,11 +75,9 @@ public class BuildPlayoffBracket
             return;
         }
 
-        // Take the top 50% of teams, floored to the nearest power of 2.
-        // A power-of-2 bracket size is required for clean single-elimination without byes.
-        int half = (int)Math.Floor(totalTeams / 2.0);
+        // Use the largest power of 2 that fits all teams (no bye weeks).
         int bracketSize = 1;
-        while (bracketSize * 2 <= half)
+        while (bracketSize * 2 <= totalTeams)
             bracketSize *= 2;
 
         // Minimum bracket size is 2.
