@@ -1,11 +1,15 @@
 using System.Text.Json;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.RiotApi;
+using Camille.Enums;
+using Camille.RiotGames;
 using Camille.RiotGames.TournamentV5;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace BloodsportFunctions.Functions;
@@ -14,12 +18,25 @@ public class HandleSeasonWeekMatchup
 {
     private readonly ILogger<HandleSeasonWeekMatchup> _logger;
     private readonly IDbContextFactory<SqlDbContext> _dbFactory;
+    private readonly RiotGamesApi _riotApi;
+    private readonly IConfiguration _config;
 
-    public HandleSeasonWeekMatchup(ILogger<HandleSeasonWeekMatchup> logger, IDbContextFactory<SqlDbContext> dbFactory)
+    public HandleSeasonWeekMatchup(
+        ILogger<HandleSeasonWeekMatchup> logger,
+        IDbContextFactory<SqlDbContext> dbFactory,
+        RiotGamesApi riotApi,
+        IConfiguration config)
     {
         _logger = logger;
         _dbFactory = dbFactory;
+        _riotApi = riotApi;
+        _config = config;
     }
+
+    private RegionalRoute Route =>
+        Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
+
+    private string PlatformId => _config["RiotApi:PlatformId"] ?? "NA1";
 
     [Function("HandleSeasonWeekMatchup")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
@@ -135,6 +152,8 @@ public class HandleSeasonWeekMatchup
             }
         }
 
+        var winnerTeamAverageGpm = await TryGetWinnerAverageGpmAsync(payload, winningPuuids);
+
         db.SeasonWeekMatchupResults.Add(new SeasonWeekMatchupResult
         {
             SeasonWeekMatchupId = matchup.Id,
@@ -142,6 +161,7 @@ public class HandleSeasonWeekMatchup
             WinnerTeamId = winningMembership.TeamId,
             WinnerTeam = winningMembership.Team,
             RosterMismatch = rosterMismatch,
+            WinnerTeamAverageGPM = winnerTeamAverageGpm,
         });
 
         var winnerResult = await db.TeamSeasonResults
@@ -159,9 +179,42 @@ public class HandleSeasonWeekMatchup
         await db.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Recorded winner team {teamId} for matchup {matchupId} (tournament code {shortCode}).",
-            winningMembership.TeamId, matchup.Id, payload.ShortCode);
+            "Recorded winner team {teamId} for matchup {matchupId} (tournament code {shortCode}), winner GPM: {gpm}.",
+            winningMembership.TeamId, matchup.Id, payload.ShortCode, winnerTeamAverageGpm);
 
         return new OkResult();
+    }
+
+    private async Task<long> TryGetWinnerAverageGpmAsync(TournamentGamesV5 payload, HashSet<string> winningPuuids)
+    {
+        if (RiotApiEndpoints.UseStub || payload.GameId == 0)
+            return 0;
+
+        try
+        {
+            var matchId = $"{PlatformId}_{payload.GameId}";
+            var match = await _riotApi.MatchV5().GetMatchAsync(Route, matchId);
+
+            if (match?.Info is null)
+            {
+                _logger.LogWarning("Match {matchId} returned null info; winner GPM will be 0.", matchId);
+                return 0;
+            }
+
+            var gameDurationMinutes = match.Info.GameDuration / 60.0;
+            if (gameDurationMinutes <= 0)
+                return 0;
+
+            var totalGold = match.Info.Participants
+                .Where(p => winningPuuids.Contains(p.Puuid))
+                .Sum(p => (long)p.GoldEarned);
+
+            return (long)(totalGold / gameDurationMinutes);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to fetch match stats for game {gameId}; winner GPM will be 0.", payload.GameId);
+            return 0;
+        }
     }
 }

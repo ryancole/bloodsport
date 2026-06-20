@@ -14,6 +14,8 @@ namespace Bloodsport.Entity.Database
 
         public long? WinnerTeamId { get; set; }
 
+        public long WinnerTeamAverageGPM { get; set; }
+
         public required long SeasonWeekMatchupId { get; set; }
 
         public DateTime DateCreated { get; private set; }
