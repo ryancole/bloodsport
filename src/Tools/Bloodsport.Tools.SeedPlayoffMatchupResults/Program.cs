@@ -51,7 +51,7 @@ await using (var cmd = conn.CreateCommand())
 {
     cmd.CommandText = """
         SELECT m.Id, m.TournamentCode, t1.TeamId, t2.TeamId
-        FROM PlayoffMatchups m
+        FROM PlayoffRoundMatchups m
         INNER JOIN PlayoffRounds r ON r.Id = m.PlayoffRoundId
         LEFT JOIN PlayoffTeams t1 ON t1.Id = m.TeamOneId
         LEFT JOIN PlayoffTeams t2 ON t2.Id = m.TeamTwoId
@@ -138,7 +138,7 @@ foreach (var matchup in matchups)
     {
         tournamentCode = $"SEED-PLAYOFF-{matchup.Id}";
         await using var updateCmd = conn.CreateCommand();
-        updateCmd.CommandText = "UPDATE PlayoffMatchups SET TournamentCode = @Code WHERE Id = @Id";
+        updateCmd.CommandText = "UPDATE PlayoffRoundMatchups SET TournamentCode = @Code WHERE Id = @Id";
         updateCmd.Parameters.AddWithValue("@Code", tournamentCode);
         updateCmd.Parameters.AddWithValue("@Id", matchup.Id);
         await updateCmd.ExecuteNonQueryAsync();
