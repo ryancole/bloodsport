@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Bloodsport.Entity.Database
 {
-    public class PlayoffMatchup
+    public class PlayoffRoundMatchup
     {
         #region Properties
 
@@ -11,6 +11,8 @@ namespace Bloodsport.Entity.Database
         public required long PlayoffRoundId { get; set; }
 
         public required int MatchNumber { get; set; }
+
+        public required string Name { get; set; }
 
         public long? TeamOneId { get; set; }
 
@@ -43,7 +45,7 @@ namespace Bloodsport.Entity.Database
         public virtual PlayoffTeam? WinningTeam { get; set; }
 
         [JsonIgnore]
-        public virtual PlayoffMatchup? NextMatchup { get; set; }
+        public virtual PlayoffRoundMatchup? NextMatchup { get; set; }
 
         #endregion
     }

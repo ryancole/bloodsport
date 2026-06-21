@@ -5,11 +5,11 @@ using Bloodsport.Entity.Database;
 
 namespace Bloodsport.Data.Sql.EntityConfigurations
 {
-    internal class PlayoffMatchupEntityConfiguration : IEntityTypeConfiguration<PlayoffMatchup>
+    internal class PlayoffMatchupEntityConfiguration : IEntityTypeConfiguration<PlayoffRoundMatchup>
     {
         #region Methods
 
-        public void Configure(EntityTypeBuilder<PlayoffMatchup> builder)
+        public void Configure(EntityTypeBuilder<PlayoffRoundMatchup> builder)
         {
             builder
                 .Property(m => m.DateCreated)

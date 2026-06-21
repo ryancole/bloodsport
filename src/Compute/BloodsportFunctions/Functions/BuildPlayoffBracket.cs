@@ -168,8 +168,8 @@ public class BuildPlayoffBracket
 
         // --- Create matchups per round ---
 
-        var allMatchups = new List<PlayoffMatchup>();
-        var matchupIndex = new Dictionary<(int round, int matchNumber), PlayoffMatchup>();
+        var allMatchups = new List<PlayoffRoundMatchup>();
+        var matchupIndex = new Dictionary<(int round, int matchNumber), PlayoffRoundMatchup>();
 
         for (int round = roundCount; round >= 1; round--)
         {
@@ -178,18 +178,19 @@ public class BuildPlayoffBracket
 
             for (int matchNumber = 0; matchNumber < matchupsInRound; matchNumber++)
             {
-                var matchup = new PlayoffMatchup
+                var matchup = new PlayoffRoundMatchup
                 {
                     PlayoffRoundId = playoffRound.Id,
                     PlayoffRound = playoffRound,
                     MatchNumber = matchNumber,
+                    Name = $"{playoffRound.Name} Match {matchNumber + 1}",
                 };
                 allMatchups.Add(matchup);
                 matchupIndex[(round, matchNumber)] = matchup;
             }
         }
 
-        db.PlayoffMatchups.AddRange(allMatchups);
+        db.PlayoffRoundMatchups.AddRange(allMatchups);
         await db.SaveChangesAsync(); // flush to get DB-generated IDs
 
         // --- Wire NextMatchupId ---
@@ -211,13 +212,17 @@ public class BuildPlayoffBracket
         // With MatchNumber/2 advancement: semi 0 = (1 or 8) vs (4 or 5), semi 1 = (2 or 7) vs (3 or 6).
 
         var seedIndex = playoffTeams.ToDictionary(pt => pt.Seed);
+        var teamNameIndex = playoffTeams.ToDictionary(pt => pt.Id, pt => pt.Team.Name);
         var seedOrder = GenerateBracketSeedOrder(bracketSize);
 
         for (int m = 0; m < bracketSize / 2; m++)
         {
             var matchup = matchupIndex[(roundCount, m)];
-            matchup.TeamOneId = seedIndex[seedOrder[m * 2]].Id;
-            matchup.TeamTwoId = seedIndex[seedOrder[m * 2 + 1]].Id;
+            var teamOne = seedIndex[seedOrder[m * 2]];
+            var teamTwo = seedIndex[seedOrder[m * 2 + 1]];
+            matchup.TeamOneId = teamOne.Id;
+            matchup.TeamTwoId = teamTwo.Id;
+            matchup.Name = $"{teamOne.Team.Name} vs {teamTwo.Team.Name}";
         }
 
         await db.SaveChangesAsync();

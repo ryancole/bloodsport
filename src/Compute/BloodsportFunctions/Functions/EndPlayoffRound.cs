@@ -71,7 +71,7 @@ public class EndPlayoffRound
 
                 if (matchup.NextMatchupId is not null)
                 {
-                    var nextMatchup = await db.PlayoffMatchups.FirstAsync(m => m.Id == matchup.NextMatchupId);
+                    var nextMatchup = await db.PlayoffRoundMatchups.FirstAsync(m => m.Id == matchup.NextMatchupId);
 
                     if (matchup.MatchNumber % 2 == 0)
                         nextMatchup.TeamOneId = winner;
