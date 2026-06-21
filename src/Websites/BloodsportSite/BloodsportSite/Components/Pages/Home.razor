@@ -77,34 +77,30 @@ else
             }
             else
             {
-                <table class="table">
+                <table class="table" style="table-layout:fixed;">
                     <thead>
                         <tr>
-                            <th>Playoff</th>
-                            <th>Round</th>
-                            <th>Match</th>
-                            <th>Winner</th>
-                            <th>Date</th>
+                            <th style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Matchup</th>
+                            <th style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Winner</th>
+                            <th style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var matchup in recentPlayoffResults)
                         {
                             <tr>
-                                <td>
-                                    <a href="/playoffs/@matchup.PlayoffRound.PlayoffId">
-                                        @matchup.PlayoffRound.Playoff.Name
+                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@matchup.Name">
+                                    <a href="/playoffs/@matchup.PlayoffRound.PlayoffId/matchups/@matchup.Id">
+                                        @matchup.Name
                                     </a>
                                 </td>
-                                <td>@matchup.PlayoffRound.Name</td>
-                                <td>Match @matchup.MatchNumber</td>
-                                <td>
+                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@matchup.WinningTeam?.Team?.Name">
                                     @if (matchup.WinningTeam is not null)
                                     {
                                         <a href="/teams/@matchup.WinningTeam.TeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.WinningTeam.Team.LogoUrl" />@matchup.WinningTeam.Team.Name</a>
                                     }
                                 </td>
-                                <td>@matchup.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@matchup.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")">@matchup.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                             </tr>
                         }
                     </tbody>
