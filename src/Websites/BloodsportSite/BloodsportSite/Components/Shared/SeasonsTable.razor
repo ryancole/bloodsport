@@ -11,10 +11,8 @@ else
             <tr>
                 <th>Name</th>
                 <th>Status</th>
-                <th>Start</th>
                 <th>End</th>
                 <th>Length</th>
-                <th>Teams</th>
             </tr>
         </thead>
         <tbody>
@@ -29,10 +27,8 @@ else
                         }
                     </td>
                     <td><span class="badge @StatusBadgeClass(season.Status)">@season.Status</span></td>
-                    <td>@(season.EstimatedDateStart?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
                     <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
                     <td>@season.Length weeks</td>
-                    <td>@season.SeasonRegistrations.Count</td>
                 </tr>
             }
         </tbody>

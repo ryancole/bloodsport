@@ -12,73 +12,113 @@
 }
 else
 {
-    <h2 class="mb-3">Recent Seasons</h2>
+    <div class="d-flex gap-4 align-items-start">
+        <div style="flex: 1 1 0; min-width: 0;">
+            <h2 class="mb-3">Seasons</h2>
+            <SeasonsTable Seasons="seasons" />
+        </div>
+        <div style="flex: 1 1 0; min-width: 0;">
+            <h2 class="mb-3">Playoffs</h2>
+            <PlayoffsTable Playoffs="activePlayoffs" />
+        </div>
+    </div>
 
-    <SeasonsTable Seasons="seasons" />
+    <div class="d-flex gap-4 align-items-start mt-4">
+        <div style="flex: 1 1 0; min-width: 0;">
+            <h2 class="mb-3">Regular Season Matchup Results</h2>
 
-    <h2 class="mt-4 mb-3">Recent Playoffs</h2>
+            @if (recentResults.Count == 0)
+            {
+                <p class="text-muted">No results yet.</p>
+            }
+            else
+            {
+                <table class="table" style="table-layout:fixed;">
+                    <thead>
+                        <tr>
+                            <th style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Matchup</th>
+                            <th style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Winner</th>
+                            <th style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var result in recentResults)
+                        {
+                            <tr>
+                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@result.SeasonWeekMatchup.Name">
+                                    <a href="/seasons/@result.SeasonWeekMatchup.SeasonWeek.SeasonId/weeks/@result.SeasonWeekMatchup.SeasonWeekId/matchups/@result.SeasonWeekMatchupId">
+                                        @result.SeasonWeekMatchup.Name
+                                    </a>
+                                </td>
+                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@(result.WinnerTeam?.Name ?? "Did Not Play")">
+                                    @if (result.WinnerTeam is not null)
+                                    {
+                                        <a href="/teams/@result.WinnerTeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@result.WinnerTeam.LogoUrl" />@result.WinnerTeam.Name</a>
+                                    }
+                                    else
+                                    {
+                                        <span>Did Not Play</span>
+                                    }
+                                </td>
+                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")">@result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
 
-    <PlayoffsTable Playoffs="activePlayoffs" />
+        <div style="flex: 1 1 0; min-width: 0;">
+            <h2 class="mb-3">Playoff Matchup Results</h2>
 
-    <h2 class="mt-4 mb-3">Recent Results</h2>
-
-    @if (recentResults.Count == 0)
-    {
-        <p class="text-muted">No results yet.</p>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Season</th>
-                    <th>Week</th>
-                    <th>Matchup</th>
-                    <th>Winner</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var result in recentResults)
-                {
-                    <tr>
-                        <td>
-                            <a href="/seasons/@result.SeasonWeekMatchup.SeasonWeek.SeasonId">
-                                @result.SeasonWeekMatchup.SeasonWeek.Season.Name
-                            </a>
-                        </td>
-                        <td>
-                            <a href="/seasons/@result.SeasonWeekMatchup.SeasonWeek.SeasonId/weeks/@result.SeasonWeekMatchup.SeasonWeekId">
-                                @result.SeasonWeekMatchup.SeasonWeek.Name
-                            </a>
-                        </td>
-                        <td>
-                            <a href="/seasons/@result.SeasonWeekMatchup.SeasonWeek.SeasonId/weeks/@result.SeasonWeekMatchup.SeasonWeekId/matchups/@result.SeasonWeekMatchupId">
-                                @result.SeasonWeekMatchup.Name
-                            </a>
-                        </td>
-                        <td>
-                            @if (result.WinnerTeam is not null)
-                            {
-                                <a href="/teams/@result.WinnerTeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@result.WinnerTeam.LogoUrl" />@result.WinnerTeam.Name</a>
-                            }
-                            else
-                            {
-                                <span>Did Not Play</span>
-                            }
-                        </td>
-                        <td>@result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+            @if (recentPlayoffResults.Count == 0)
+            {
+                <p class="text-muted">No results yet.</p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Playoff</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Winner</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var matchup in recentPlayoffResults)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="/playoffs/@matchup.PlayoffRound.PlayoffId">
+                                        @matchup.PlayoffRound.Playoff.Name
+                                    </a>
+                                </td>
+                                <td>@matchup.PlayoffRound.Name</td>
+                                <td>Match @matchup.MatchNumber</td>
+                                <td>
+                                    @if (matchup.WinningTeam is not null)
+                                    {
+                                        <a href="/teams/@matchup.WinningTeam.TeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.WinningTeam.Team.LogoUrl" />@matchup.WinningTeam.Team.Name</a>
+                                    }
+                                </td>
+                                <td>@matchup.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
 }
 
 @code {
     private List<Season>? seasons;
     private List<Playoff> activePlayoffs = [];
     private List<SeasonWeekMatchupResult> recentResults = [];
+    private List<PlayoffMatchup> recentPlayoffResults = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,7 +127,6 @@ else
         var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
 
         seasons = await db.Seasons
-            .Include(s => s.SeasonRegistrations)
             .Where(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming || s.Status == SeasonStatus.PreSeason
                 || s.DateCreated >= sixMonthsAgo)
             .OrderBy(s => s.Status)
@@ -96,7 +135,6 @@ else
 
         activePlayoffs = await db.Playoffs
             .Include(p => p.Season)
-            .Include(p => p.PlayoffTeams)
             .Where(p => p.Status == PlayoffStatus.Active || p.Status == PlayoffStatus.Upcoming
                 || p.DateCreated >= sixMonthsAgo)
             .OrderBy(p => p.Status)
@@ -107,8 +145,17 @@ else
             .Include(r => r.WinnerTeam)
             .Include(r => r.SeasonWeekMatchup)
                 .ThenInclude(m => m.SeasonWeek)
-                    .ThenInclude(w => w.Season)
             .OrderByDescending(r => r.DateCreated)
+            .Take(5)
+            .ToListAsync();
+
+        recentPlayoffResults = await db.PlayoffMatchups
+            .Where(m => m.WinningTeamId != null)
+            .Include(m => m.WinningTeam)
+                .ThenInclude(t => t.Team)
+            .Include(m => m.PlayoffRound)
+                .ThenInclude(r => r.Playoff)
+            .OrderByDescending(m => m.DateCreated)
             .Take(5)
             .ToListAsync();
     }
