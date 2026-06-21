@@ -140,7 +140,7 @@ else
 
     private static readonly JsonSerializerOptions _caseInsensitive = new() { PropertyNameCaseInsensitive = true };
 
-    private PlayoffMatchup? matchup;
+    private PlayoffRoundMatchup? matchup;
     private bool notFound;
     private bool isManager;
     private bool isMember;
@@ -167,7 +167,7 @@ else
 
         await using var db = await DbFactory.CreateDbContextAsync();
 
-        matchup = await db.PlayoffMatchups
+        matchup = await db.PlayoffRoundMatchups
             .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
             .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
             .Include(m => m.WinningTeam).ThenInclude(pt => pt!.Team)

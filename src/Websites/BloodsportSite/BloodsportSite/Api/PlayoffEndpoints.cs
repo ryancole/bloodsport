@@ -72,7 +72,7 @@ namespace BloodsportSite.Api
             if (user is null)
                 return Results.Redirect("?error=not_authenticated");
 
-            var matchup = await db.PlayoffMatchups
+            var matchup = await db.PlayoffRoundMatchups
                 .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
                 .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
                 .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
@@ -151,7 +151,7 @@ namespace BloodsportSite.Api
             if (user is null)
                 return Results.Redirect("?error=not_authenticated");
 
-            var matchup = await db.PlayoffMatchups
+            var matchup = await db.PlayoffRoundMatchups
                 .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
                 .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
                 .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
@@ -172,7 +172,7 @@ namespace BloodsportSite.Api
             return Results.Redirect($"{MatchupUrl(matchup)}?info=lobby_events_requested");
         }
 
-        private static string MatchupUrl(PlayoffMatchup matchup) =>
+        private static string MatchupUrl(PlayoffRoundMatchup matchup) =>
             $"/playoffs/{matchup.PlayoffRound.Playoff.Id}/matchups/{matchup.Id}";
 
         // Admin: queue the BuildPlayoffBracket function for a playoff

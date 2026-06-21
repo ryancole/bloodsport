@@ -168,8 +168,8 @@ public class BuildPlayoffBracket
 
         // --- Create matchups per round ---
 
-        var allMatchups = new List<PlayoffMatchup>();
-        var matchupIndex = new Dictionary<(int round, int matchNumber), PlayoffMatchup>();
+        var allMatchups = new List<PlayoffRoundMatchup>();
+        var matchupIndex = new Dictionary<(int round, int matchNumber), PlayoffRoundMatchup>();
 
         for (int round = roundCount; round >= 1; round--)
         {
@@ -178,7 +178,7 @@ public class BuildPlayoffBracket
 
             for (int matchNumber = 0; matchNumber < matchupsInRound; matchNumber++)
             {
-                var matchup = new PlayoffMatchup
+                var matchup = new PlayoffRoundMatchup
                 {
                     PlayoffRoundId = playoffRound.Id,
                     PlayoffRound = playoffRound,
@@ -189,7 +189,7 @@ public class BuildPlayoffBracket
             }
         }
 
-        db.PlayoffMatchups.AddRange(allMatchups);
+        db.PlayoffRoundMatchups.AddRange(allMatchups);
         await db.SaveChangesAsync(); // flush to get DB-generated IDs
 
         // --- Wire NextMatchupId ---

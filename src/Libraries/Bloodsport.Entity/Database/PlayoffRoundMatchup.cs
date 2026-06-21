@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Bloodsport.Entity.Database
 {
-    public class PlayoffMatchup
+    public class PlayoffRoundMatchup
     {
         #region Properties
 
@@ -43,7 +43,7 @@ namespace Bloodsport.Entity.Database
         public virtual PlayoffTeam? WinningTeam { get; set; }
 
         [JsonIgnore]
-        public virtual PlayoffMatchup? NextMatchup { get; set; }
+        public virtual PlayoffRoundMatchup? NextMatchup { get; set; }
 
         #endregion
     }

@@ -118,7 +118,7 @@ else
     private List<Season>? seasons;
     private List<Playoff> activePlayoffs = [];
     private List<SeasonWeekMatchupResult> recentResults = [];
-    private List<PlayoffMatchup> recentPlayoffResults = [];
+    private List<PlayoffRoundMatchup> recentPlayoffResults = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -149,7 +149,7 @@ else
             .Take(5)
             .ToListAsync();
 
-        recentPlayoffResults = await db.PlayoffMatchups
+        recentPlayoffResults = await db.PlayoffRoundMatchups
             .Where(m => m.WinningTeamId != null)
             .Include(m => m.WinningTeam)
                 .ThenInclude(t => t.Team)

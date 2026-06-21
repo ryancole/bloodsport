@@ -57,7 +57,7 @@ public class HandlePlayoffMatchup
 
         await using var db = await _dbFactory.CreateDbContextAsync();
 
-        var matchup = await db.PlayoffMatchups
+        var matchup = await db.PlayoffRoundMatchups
             .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
             .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
             .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
@@ -151,7 +151,7 @@ public class HandlePlayoffMatchup
         // Even MatchNumber → winner becomes TeamOne; odd → TeamTwo.
         if (matchup.NextMatchupId is not null)
         {
-            var nextMatchup = await db.PlayoffMatchups.FirstAsync(m => m.Id == matchup.NextMatchupId);
+            var nextMatchup = await db.PlayoffRoundMatchups.FirstAsync(m => m.Id == matchup.NextMatchupId);
 
             if (matchup.MatchNumber % 2 == 0)
                 nextMatchup.TeamOneId = winningPlayoffTeam.Id;
@@ -180,11 +180,11 @@ public class HandlePlayoffMatchup
         return new OkResult();
     }
 
-    private async Task SendPlayoffEndedEmailsAsync(SqlDbContext db, PlayoffMatchup finalMatchup)
+    private async Task SendPlayoffEndedEmailsAsync(SqlDbContext db, PlayoffRoundMatchup finalMatchup)
     {
         var playoff = finalMatchup.PlayoffRound.Playoff;
 
-        var allMatchups = await db.PlayoffMatchups
+        var allMatchups = await db.PlayoffRoundMatchups
             .Include(m => m.PlayoffRound)
             .Include(m => m.TeamOne)
                 .ThenInclude(pt => pt!.Team)
