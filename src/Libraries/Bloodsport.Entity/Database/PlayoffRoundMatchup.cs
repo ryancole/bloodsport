@@ -12,6 +12,8 @@ namespace Bloodsport.Entity.Database
 
         public required int MatchNumber { get; set; }
 
+        public required string Name { get; set; }
+
         public long? TeamOneId { get; set; }
 
         public long? TeamTwoId { get; set; }
