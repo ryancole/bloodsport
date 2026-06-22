@@ -151,11 +151,14 @@ function fitView(s) {
         s.panX = (canvas.width  - layout.totalW * s.zoom) / 2;
         s.panY = (canvas.height - layout.totalH * s.zoom) / 2;
     } else {
-        // Bracket is large — zoom to show ~last 2 rounds and center on the final round
+        // Bracket is large — zoom to show ~2 rounds centered on the first incomplete round
         s.zoom = 0.72;
-        const last = layout.rounds[layout.rounds.length - 1];
-        const cx   = last ? last.x + CARD_W / 2 : layout.totalW / 2;
-        const cy   = layout.totalH / 2;
+        const firstIncomplete = layout.rounds.find(r =>
+            r.matchups.some(m => !m.teamOneWinner && !m.teamTwoWinner)
+        );
+        const target = firstIncomplete ?? layout.rounds[layout.rounds.length - 1];
+        const cx = target ? target.x + CARD_W / 2 : layout.totalW / 2;
+        const cy = layout.totalH / 2;
         s.panX = canvas.width  / 2 - cx * s.zoom;
         s.panY = canvas.height / 2 - cy * s.zoom;
     }
