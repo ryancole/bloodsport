@@ -15,7 +15,7 @@ else
     <div class="dashboard-stat-row">
         <div class="dashboard-stat-card">
             <span class="dashboard-stat-label">Active seasons</span>
-            <span class="dashboard-stat-value">@seasons.Count(s => s.Status == SeasonStatus.Active)</span>
+            <span class="dashboard-stat-value">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
         </div>
         <div class="dashboard-stat-card">
             <span class="dashboard-stat-label">Active playoffs</span>
