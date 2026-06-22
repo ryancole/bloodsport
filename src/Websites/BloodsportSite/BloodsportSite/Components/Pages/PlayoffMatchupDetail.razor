@@ -65,10 +65,11 @@ else
     }
 
     @* Result *@
-    @if (matchup.WinningTeam is not null)
+    var result = matchup.PlayoffRoundMatchupResults.FirstOrDefault();
+    @if (result?.WinningTeam is not null)
     {
         <div class="alert alert-success mb-4">
-            <strong>@matchup.WinningTeam.Team?.Name</strong> wins this matchup.
+            <strong>@result.WinningTeam.Team?.Name</strong> wins this matchup.
         </div>
     }
     else if (matchup.TournamentCode is not null && RoundEnded)
@@ -110,7 +111,7 @@ else
     }
 
     @* Teams *@
-    @if (matchup.WinningTeam is null)
+    @if (!matchup.PlayoffRoundMatchupResults.Any())
     {
         <div class="alert alert-warning small mb-4">
             <strong>Locked-in rosters enforced.</strong>
@@ -170,7 +171,7 @@ else
         matchup = await db.PlayoffRoundMatchups
             .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
             .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
-            .Include(m => m.WinningTeam).ThenInclude(pt => pt!.Team)
+            .Include(m => m.PlayoffRoundMatchupResults).ThenInclude(r => r.WinningTeam).ThenInclude(pt => pt!.Team)
             .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
             .Include(m => m.PlayoffRound).ThenInclude(r => r.PlayoffMatchups)
             .FirstOrDefaultAsync(m => m.Id == MatchupId && m.PlayoffRound.PlayoffId == PlayoffId);

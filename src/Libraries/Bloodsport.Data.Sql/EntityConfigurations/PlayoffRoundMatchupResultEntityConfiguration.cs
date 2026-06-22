@@ -17,7 +17,14 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
 
             builder
                 .HasOne(m => m.PlayoffRoundMatchup)
-                .WithMany(m => m.PlayoffRoundMatchupResults);
+                .WithMany(m => m.PlayoffRoundMatchupResults)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .HasOne(m => m.WinningTeam)
+                .WithMany(m => m.PlayoffRoundMatchupResults)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         #endregion

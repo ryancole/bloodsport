@@ -120,7 +120,7 @@ else
         .FirstOrDefault()
         ?.PlayoffMatchups
         .SingleOrDefault()
-        ?.WinningTeam;
+        ?.PlayoffRoundMatchupResults.FirstOrDefault()?.WinningTeam;
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,8 +140,9 @@ else
                         .ThenInclude(pt => pt!.Team)
             .Include(p => p.PlayoffRounds)
                 .ThenInclude(r => r.PlayoffMatchups)
-                    .ThenInclude(m => m.WinningTeam)
-                        .ThenInclude(pt => pt!.Team)
+                    .ThenInclude(m => m.PlayoffRoundMatchupResults)
+                        .ThenInclude(r => r.WinningTeam)
+                            .ThenInclude(pt => pt!.Team)
             .FirstOrDefaultAsync(p => p.Id == Id);
 
         if (playoff is null)

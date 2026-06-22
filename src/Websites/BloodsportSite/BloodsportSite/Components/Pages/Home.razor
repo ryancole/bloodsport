@@ -94,10 +94,11 @@ else
                                         @matchup.Name
                                     </a>
                                 </td>
-                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@matchup.WinningTeam?.Team?.Name">
-                                    @if (matchup.WinningTeam is not null)
+                                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@matchup.PlayoffRoundMatchupResults.FirstOrDefault()?.WinningTeam?.Team?.Name">
+                                    @{ var winner = matchup.PlayoffRoundMatchupResults.FirstOrDefault()?.WinningTeam; }
+                                    @if (winner is not null)
                                     {
-                                        <a href="/teams/@matchup.WinningTeam.TeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.WinningTeam.Team.LogoUrl" />@matchup.WinningTeam.Team.Name</a>
+                                        <a href="/teams/@winner.TeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@winner.Team.LogoUrl" />@winner.Team.Name</a>
                                     }
                                 </td>
                                 <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@matchup.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")">@matchup.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
@@ -146,9 +147,10 @@ else
             .ToListAsync();
 
         recentPlayoffResults = await db.PlayoffRoundMatchups
-            .Where(m => m.WinningTeamId != null)
-            .Include(m => m.WinningTeam)
-                .ThenInclude(t => t.Team)
+            .Where(m => m.PlayoffRoundMatchupResults.Any())
+            .Include(m => m.PlayoffRoundMatchupResults)
+                .ThenInclude(r => r.WinningTeam)
+                    .ThenInclude(t => t!.Team)
             .Include(m => m.PlayoffRound)
                 .ThenInclude(r => r.Playoff)
             .OrderByDescending(m => m.DateCreated)
