@@ -19,7 +19,7 @@ var config = new ConfigurationBuilder()
 long playoffId = 0;
 string functionUrl = "http://localhost:7071/api/HandlePlayoffMatchup";
 string functionKey = "";
-int skipPercent = 20;
+int skipPercent = 10;
 
 for (int i = 0; i < args.Length - 1; i++)
 {
