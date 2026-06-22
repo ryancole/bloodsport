@@ -1,92 +1,61 @@
 @using Bloodsport.Entity.Database
+@using System.Text.Json
 
 @{
-    // most matchups = first round played (leftmost column)
     var orderedRounds = Rounds
         .OrderByDescending(r => r.PlayoffMatchups.Count)
         .ToList();
+
+    var canvasId = $"bracket-canvas-{PlayoffId}";
+
+    string? dataJson = null;
+    if (orderedRounds.Any())
+    {
+        var bracketData = new
+        {
+            playoffId = PlayoffId,
+            rounds = orderedRounds.Select(r => new
+            {
+                name = r.Name,
+                matchups = r.PlayoffMatchups.OrderBy(m => m.MatchNumber).Select(m => new
+                {
+                    id            = m.Id,
+                    teamOne       = m.TeamOne != null ? (object)new { seed = m.TeamOne.Seed, name = m.TeamOne.Team?.Name ?? "Unknown", logoUrl = m.TeamOne.Team?.LogoUrl?.Replace("/original.", "/flag.") } : null,
+                    teamTwo       = m.TeamTwo != null ? (object)new { seed = m.TeamTwo.Seed, name = m.TeamTwo.Team?.Name ?? "Unknown", logoUrl = m.TeamTwo.Team?.LogoUrl?.Replace("/original.", "/flag.") } : null,
+                    teamOneWinner = m.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == m.TeamOneId),
+                    teamTwoWinner = m.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == m.TeamTwoId)
+                }).ToList()
+            }).ToList()
+        };
+
+        dataJson = JsonSerializer.Serialize(bracketData);
+    }
 }
 
-@if (!Rounds.Any())
+@if (!orderedRounds.Any())
 {
     <p class="text-muted fst-italic">Bracket has not been built yet.</p>
 }
 else
 {
-    <div class="playoff-bracket-outer">
-
-        @* Header row: round labels *@
-        <div class="bracket-header">
-            @for (int ri = 0; ri < orderedRounds.Count; ri++)
-            {
-                var round = orderedRounds[ri];
-                <PlayoffRoundLabel Round="round" />
-                @if (ri < orderedRounds.Count - 1)
-                {
-                    <div class="bracket-connector-spacer"></div>
-                }
-            }
+    <div class="bracket-canvas-wrapper">
+        <div class="bracket-toolbar">
+            <button class="bracket-btn" type="button" onclick="window._bc?.zoomIn?.('@canvasId')" title="Zoom in">+</button>
+            <button class="bracket-btn" type="button" onclick="window._bc?.fit?.('@canvasId')"    title="Fit to view">Fit</button>
+            <button class="bracket-btn" type="button" onclick="window._bc?.zoomOut?.('@canvasId')" title="Zoom out">−</button>
         </div>
-
-        @* Body row: matchup slots interleaved with connector columns *@
-        <div class="bracket-body">
-            @for (int ri = 0; ri < orderedRounds.Count; ri++)
-            {
-                var round = orderedRounds[ri];
-                var matchups = round.PlayoffMatchups.OrderBy(m => m.MatchNumber).ToList();
-                bool isFirstRound = ri == 0;
-                bool isLastRound = ri == orderedRounds.Count - 1;
-
-                <div class="bracket-slots">
-                    @foreach (var matchup in matchups)
-                    {
-                        <div class="bracket-slot @(isFirstRound ? "" : "has-left-stub")">
-                            <a class="bracket-card text-decoration-none" href="/playoffs/@PlayoffId/matchups/@matchup.Id">
-                                @TeamRow(matchup.TeamOne, matchup.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == matchup.TeamOneId))
-                                @TeamRow(matchup.TeamTwo, matchup.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == matchup.TeamTwoId))
-                            </a>
-                        </div>
-
-                    }
-                </div>
-
-                @if (!isLastRound)
-                {
-                    @* One connector-pair per two matchups in this round.
-                       Each pair has flex:2, so it spans the same vertical space as two adjacent slots.
-                       The ::before line runs from 25%-75% of the pair height, which aligns exactly
-                       with the vertical centres of those two slots. *@
-                    <div class="bracket-connector-col">
-                        @for (int pi = 0; pi < matchups.Count / 2; pi++)
-                        {
-                            <div class="connector-pair"></div>
-                        }
-                    </div>
-                }
-            }
-        </div>
-
+        <canvas id="@canvasId" data-bracket="@dataJson"></canvas>
     </div>
+
+    <script type="module">
+        import { init, zoomIn, zoomOut, resetView } from '/js/bracketCanvas.js';
+        window._bc = { zoomIn, zoomOut, fit: resetView };
+        const canvas = document.getElementById('@canvasId');
+        if (canvas) init('@canvasId', JSON.parse(canvas.dataset.bracket));
+    </script>
 }
 
 @code {
     [Parameter] public List<PlayoffRound> Rounds { get; set; } = [];
     [Parameter] public long PlayoffId { get; set; }
-
-    private RenderFragment TeamRow(PlayoffTeam? team, bool isWinner) => __builder =>
-    {
-        <div class="@("bracket-team" + (isWinner ? " winner" : ""))">
-            @if (team is not null)
-            {
-                <span class="bracket-seed">@team.Seed</span>
-                <TeamFlag LogoUrl="@team.Team?.LogoUrl" />
-                <span class="bracket-name">@(team.Team?.Name ?? "Unknown")</span>
-            }
-            else
-            {
-                <span class="bracket-seed text-muted">—</span>
-                <span class="bracket-name text-muted">TBD</span>
-            }
-        </div>
-    };
 }

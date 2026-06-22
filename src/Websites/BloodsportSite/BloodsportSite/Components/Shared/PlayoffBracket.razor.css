@@ -1,129 +1,46 @@
-.playoff-bracket-outer {
-    overflow-x: auto;
-}
-
-/* ── Header row ──────────────────────────────────────────────────────────── */
-
-.bracket-header {
-    display: flex;
-    margin-bottom: 4px;
-}
-
-/* Spacer in the header row that sits above each connector column */
-.bracket-connector-spacer {
-    width: 32px;
-    flex-shrink: 0;
-}
-
-/* ── Body row ────────────────────────────────────────────────────────────── */
-
-.bracket-body {
-    display: flex;
-    min-height: 320px;
-}
-
-/* Round column: stacks matchup slots vertically */
-.bracket-slots {
-    flex: 1;
-    min-width: 180px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* One slot per matchup; all slots share equal flex height within a round */
-.bracket-slot {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    padding: 4px 8px;
+.bracket-canvas-wrapper {
     position: relative;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 560px;
+    background: #fff;
+    user-select: none;
 }
 
-/* Left horizontal stub connecting from the previous connector column */
-.bracket-slot.has-left-stub {
-    padding-left: 20px;
-}
-
-.bracket-slot.has-left-stub::before {
-    content: '';
+.bracket-toolbar {
     position: absolute;
-    left: 0;
-    top: 50%;
-    width: 20px;
-    border-top: 2px solid #dee2e6;
-    transform: translateY(-1px);
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    display: flex;
+    gap: 4px;
 }
 
-/* ── Matchup card ────────────────────────────────────────────────────────── */
-
-.bracket-card {
-    width: 100%;
+.bracket-btn {
+    min-width: 36px;
+    height: 32px;
+    padding: 0 8px;
     border: 1px solid #dee2e6;
     border-radius: 4px;
-    overflow: hidden;
-    background: #fff;
-}
-
-.bracket-team {
+    background: rgba(255, 255, 255, 0.92);
+    cursor: pointer;
+    font-size: 15px;
+    color: #495057;
+    line-height: 1;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 8px;
-    font-size: 0.85rem;
-    line-height: 1.2;
+    justify-content: center;
+    backdrop-filter: blur(2px);
 }
 
-.bracket-team + .bracket-team {
-    border-top: 1px solid #dee2e6;
+.bracket-btn:hover {
+    background: #f8f9fa;
+    border-color: #adb5bd;
 }
 
-.bracket-team.winner {
-    background-color: rgba(25, 135, 84, 0.08);
-    font-weight: 600;
-}
-
-.bracket-seed {
-    font-size: 0.7rem;
-    color: #6c757d;
-    min-width: 14px;
-    text-align: center;
-}
-
-.bracket-name {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ── Connector column ────────────────────────────────────────────────────── */
-
-.bracket-connector-col {
-    width: 32px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-/*
- * Each connector-pair has flex:2, spanning the same vertical space as two
- * adjacent bracket-slots. The ::before vertical line runs from 25% to 75% of
- * the pair's height, which places it exactly between the vertical centres of
- * those two slots — correct for any bracket size.
- *
- * The left stubs on the next round's slots (.has-left-stub::before) connect
- * horizontally into the right edge of these vertical lines.
- */
-.connector-pair {
-    flex: 2;
-    position: relative;
-}
-
-.connector-pair::before {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 25%;
-    bottom: 25%;
-    border-right: 2px solid #dee2e6;
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
