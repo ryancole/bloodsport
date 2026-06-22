@@ -42,8 +42,8 @@ else
                     {
                         <div class="bracket-slot @(isFirstRound ? "" : "has-left-stub")">
                             <a class="bracket-card text-decoration-none" href="/playoffs/@PlayoffId/matchups/@matchup.Id">
-                                @TeamRow(matchup.TeamOne, matchup.WinningTeamId.HasValue && matchup.WinningTeamId == matchup.TeamOneId)
-                                @TeamRow(matchup.TeamTwo, matchup.WinningTeamId.HasValue && matchup.WinningTeamId == matchup.TeamTwoId)
+                                @TeamRow(matchup.TeamOne, matchup.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == matchup.TeamOneId))
+                                @TeamRow(matchup.TeamTwo, matchup.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == matchup.TeamTwoId))
                             </a>
                         </div>
 

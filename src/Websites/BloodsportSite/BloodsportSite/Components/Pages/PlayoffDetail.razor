@@ -28,14 +28,14 @@ else
                 <div class="d-flex gap-2">
                     @if (playoff.PlayoffRounds.Count == 0)
                     {
-                        <form method="post" action="/api/playoffs/@playoff.Id/build-bracket">
+                        <form method="post" action="/api/playoffs/@playoff.Id/build-bracket" data-enhance="false">
                             <AntiforgeryToken />
                             <button type="submit" class="btn btn-sm btn-primary">Build Bracket</button>
                         </form>
                     }
                     @if (playoff.Status == PlayoffStatus.Upcoming)
                     {
-                        <form method="post" action="/api/playoffs/@playoff.Id/start">
+                        <form method="post" action="/api/playoffs/@playoff.Id/start" data-enhance="false">
                             <AntiforgeryToken />
                             <button type="submit" class="btn btn-sm btn-success">Start Playoff</button>
                         </form>
@@ -120,7 +120,7 @@ else
         .FirstOrDefault()
         ?.PlayoffMatchups
         .SingleOrDefault()
-        ?.WinningTeam;
+        ?.PlayoffRoundMatchupResults.FirstOrDefault()?.WinningTeam;
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,8 +140,9 @@ else
                         .ThenInclude(pt => pt!.Team)
             .Include(p => p.PlayoffRounds)
                 .ThenInclude(r => r.PlayoffMatchups)
-                    .ThenInclude(m => m.WinningTeam)
-                        .ThenInclude(pt => pt!.Team)
+                    .ThenInclude(m => m.PlayoffRoundMatchupResults)
+                        .ThenInclude(r => r.WinningTeam)
+                            .ThenInclude(pt => pt!.Team)
             .FirstOrDefaultAsync(p => p.Id == Id);
 
         if (playoff is null)

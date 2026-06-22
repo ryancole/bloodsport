@@ -61,6 +61,7 @@ public class HandlePlayoffMatchup
             .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
             .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
             .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
+            .Include(m => m.PlayoffRoundMatchupResults)
             .FirstOrDefaultAsync(m => m.TournamentCode == payload.ShortCode);
 
         if (matchup is null)
@@ -69,7 +70,7 @@ public class HandlePlayoffMatchup
             return new NotFoundResult();
         }
 
-        if (matchup.WinningTeamId is not null)
+        if (matchup.PlayoffRoundMatchupResults.Any())
         {
             _logger.LogWarning("Playoff matchup {matchupId} already has a result recorded. Ignoring duplicate callback.", matchup.Id);
             return new OkResult();
@@ -144,8 +145,13 @@ public class HandlePlayoffMatchup
             }
         }
 
-        // Record the result on the matchup.
-        matchup.WinningTeamId = winningPlayoffTeam!.Id;
+        // Record the result.
+        db.PlayoffRoundMatchupResults.Add(new PlayoffRoundMatchupResult
+        {
+            PlayoffRoundMatchupId = matchup.Id,
+            WinningTeamId = winningPlayoffTeam!.Id,
+            PlayoffRoundMatchup = matchup
+        });
 
         // Advance the winner into the next round's matchup slot.
         // Even MatchNumber → winner becomes TeamOne; odd → TeamTwo.
@@ -186,6 +192,7 @@ public class HandlePlayoffMatchup
 
         var allMatchups = await db.PlayoffRoundMatchups
             .Include(m => m.PlayoffRound)
+            .Include(m => m.PlayoffRoundMatchupResults)
             .Include(m => m.TeamOne)
                 .ThenInclude(pt => pt!.Team)
                     .ThenInclude(t => t.TeamMemberships)
@@ -201,15 +208,16 @@ public class HandlePlayoffMatchup
 
         // Build a lookup of PlayoffTeam.Id → the round name in which they were eliminated.
         var eliminatedInRound = new Dictionary<long, string>();
-        foreach (var m in allMatchups.Where(m => m.WinningTeamId is not null))
+        foreach (var m in allMatchups.Where(m => m.PlayoffRoundMatchupResults.Any()))
         {
-            var loserId = m.TeamOneId == m.WinningTeamId ? m.TeamTwoId : m.TeamOneId;
+            var winningTeamId = m.PlayoffRoundMatchupResults.First().WinningTeamId;
+            var loserId = m.TeamOneId == winningTeamId ? m.TeamTwoId : m.TeamOneId;
             if (loserId is not null)
                 eliminatedInRound[loserId.Value] = m.PlayoffRound.Name;
         }
 
         // The final matchup has no NextMatchupId; its winner is 1st, loser is 2nd.
-        var winnerId = finalMatchup.WinningTeamId!.Value;
+        var winnerId = finalMatchup.PlayoffRoundMatchupResults.First().WinningTeamId!.Value;
         var loserId2nd = finalMatchup.TeamOneId == winnerId ? finalMatchup.TeamTwoId : finalMatchup.TeamOneId;
 
         var allPlayoffTeams = allMatchups

@@ -32,6 +32,8 @@ public class EndPlayoffRound
         var expiredRounds = await db.PlayoffRounds
             .Include(r => r.Playoff)
             .Include(r => r.PlayoffMatchups)
+                .ThenInclude(m => m.PlayoffRoundMatchupResults)
+            .Include(r => r.PlayoffMatchups)
                 .ThenInclude(m => m.TeamOne)
                     .ThenInclude(pt => pt.Team)
                         .ThenInclude(t => t.TeamMemberships)
@@ -46,14 +48,14 @@ public class EndPlayoffRound
             .Where(r =>
                 r.Playoff.Status == PlayoffStatus.Active &&
                 r.DateEnd != null && r.DateEnd < now &&
-                r.PlayoffMatchups.Any(m => m.WinningTeamId == null))
+                r.PlayoffMatchups.Any(m => !m.PlayoffRoundMatchupResults.Any()))
             .ToListAsync();
 
         var defaultedCount = 0;
 
         foreach (var round in expiredRounds)
         {
-            var unresolved = round.PlayoffMatchups.Where(m => m.WinningTeamId == null).ToList();
+            var unresolved = round.PlayoffMatchups.Where(m => !m.PlayoffRoundMatchupResults.Any()).ToList();
 
             foreach (var matchup in unresolved)
             {
@@ -67,7 +69,12 @@ public class EndPlayoffRound
                     continue;
                 }
 
-                matchup.WinningTeamId = winner;
+                db.PlayoffRoundMatchupResults.Add(new PlayoffRoundMatchupResult
+                {
+                    PlayoffRoundMatchupId = matchup.Id,
+                    WinningTeamId = winner,
+                    PlayoffRoundMatchup = matchup
+                });
 
                 if (matchup.NextMatchupId is not null)
                 {
