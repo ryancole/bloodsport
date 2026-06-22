@@ -4,13 +4,51 @@
 
 <h1>Rules</h1>
 
+<nav>
+    <ul>
+        <li><a href="/rules#1.00">1.00 Rosters</a></li>
+        <ul>
+            <li><a href="/rules#1.10">1.10 Roster Lock-In</a></li>
+            <li><a href="/rules#1.20">1.20 Roster Size</a></li>
+            <li><a href="/rules#1.30">1.30 One Team Per Season</a></li>
+        </ul>
+        <li><a href="/rules#2.00">2.00 Match Rules</a></li>
+        <ul>
+            <li><a href="/rules#2.10">2.10 Tournament Lobby</a></li>
+            <li><a href="/rules#2.20">2.20 Playing Ahead</a></li>
+        </ul>
+        <li><a href="/rules#3.00">3.00 Forfeiture</a></li>
+        <ul>
+            <li><a href="/rules#3.10">3.10 Automatic Forfeiture</a></li>
+            <li><a href="/rules#3.20">3.20 Manual Forfeiture</a></li>
+        </ul>
+        <li><a href="/rules#4.00">4.00 Playoffs</a></li>
+        <ul>
+            <li><a href="/rules#4.10">4.10 Seeding Tiebreakers</a></li>
+        </ul>
+        <li><a href="/rules#5.00">5.00 Conduct</a></li>
+        <ul>
+            <li><a href="/rules#5.10">5.10 Team and Player Logos</a></li>
+        </ul>
+    </ul>
+</nav>
+
 <section>
-    <h2>Roster Lock-In</h2>
+    <h2 id="1.00"><a href="/rules#1.00">1.00 Rosters</a></h2>
+
+    <h3 id="1.10"><a href="/rules#1.10">1.10 Roster Lock-In</a></h3>
     <p>
         Team rosters are locked in at the start of each season. Once the season officially begins, only the players listed
         on a team's roster at that time are eligible to compete in any regular season or playoff match. No roster changes
         are permitted after the season starts.
     </p>
+    <p>
+        Roster lock-in is enforced at the Riot API level. When a custom lobby is created for a match, only Riot IDs
+        registered on the team's locked roster will be permitted to enter. Any player whose Riot ID is not on the roster
+        will be unable to join the lobby.
+    </p>
+
+    <h3 id="1.20"><a href="/rules#1.20">1.20 Roster Size</a></h3>
     <p>
         A roster must contain at least 5 players. Teams that fall below this minimum will not receive a match schedule
         for the season and are not eligible to participate until the roster requirement is met.
@@ -19,15 +57,8 @@
         A roster may contain up to 7 players. Any player on the roster is eligible to play in any given matchup — teams
         are free to field whichever combination of their rostered players they choose from week to week.
     </p>
-    <p>
-        Roster lock-in is enforced at the Riot API level. When a custom lobby is created for a match, only Riot IDs
-        registered on the team's locked roster will be permitted to enter. Any player whose Riot ID is not on the roster
-        will be unable to join the lobby.
-    </p>
-</section>
 
-<section>
-    <h2>One Team Per Season</h2>
+    <h3 id="1.30"><a href="/rules#1.30">1.30 One Team Per Season</a></h3>
     <p>
         A player may only be rostered on one team per season. A Riot account that is already registered to a team's
         locked roster cannot be added to any other team for the duration of that season.
@@ -35,7 +66,9 @@
 </section>
 
 <section>
-    <h2>League of Legends Tournament Lobby</h2>
+    <h2 id="2.00"><a href="/rules#2.00">2.00 Match Rules</a></h2>
+
+    <h3 id="2.10"><a href="/rules#2.10">2.10 Tournament Lobby</a></h3>
     <p>
         A unique custom lobby is generated for each matchup, including both regular season and playoff matches. Each lobby
         is protected by an auto-generated password. Teams should not share the lobby code or password outside of their
@@ -47,10 +80,8 @@
     <p>
         Spectating is allowed in the custom lobby.
     </p>
-</section>
 
-<section>
-    <h2>Playing Ahead</h2>
+    <h3 id="2.20"><a href="/rules#2.20">2.20 Playing Ahead</a></h3>
     <p>
         Teams are permitted to play ahead of the current week during both the regular season and playoffs. If both teams
         are ready and willing, they may complete a matchup from the next upcoming week before it officially begins.
@@ -64,7 +95,9 @@
 </section>
 
 <section>
-    <h2>Automatic Forfeiture</h2>
+    <h2 id="3.00"><a href="/rules#3.00">3.00 Forfeiture</a></h2>
+
+    <h3 id="3.10"><a href="/rules#3.10">3.10 Automatic Forfeiture</a></h3>
     <p>
         Each regular season week has a set end date. When that date passes, the week is automatically marked as completed.
         Any team that did not play their matchup before the deadline will receive an automatic forfeit loss for that week.
@@ -83,10 +116,8 @@
         If neither team appeals a playoff forfeiture, the opposing teams in subsequent rounds will receive byes and advance
         automatically without playing a match.
     </p>
-</section>
 
-<section>
-    <h2>Manual Forfeiture</h2>
+    <h3 id="3.20"><a href="/rules#3.20">3.20 Manual Forfeiture</a></h3>
     <p>
         A team manager may manually forfeit a regular season week or playoff round at any time. Forfeiting a regular season
         week results in a loss for the forfeiting team and a win for their opponent. Forfeiting a playoff round results in
@@ -95,7 +126,9 @@
 </section>
 
 <section>
-    <h2>Playoff Seeding Tiebreakers</h2>
+    <h2 id="4.00"><a href="/rules#4.00">4.00 Playoffs</a></h2>
+
+    <h3 id="4.10"><a href="/rules#4.10">4.10 Seeding Tiebreakers</a></h3>
     <p>
         When two or more teams finish the regular season with identical win-loss records, playoff seeding is determined by
         average gold per minute (GPM) across all matches won during the regular season. The team with the higher average
@@ -108,7 +141,9 @@
 </section>
 
 <section>
-    <h2>Team and Player Logos</h2>
+    <h2 id="5.00"><a href="/rules#5.00">5.00 Conduct</a></h2>
+
+    <h3 id="5.10"><a href="/rules#5.10">5.10 Team and Player Logos</a></h3>
     <p>
         Teams and players may upload custom logos to represent themselves in the league. Logos containing illegal content
         will not be permitted and are subject to removal.
