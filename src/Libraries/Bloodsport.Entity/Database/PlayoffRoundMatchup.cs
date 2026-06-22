@@ -18,8 +18,6 @@ namespace Bloodsport.Entity.Database
 
         public long? TeamTwoId { get; set; }
 
-        public long? WinningTeamId { get; set; }
-
         public long? NextMatchupId { get; set; }
 
         public string? TournamentCode { get; set; }
@@ -42,10 +40,10 @@ namespace Bloodsport.Entity.Database
         public virtual PlayoffTeam? TeamTwo { get; set; }
 
         [JsonIgnore]
-        public virtual PlayoffTeam? WinningTeam { get; set; }
+        public virtual PlayoffRoundMatchup? NextMatchup { get; set; }
 
         [JsonIgnore]
-        public virtual PlayoffRoundMatchup? NextMatchup { get; set; }
+        public virtual ICollection<PlayoffRoundMatchupResult> PlayoffRoundMatchupResults { get; set; } = [];
 
         #endregion
     }

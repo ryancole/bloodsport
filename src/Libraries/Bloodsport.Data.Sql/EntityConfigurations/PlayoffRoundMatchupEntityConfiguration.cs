@@ -5,7 +5,7 @@ using Bloodsport.Entity.Database;
 
 namespace Bloodsport.Data.Sql.EntityConfigurations
 {
-    internal class PlayoffMatchupEntityConfiguration : IEntityTypeConfiguration<PlayoffRoundMatchup>
+    internal class PlayoffRoundMatchupEntityConfiguration : IEntityTypeConfiguration<PlayoffRoundMatchup>
     {
         #region Methods
 
