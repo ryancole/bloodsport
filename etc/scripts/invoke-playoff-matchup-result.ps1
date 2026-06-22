@@ -2,12 +2,6 @@ param(
     [Parameter(Mandatory)]
     [long] $PlayoffId,
 
-    [Parameter(Mandatory)]
-    [string] $ServerInstance,
-
-    [Parameter(Mandatory)]
-    [string] $Database,
-
     [string] $FunctionUrl = "http://localhost:7071/api/HandlePlayoffMatchup",
 
     [string] $FunctionKey = "",
@@ -20,11 +14,9 @@ $projectPath = "$PSScriptRoot\..\..\src\Tools\Bloodsport.Tools.SeedPlayoffMatchu
 
 $dotnetArgs = @(
     "run", "--project", $projectPath, "--",
-    "--playoff",  $PlayoffId,
-    "--server",   $ServerInstance,
-    "--database", $Database,
-    "--url",      $FunctionUrl,
-    "--skip",     $SkipPercent
+    "--playoff", $PlayoffId,
+    "--url",     $FunctionUrl,
+    "--skip",    $SkipPercent
 )
 
 if ($FunctionKey) {

@@ -2,12 +2,6 @@ param(
     [Parameter(Mandatory)]
     [long] $SeasonId,
 
-    [Parameter(Mandatory)]
-    [string] $ServerInstance,
-
-    [Parameter(Mandatory)]
-    [string] $Database,
-
     [string] $FunctionUrl = "http://localhost:7071/api/HandleSeasonWeekMatchup",
 
     [string] $FunctionKey = "",
@@ -20,11 +14,9 @@ $projectPath = "$PSScriptRoot\..\..\src\Tools\Bloodsport.Tools.SeedMatchupResult
 
 $dotnetArgs = @(
     "run", "--project", $projectPath, "--",
-    "--season",   $SeasonId,
-    "--server",   $ServerInstance,
-    "--database", $Database,
-    "--url",      $FunctionUrl,
-    "--skip",     $SkipPercent
+    "--season", $SeasonId,
+    "--url",    $FunctionUrl,
+    "--skip",   $SkipPercent
 )
 
 if ($FunctionKey) {
