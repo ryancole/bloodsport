@@ -12,39 +12,77 @@
 {
     <p><em>Loading...</em></p>
 }
-else if (playoffs.Count == 0)
-{
-    <p class="text-muted">No playoffs yet.</p>
-}
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Season</th>
-                <th>Status</th>
-                <th>Teams</th>
-                <th>Created</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var playoff in playoffs)
-            {
+    <h2 class="h5 mb-2">Active Playoffs</h2>
+    @if (activePlayoffs.Count == 0)
+    {
+        <p class="text-muted">No active playoffs.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td><a href="/playoffs/@playoff.Id">@playoff.Name</a></td>
-                    <td><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></td>
-                    <td>@playoff.Status</td>
-                    <td>@playoff.PlayoffTeams.Count</td>
-                    <td>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    <th>Name</th>
+                    <th>Season</th>
+                    <th>Status</th>
+                    <th>Teams</th>
+                    <th>Created</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var playoff in activePlayoffs)
+                {
+                    <tr>
+                        <td><a href="/playoffs/@playoff.Id">@playoff.Name</a></td>
+                        <td><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></td>
+                        <td>@playoff.Status</td>
+                        <td>@playoff.PlayoffTeams.Count</td>
+                        <td>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <h2 class="h5 mb-2 mt-4">Past Playoffs</h2>
+    @if (pastPlayoffs.Count == 0)
+    {
+        <p class="text-muted">No past playoffs.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Season</th>
+                    <th>Status</th>
+                    <th>Teams</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var playoff in pastPlayoffs)
+                {
+                    <tr>
+                        <td><a href="/playoffs/@playoff.Id">@playoff.Name</a></td>
+                        <td><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></td>
+                        <td>@playoff.Status</td>
+                        <td>@playoff.PlayoffTeams.Count</td>
+                        <td>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 }
 
 @code {
     private List<Playoff>? playoffs;
+    private List<Playoff> activePlayoffs = [];
+    private List<Playoff> pastPlayoffs = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,5 +92,8 @@ else
             .Include(p => p.PlayoffTeams)
             .OrderByDescending(p => p.DateCreated)
             .ToListAsync();
+
+        activePlayoffs = playoffs.Where(p => p.Status != PlayoffStatus.Completed).ToList();
+        pastPlayoffs = playoffs.Where(p => p.Status == PlayoffStatus.Completed).ToList();
     }
 }

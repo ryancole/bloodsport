@@ -22,11 +22,17 @@
 }
 else
 {
-    <SeasonsTable Seasons="seasons" />
+    <h2 class="h5 mb-2">Active Seasons</h2>
+    <SeasonsTable Seasons="activeSeasons" />
+
+    <h2 class="h5 mb-2 mt-4">Past Seasons</h2>
+    <SeasonsTable Seasons="pastSeasons" />
 }
 
 @code {
     private List<Season>? seasons;
+    private List<Season> activeSeasons = [];
+    private List<Season> pastSeasons = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,5 +41,8 @@ else
             .Include(s => s.SeasonRegistrations)
             .OrderByDescending(s => s.DateCreated)
             .ToListAsync();
+
+        activeSeasons = seasons.Where(s => s.Status != SeasonStatus.Completed).ToList();
+        pastSeasons = seasons.Where(s => s.Status == SeasonStatus.Completed).ToList();
     }
 }
