@@ -12,7 +12,13 @@
 <PageTitle>Profile | BSAL</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">My Profile</h1>
+    <div class="d-flex align-items-center gap-3">
+        @if (user?.LogoUrl is not null)
+        {
+            <img src="@user.LogoUrl" alt="Profile logo" style="width: 72px; height: 72px; object-fit: contain;" />
+        }
+        <h1 class="mb-0">My Profile</h1>
+    </div>
     <form method="post" action="/auth/logout">
         <AntiforgeryToken />
         <button type="submit" class="btn btn-outline-danger btn-sm">Log out</button>

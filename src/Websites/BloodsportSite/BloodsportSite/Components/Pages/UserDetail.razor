@@ -15,7 +15,13 @@ else if (user is null)
 }
 else
 {
-    <h1 class="mb-4">@user.DisplayName</h1>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        @if (user.LogoUrl is not null)
+        {
+            <img src="@user.LogoUrl" alt="@user.DisplayName logo" style="width: 72px; height: 72px; object-fit: contain;" />
+        }
+        <h1 class="mb-0">@user.DisplayName</h1>
+    </div>
 
     <dl class="row mb-4">
         <dt class="col-sm-3">Member Since</dt>
