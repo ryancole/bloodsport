@@ -4,6 +4,7 @@ using Bloodsport.Data.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    partial class SqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260623023528_Post")]
+    partial class Post
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,38 +233,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("Bloodsport.Entity.Database.PostComment", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<long>("PostId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PostComments");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccount", b =>
@@ -851,25 +822,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.PostComment", b =>
-                {
-                    b.HasOne("Bloodsport.Entity.Database.Post", "Post")
-                        .WithMany("PostComments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bloodsport.Entity.Database.User", "User")
-                        .WithMany("PostComments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccount", b =>
                 {
                     b.HasOne("Bloodsport.Entity.Database.User", "User")
@@ -1086,11 +1038,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("PlayoffRoundMatchupResults");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.Post", b =>
-                {
-                    b.Navigation("PostComments");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccount", b =>
                 {
                     b.Navigation("TeamInvites");
@@ -1144,8 +1091,6 @@ namespace Bloodsport.Data.Sql.Migrations
             modelBuilder.Entity("Bloodsport.Entity.Database.User", b =>
                 {
                     b.Navigation("ManagedTeams");
-
-                    b.Navigation("PostComments");
 
                     b.Navigation("Posts");
 

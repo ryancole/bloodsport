@@ -115,6 +115,139 @@ h3 {
     font-weight: 700;
 }
 
+/* News index */
+.news-list {
+    max-width: 680px;
+}
+
+.news-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.news-item:first-child {
+    padding-top: 0;
+}
+
+.news-item-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--bs-body-color, #212529);
+    text-decoration: none;
+}
+
+.news-item-title:hover {
+    color: #c0392b;
+    text-decoration: none;
+}
+
+.news-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color, #6c757d);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.news-item-meta a {
+    color: var(--bs-secondary-color, #6c757d);
+    text-decoration: none;
+}
+
+.news-item-meta a:hover {
+    color: var(--bs-body-color, #212529);
+    text-decoration: underline;
+}
+
+.news-item-meta-sep {
+    opacity: 0.5;
+}
+
+.news-item-excerpt {
+    margin: 0;
+    color: #444;
+    line-height: 1.6;
+    font-size: 0.97rem;
+}
+
+.news-item-read-more {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #c0392b;
+    text-decoration: none;
+    margin-top: 0.1rem;
+}
+
+.news-item-read-more:hover {
+    text-decoration: underline;
+    color: #a93226;
+}
+
+/* Post comments */
+.post-comments {
+    max-width: 680px;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    padding-top: 2rem;
+}
+
+.post-comment {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.post-comment:last-child {
+    border-bottom: none;
+}
+
+.post-comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color, #6c757d);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.35rem;
+}
+
+.post-comment-meta a {
+    color: var(--bs-secondary-color, #6c757d);
+    text-decoration: none;
+}
+
+.post-comment-meta a:hover {
+    color: var(--bs-body-color, #212529);
+    text-decoration: underline;
+}
+
+.post-comment-body {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.post-comment-delete {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color, #6c757d);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.post-comment-delete:hover {
+    color: #c0392b;
+    text-decoration: underline;
+}
+
 .site-footer {
     display: flex;
     align-items: center;

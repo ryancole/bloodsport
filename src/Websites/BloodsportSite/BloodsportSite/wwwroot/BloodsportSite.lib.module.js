@@ -10,7 +10,31 @@ async function initBrackets() {
     });
 }
 
-export function afterWebStarted(blazor) {
+function initEasyMDE() {
+    const el = document.getElementById('markdown-editor');
+    if (!el || !window.EasyMDE) return;
+
+    new EasyMDE({
+        element: el,
+        placeholder: 'Write your post content here...',
+        spellChecker: false,
+        autofocus: false,
+        toolbar: [
+            'bold', 'italic', 'heading', '|',
+            'quote', 'unordered-list', 'ordered-list', '|',
+            'link', 'image', '|',
+            'preview', 'side-by-side', 'fullscreen', '|',
+            'guide'
+        ]
+    });
+}
+
+function initAll() {
     initBrackets();
-    blazor.addEventListener('enhancedload', initBrackets);
+    initEasyMDE();
+}
+
+export function afterWebStarted(blazor) {
+    initAll();
+    blazor.addEventListener('enhancedload', initAll);
 }
