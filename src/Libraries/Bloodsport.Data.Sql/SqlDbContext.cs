@@ -44,6 +44,7 @@ namespace Bloodsport.Data.Sql
             new RiotLobbyEventEntityConfiguration().Configure(modelBuilder.Entity<RiotLobbyEvent>());
 
             new PostEntityConfiguration().Configure(modelBuilder.Entity<Post>());
+            new PostCommentEntityConfiguration().Configure(modelBuilder.Entity<PostComment>());
         }
 
         #endregion
@@ -89,6 +90,8 @@ namespace Bloodsport.Data.Sql
         public DbSet<RiotLobbyEvent> RiotLobbyEvents { get; set; }
 
         public DbSet<Post> Posts { get; set; }
+
+        public DbSet<PostComment> PostComments { get; set; }
 
         #endregion
     }

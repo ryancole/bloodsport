@@ -31,6 +31,9 @@ namespace Bloodsport.Entity.Database
         [JsonIgnore]
         public virtual ICollection<Post> Posts { get; private set; } = [];
 
+        [JsonIgnore]
+        public virtual ICollection<PostComment> PostComments { get; private set; } = [];
+
         #endregion
     }
 }

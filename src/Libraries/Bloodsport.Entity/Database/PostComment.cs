@@ -2,17 +2,17 @@
 
 namespace Bloodsport.Entity.Database
 {
-    public class Post
+    public class PostComment
     {
         #region Properties
 
         public long Id { get; protected set; }
 
+        public required long PostId { get; set; }
+
         public required long UserId { get; set; }
 
-        public required string Title { get; set; }
-
-        public required string Markdown { get; set; }
+        public required string Body { get; set; }
 
         public DateTime DateCreated { get; protected set; }
 
@@ -21,10 +21,10 @@ namespace Bloodsport.Entity.Database
         #region Nav Props
 
         [JsonIgnore]
-        public virtual User User { get; set; }
+        public virtual Post Post { get; set; }
 
         [JsonIgnore]
-        public virtual ICollection<PostComment> PostComments { get; set; } = [];
+        public virtual User User { get; set; }
 
         #endregion
     }
