@@ -1,0 +1,56 @@
+@page "/news/{id:long}"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Markdig
+@using Microsoft.AspNetCore.Components
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
+
+<PageTitle>@(post?.Title ?? "Post") | BSAL</PageTitle>
+
+@if (notFound)
+{
+    <p class="text-muted">Post not found.</p>
+}
+else if (post is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <SectionContent SectionName="breadcrumbs">
+        <nav class="small"><a href="/news">News</a> / @post.Title</nav>
+    </SectionContent>
+
+    <div class="mb-1">
+        <h1 class="mb-1">@post.Title</h1>
+        <p class="text-muted small">@post.DateCreated.ToString("MMMM d, yyyy")</p>
+    </div>
+
+    <div class="post-content">
+        @renderedHtml
+    </div>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private Post? post;
+    private MarkupString renderedHtml;
+    private bool notFound;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        post = await db.Posts.FirstOrDefaultAsync(p => p.Id == Id);
+
+        if (post is null)
+        {
+            notFound = true;
+            return;
+        }
+
+        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+        renderedHtml = new MarkupString(Markdown.ToHtml(post.Markdown, pipeline));
+    }
+}

@@ -31,7 +31,7 @@ else
         {
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title mb-1">@post.Title</h5>
+                    <h5 class="card-title mb-1"><a href="/news/@post.Id">@post.Title</a></h5>
                     <p class="text-muted small mb-2">@post.DateCreated.ToString("MMMM d, yyyy")</p>
                     <p class="card-text">@post.Markdown</p>
                 </div>
