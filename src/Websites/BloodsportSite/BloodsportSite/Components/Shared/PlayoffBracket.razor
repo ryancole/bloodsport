@@ -46,13 +46,6 @@ else
         </div>
         <canvas id="@canvasId" data-bracket="@dataJson"></canvas>
     </div>
-
-    <script type="module">
-        import { init, zoomIn, zoomOut, resetView } from '/js/bracketCanvas.js';
-        window._bc = { zoomIn, zoomOut, fit: resetView };
-        const canvas = document.getElementById('@canvasId');
-        if (canvas) init('@canvasId', JSON.parse(canvas.dataset.bracket));
-    </script>
 }
 
 @code {
