@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@(playoff?.Name ?? "Playoff") | BSAL</PageTitle>
 
@@ -101,7 +102,7 @@ else
     }
     else
     {
-        <PlayoffBracket Rounds="playoff.PlayoffRounds.ToList()" PlayoffId="playoff.Id" />
+        <PlayoffBracket Rounds="playoff.PlayoffRounds.ToList()" PlayoffId="playoff.Id" MyTeamIds="myTeamIds" />
     }
 }
 
@@ -114,6 +115,7 @@ else
 
     private Playoff? playoff;
     private bool notFound;
+    private HashSet<long> myTeamIds = [];
 
     private PlayoffTeam? grandFinalWinner => playoff?.PlayoffRounds
         .OrderBy(r => r.PlayoffMatchups.Count)
@@ -146,7 +148,30 @@ else
             .FirstOrDefaultAsync(p => p.Id == Id);
 
         if (playoff is null)
+        {
             notFound = true;
+            return;
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is not null)
+        {
+            var user = await db.Users
+                .Include(u => u.ManagedTeams)
+                .Include(u => u.RiotAccounts)
+                    .ThenInclude(a => a.TeamMemberships)
+                .FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+
+            if (user is not null)
+            {
+                myTeamIds = user.ManagedTeams.Select(t => t.Id)
+                    .Concat(user.RiotAccounts.SelectMany(a => a.TeamMemberships).Select(m => m.TeamId))
+                    .ToHashSet();
+            }
+        }
     }
 
     private static string StatusBadgeClass(PlayoffStatus status) => status switch

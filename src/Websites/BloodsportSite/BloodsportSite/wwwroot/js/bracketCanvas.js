@@ -17,6 +17,7 @@ const C_SEED    = '#6c757d';
 const C_TEXT    = '#212529';
 const C_TBD     = '#adb5bd';
 const C_HEADER  = '#6c757d';
+const C_MY_TEAM = '#0d6efd';
 
 const instances = new Map();
 
@@ -269,6 +270,11 @@ function drawTeamRow(ctx, team, x, y, winner, images) {
     if (winner) {
         ctx.fillStyle = C_WIN_BG;
         ctx.fillRect(x + 1, y + 1, CARD_W - 2, ROW_H - 1);
+    }
+
+    if (team?.myTeam) {
+        ctx.fillStyle = C_MY_TEAM;
+        ctx.fillRect(x + 1, y + 1, 3, ROW_H - 1);
     }
 
     const cy = y + ROW_H / 2;

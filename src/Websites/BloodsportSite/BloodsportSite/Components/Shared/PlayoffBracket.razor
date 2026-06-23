@@ -20,8 +20,8 @@
                 matchups = r.PlayoffMatchups.OrderBy(m => m.MatchNumber).Select(m => new
                 {
                     id            = m.Id,
-                    teamOne       = m.TeamOne != null ? (object)new { seed = m.TeamOne.Seed, name = m.TeamOne.Team?.Name ?? "Unknown", logoUrl = m.TeamOne.Team?.LogoUrl?.Replace("/original.", "/flag.") } : null,
-                    teamTwo       = m.TeamTwo != null ? (object)new { seed = m.TeamTwo.Seed, name = m.TeamTwo.Team?.Name ?? "Unknown", logoUrl = m.TeamTwo.Team?.LogoUrl?.Replace("/original.", "/flag.") } : null,
+                    teamOne       = m.TeamOne != null ? (object)new { seed = m.TeamOne.Seed, name = m.TeamOne.Team?.Name ?? "Unknown", logoUrl = m.TeamOne.Team?.LogoUrl?.Replace("/original.", "/flag."), myTeam = MyTeamIds.Contains(m.TeamOne.TeamId) } : null,
+                    teamTwo       = m.TeamTwo != null ? (object)new { seed = m.TeamTwo.Seed, name = m.TeamTwo.Team?.Name ?? "Unknown", logoUrl = m.TeamTwo.Team?.LogoUrl?.Replace("/original.", "/flag."), myTeam = MyTeamIds.Contains(m.TeamTwo.TeamId) } : null,
                     teamOneWinner = m.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == m.TeamOneId),
                     teamTwoWinner = m.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == m.TeamTwoId)
                 }).ToList()
@@ -58,4 +58,5 @@ else
 @code {
     [Parameter] public List<PlayoffRound> Rounds { get; set; } = [];
     [Parameter] public long PlayoffId { get; set; }
+    [Parameter] public HashSet<long> MyTeamIds { get; set; } = [];
 }
