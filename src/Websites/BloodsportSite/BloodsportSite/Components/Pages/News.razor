@@ -7,7 +7,7 @@
 
 <PageTitle>News | BSAL</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="mb-0">News</h1>
     <AuthorizeView Roles="Bloodsport.Admin">
         <Authorized>
@@ -26,16 +26,19 @@ else if (posts.Count == 0)
 }
 else
 {
-    <div class="d-flex flex-column gap-3">
+    <div class="news-list">
         @foreach (var post in posts)
         {
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title mb-1"><a href="/news/@post.Id">@post.Title</a></h5>
-                    <p class="text-muted small mb-2">@post.DateCreated.ToString("MMMM d, yyyy")</p>
-                    <p class="card-text">@post.Markdown</p>
+            <article class="news-item">
+                <a href="/news/@post.Id" class="news-item-title">@post.Title</a>
+                <div class="news-item-meta">
+                    <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
+                    <span class="news-item-meta-sep">·</span>
+                    <a href="/users/@post.User.Id">@post.User.DisplayName</a>
                 </div>
-            </div>
+                <p class="news-item-excerpt">@Excerpt(post.Markdown)</p>
+                <a href="/news/@post.Id" class="news-item-read-more">Read more →</a>
+            </article>
         }
     </div>
 }
@@ -47,7 +50,16 @@ else
     {
         await using var db = await DbFactory.CreateDbContextAsync();
         posts = await db.Posts
+            .Include(p => p.User)
             .OrderByDescending(p => p.DateCreated)
             .ToListAsync();
+    }
+
+    private static string Excerpt(string markdown, int maxLength = 200)
+    {
+        // Strip common Markdown syntax for a clean plain-text preview
+        var text = System.Text.RegularExpressions.Regex.Replace(markdown, @"[#*_~`>\[\]!]|(\[.*?\]\(.*?\))", " ");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ").Trim();
+        return text.Length <= maxLength ? text : text[..maxLength].TrimEnd() + "…";
     }
 }

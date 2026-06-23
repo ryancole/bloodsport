@@ -11,6 +11,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/posts/create", CreateAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/posts/{id}/edit", EditAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -53,6 +56,39 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/news");
+        }
+
+        private static async Task<IResult> EditAsync(
+            long id,
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            [Microsoft.AspNetCore.Mvc.FromForm] string title,
+            [Microsoft.AspNetCore.Mvc.FromForm] string markdown)
+        {
+            if (!context.User.IsInRole("Bloodsport.Admin"))
+                return Results.Forbid();
+
+            title = title.Trim();
+            markdown = markdown.Trim();
+
+            if (string.IsNullOrEmpty(title))
+                return Results.Redirect($"/news/{id}/edit?error=invalid_title");
+
+            if (string.IsNullOrEmpty(markdown))
+                return Results.Redirect($"/news/{id}/edit?error=invalid_content");
+
+            await using var db = dbFactory.CreateDbContext();
+            var post = await db.Posts.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (post is null)
+                return Results.NotFound();
+
+            post.Title = title;
+            post.Markdown = markdown;
+
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/news/{id}");
         }
     }
 }
