@@ -8,6 +8,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@(post?.Title ?? "Post") | BSAL</PageTitle>
 
@@ -82,6 +83,13 @@ else
                             <a href="/users/@comment.User.Id">@comment.User.DisplayName</a>
                             <span class="news-item-meta-sep">·</span>
                             <time>@comment.DateCreated.ToString("MMMM d, yyyy")</time>
+                            @if (currentUserId == comment.UserId || isAdmin)
+                            {
+                                <form method="post" action="/api/posts/@post.Id/comments/@comment.Id/delete" class="ms-auto">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="post-comment-delete">Delete</button>
+                                </form>
+                            }
                         </div>
                         <p class="post-comment-body">@comment.Body</p>
                     </div>
@@ -99,6 +107,8 @@ else
     private MarkupString renderedHtml;
     private bool notFound;
     private string? commentError;
+    private long? currentUserId;
+    private bool isAdmin;
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,7 +124,18 @@ else
             };
         }
 
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+        isAdmin = authState.User.IsInRole("Bloodsport.Admin");
+
         await using var db = await DbFactory.CreateDbContextAsync();
+
+        if (oid is not null)
+        {
+            var currentUser = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+            currentUserId = currentUser?.Id;
+        }
 
         post = await db.Posts
             .Include(p => p.User)

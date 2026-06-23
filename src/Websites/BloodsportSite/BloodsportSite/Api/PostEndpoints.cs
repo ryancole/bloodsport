@@ -17,6 +17,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/posts/{id}/comments", AddCommentAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/posts/{id}/comments/{commentId}/delete", DeleteCommentAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -132,6 +135,36 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect($"/news/{id}");
+        }
+
+        private static async Task<IResult> DeleteCommentAsync(
+            long id,
+            long commentId,
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory)
+        {
+            var oid = context.User.FindFirst("oid")?.Value
+                   ?? context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+            await using var db = dbFactory.CreateDbContext();
+
+            var comment = await db.PostComments
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.Id == commentId && c.PostId == id);
+
+            if (comment is null)
+                return Results.NotFound();
+
+            var isAdmin = context.User.IsInRole("Bloodsport.Admin");
+            var isOwner = comment.User.EntraObjectId == oid;
+
+            if (!isAdmin && !isOwner)
+                return Results.Forbid();
+
+            db.PostComments.Remove(comment);
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/news/{id}#comments");
         }
     }
 }
