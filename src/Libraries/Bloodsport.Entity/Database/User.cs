@@ -28,6 +28,9 @@ namespace Bloodsport.Entity.Database
         [JsonIgnore]
         public virtual ICollection<RiotAccount> RiotAccounts { get; private set; } = [];
 
+        [JsonIgnore]
+        public virtual ICollection<Post> Posts { get; private set; } = [];
+
         #endregion
     }
 }

@@ -1,0 +1,53 @@
+@page "/news"
+@using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
+
+<PageTitle>News | BSAL</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">News</h1>
+    <AuthorizeView Roles="Bloodsport.Admin">
+        <Authorized>
+            <a href="/news/create" class="btn btn-sm btn-primary">Create Post</a>
+        </Authorized>
+    </AuthorizeView>
+</div>
+
+@if (posts is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (posts.Count == 0)
+{
+    <p class="text-muted">No posts yet.</p>
+}
+else
+{
+    <div class="d-flex flex-column gap-3">
+        @foreach (var post in posts)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-1">@post.Title</h5>
+                    <p class="text-muted small mb-2">@post.DateCreated.ToString("MMMM d, yyyy")</p>
+                    <p class="card-text">@post.Markdown</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Post>? posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        posts = await db.Posts
+            .OrderByDescending(p => p.DateCreated)
+            .ToListAsync();
+    }
+}

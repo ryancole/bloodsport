@@ -123,6 +123,7 @@ namespace BloodsportSite
             app.MapGroup("/api").MapSeasons();
             app.MapGroup("/api").MapMatchups();
             app.MapGroup("/api").MapPlayoffs();
+            app.MapGroup("/api").MapPosts();
 
             app.Run();
         }
