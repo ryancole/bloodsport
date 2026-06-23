@@ -14,6 +14,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/posts/{id}/edit", EditAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/posts/{id}/comments", AddCommentAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -85,6 +88,46 @@ namespace BloodsportSite.Api
 
             post.Title = title;
             post.Markdown = markdown;
+
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/news/{id}");
+        }
+
+        private static async Task<IResult> AddCommentAsync(
+            long id,
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            [Microsoft.AspNetCore.Mvc.FromForm] string body)
+        {
+            body = body.Trim();
+
+            if (string.IsNullOrEmpty(body))
+                return Results.Redirect($"/news/{id}?comment_error=empty");
+
+            var oid = context.User.FindFirst("oid")?.Value
+                   ?? context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+            await using var db = dbFactory.CreateDbContext();
+
+            var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
+
+            if (user is null)
+                return Results.Forbid();
+
+            var post = await db.Posts.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (post is null)
+                return Results.NotFound();
+
+            db.PostComments.Add(new PostComment
+            {
+                PostId = id,
+                UserId = user.Id,
+                Body = body,
+                Post = post,
+                User = user,
+            });
 
             await db.SaveChangesAsync();
 

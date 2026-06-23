@@ -35,6 +35,8 @@ else
                     <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
                     <span class="news-item-meta-sep">·</span>
                     <a href="/users/@post.User.Id">@post.User.DisplayName</a>
+                    <span class="news-item-meta-sep">·</span>
+                    <a href="/news/@post.Id#comments">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
                 </div>
                 <p class="news-item-excerpt">@Excerpt(post.Markdown)</p>
                 <a href="/news/@post.Id" class="news-item-read-more">Read more →</a>
@@ -51,6 +53,7 @@ else
         await using var db = await DbFactory.CreateDbContextAsync();
         posts = await db.Posts
             .Include(p => p.User)
+            .Include(p => p.PostComments)
             .OrderByDescending(p => p.DateCreated)
             .ToListAsync();
     }

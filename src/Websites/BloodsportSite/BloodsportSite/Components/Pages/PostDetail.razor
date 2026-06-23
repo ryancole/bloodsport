@@ -4,8 +4,10 @@
 @using Markdig
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>@(post?.Title ?? "Post") | BSAL</PageTitle>
 
@@ -39,22 +41,84 @@ else
         </AuthorizeView>
     </div>
 
-    <div class="post-content">
+    <div class="post-content mb-5">
         @renderedHtml
     </div>
+
+    <section class="post-comments" id="comments">
+        <h2 class="h5 mb-3">@(comments.Count == 1 ? "1 Comment" : $"{comments.Count} Comments")</h2>
+
+        @if (commentError is not null)
+        {
+            <div class="alert alert-danger py-2 px-3 small mb-3">@commentError</div>
+        }
+
+        <AuthorizeView>
+            <Authorized>
+                <form method="post" action="/api/posts/@post.Id/comments" class="mb-4">
+                    <AntiforgeryToken />
+                    <div class="mb-2">
+                        <textarea name="body" class="form-control" rows="3" placeholder="Write a comment..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">Post Comment</button>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <p class="text-muted small mb-4"><a href="/auth/login">Log in</a> to leave a comment.</p>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        @if (comments.Count == 0)
+        {
+            <p class="text-muted small">No comments yet. Be the first!</p>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var comment in comments)
+                {
+                    <div class="post-comment">
+                        <div class="post-comment-meta">
+                            <a href="/users/@comment.User.Id">@comment.User.DisplayName</a>
+                            <span class="news-item-meta-sep">·</span>
+                            <time>@comment.DateCreated.ToString("MMMM d, yyyy")</time>
+                        </div>
+                        <p class="post-comment-body">@comment.Body</p>
+                    </div>
+                }
+            </div>
+        }
+    </section>
 }
 
 @code {
     [Parameter] public long Id { get; set; }
 
     private Post? post;
+    private List<PostComment> comments = [];
     private MarkupString renderedHtml;
     private bool notFound;
+    private string? commentError;
 
     protected override async Task OnInitializedAsync()
     {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("comment_error", out var errorCode))
+        {
+            commentError = (string?)errorCode switch
+            {
+                "empty" => "Comment cannot be empty.",
+                _       => "An unknown error occurred. Please try again.",
+            };
+        }
+
         await using var db = await DbFactory.CreateDbContextAsync();
-        post = await db.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == Id);
+
+        post = await db.Posts
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == Id);
 
         if (post is null)
         {
@@ -64,5 +128,11 @@ else
 
         var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
         renderedHtml = new MarkupString(Markdown.ToHtml(post.Markdown, pipeline));
+
+        comments = await db.PostComments
+            .Include(c => c.User)
+            .Where(c => c.PostId == Id)
+            .OrderBy(c => c.DateCreated)
+            .ToListAsync();
     }
 }

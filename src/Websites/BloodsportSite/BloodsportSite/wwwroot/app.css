@@ -190,6 +190,48 @@ h3 {
     color: #a93226;
 }
 
+/* Post comments */
+.post-comments {
+    max-width: 680px;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    padding-top: 2rem;
+}
+
+.post-comment {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.post-comment:last-child {
+    border-bottom: none;
+}
+
+.post-comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color, #6c757d);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.35rem;
+}
+
+.post-comment-meta a {
+    color: var(--bs-secondary-color, #6c757d);
+    text-decoration: none;
+}
+
+.post-comment-meta a:hover {
+    color: var(--bs-body-color, #212529);
+    text-decoration: underline;
+}
+
+.post-comment-body {
+    margin: 0;
+    line-height: 1.6;
+}
+
 .site-footer {
     display: flex;
     align-items: center;
