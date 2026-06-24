@@ -43,7 +43,7 @@ namespace BloodsportSite.Api
             [Microsoft.AspNetCore.Mvc.FromForm] int length = 6,
             [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             name = name.Trim();
@@ -80,7 +80,7 @@ namespace BloodsportSite.Api
             [Microsoft.AspNetCore.Mvc.FromForm] bool? registrationOpen = null,
             [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             await using var db = dbFactory.CreateDbContext();
@@ -187,7 +187,7 @@ namespace BloodsportSite.Api
             ServiceBusClient serviceBusClient,
             long id)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             await using var sender = serviceBusClient.CreateSender("build-regular-season");
@@ -205,7 +205,7 @@ namespace BloodsportSite.Api
             ServiceBusClient serviceBusClient,
             long id)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             await using var sender = serviceBusClient.CreateSender("start-regular-season");
@@ -223,7 +223,7 @@ namespace BloodsportSite.Api
             IDbContextFactory<SqlDbContext> dbFactory,
             long id)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             await using var db = dbFactory.CreateDbContext();

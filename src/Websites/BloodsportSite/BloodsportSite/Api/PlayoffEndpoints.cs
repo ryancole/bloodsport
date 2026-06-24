@@ -34,7 +34,7 @@ namespace BloodsportSite.Api
             ServiceBusClient serviceBusClient,
             long id)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             await using var db = dbFactory.CreateDbContext();
@@ -182,7 +182,7 @@ namespace BloodsportSite.Api
             ServiceBusClient serviceBusClient,
             long id)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             await using var db = dbFactory.CreateDbContext();

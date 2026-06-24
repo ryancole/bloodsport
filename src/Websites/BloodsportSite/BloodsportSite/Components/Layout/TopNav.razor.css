@@ -19,12 +19,13 @@
 }
 
 .top-nav-brand:hover .top-nav-logo {
-    filter: sepia(1) saturate(3) hue-rotate(350deg) brightness(0.95);
+    filter: sepia(1) saturate(3) hue-rotate(350deg) brightness(0.95) drop-shadow(0 0 8px rgba(220, 160, 40, 0.7));
 }
 
 .top-nav-logo {
     height: 2rem;
     width: auto;
+    transition: filter 0.3s ease;
 }
 
 .top-nav-links {

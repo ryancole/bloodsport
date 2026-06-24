@@ -11,13 +11,11 @@ namespace BloodsportSite.Services
         {
             if (blobUrl is null) return null;
 
-            var uri = new Uri(blobUrl);
-            var segments = uri.AbsolutePath.TrimStart('/').Split('/', 2);
-            if (segments.Length < 2) return null;
+            var parsed = new BlobUriBuilder(new Uri(blobUrl));
 
             var blobClient = blobServiceClient
-                .GetBlobContainerClient(segments[0])
-                .GetBlobClient(segments[1]);
+                .GetBlobContainerClient(parsed.BlobContainerName)
+                .GetBlobClient(parsed.BlobName);
 
             return blobClient.GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.Add(Expiry)).ToString();
         }

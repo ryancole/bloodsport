@@ -35,7 +35,7 @@ else
                 <a href="/users/@post.User.Id">@post.User.DisplayName</a>
             </div>
         </div>
-        <AuthorizeView Roles="Bloodsport.Admin">
+        <AuthorizeView Roles="Champions.Admin">
             <Authorized>
                 <a href="/news/@post.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
             </Authorized>
@@ -127,7 +127,7 @@ else
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var oid = authState.User.FindFirst("oid")?.Value
                ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
-        isAdmin = authState.User.IsInRole("Bloodsport.Admin");
+        isAdmin = authState.User.IsInRole("Champions.Admin");
 
         await using var db = await DbFactory.CreateDbContextAsync();
 
