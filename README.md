@@ -184,10 +184,13 @@ Add these to the repo under **Settings → Secrets and variables → Actions**:
 ### Azure App Registration setup
 
 1. Create (or reuse) an **App Registration** in Entra ID.
-2. Add a **Federated credential** for each branch you'll deploy from:
-   - Go to the App Registration → **Certificates & secrets → Federated credentials → Add credential**
-   - Choose **GitHub Actions**
-   - Set **Organization** to `ryancole`, **Repository** to `bloodsport`, **Entity type** to `Branch`, and **Branch** to `master`
+2. Add a **Federated credential** for each branch you'll deploy from.
+
+   ```powershell
+   az ad app federated-credential create `
+     --id <AZURE_CLIENT_ID> `
+     --parameters '{\"name\": \"github-master-branch\", \"issuer\": \"https://token.actions.githubusercontent.com\", \"subject\": \"repo:ryancole/bloodsport:ref:refs/heads/master\", \"audiences\": [\"api://AzureADTokenExchange\"]}'
+   ```
 3. Grant the App Registration **Website Contributor** role on both the Function App and the App Service:
    - Go to each resource → **Access control (IAM) → Add role assignment**
    - Role: `Website Contributor`, assign to the App Registration (search by name)
