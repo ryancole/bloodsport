@@ -26,7 +26,7 @@ else
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">@season.Name</h1>
         <div class="d-flex align-items-center gap-2">
-            <AuthorizeView Roles="Bloodsport.Admin">
+            <AuthorizeView Roles="Champions.Admin">
                 <Authorized>
                     <a href="/seasons/@season.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
                     @if (season.SeasonWeeks.Count == 0 && !season.RegistrationOpen && season.Status == SeasonStatus.PreSeason)

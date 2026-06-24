@@ -66,9 +66,9 @@ dotnet run --project src/Websites/BloodsportSite/BloodsportSite
 
 ## Admin roles
 
-Admin access is controlled via an **Entra ID App Role** (`Bloodsport.Admin`) defined on the BloodsportSite app registration. The portal UI does not support assigning roles to users on external tenants — use the Azure CLI instead.
+Admin access is controlled via an **Entra ID App Role** (`Champions.Admin`) defined on the BloodsportSite app registration. The portal UI does not support assigning roles to users on external tenants — use the Azure CLI instead.
 
-### Assigning the Bloodsport.Admin role to a user
+### Assigning the Champions.Admin role to a user
 
 ```powershell
 # Log into the external tenant first (no subscriptions is expected)

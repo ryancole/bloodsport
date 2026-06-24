@@ -8,6 +8,7 @@
 @inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject BloodsportSite.Services.BlobSasService BlobSasService
 
 <PageTitle>Profile | BSAL</PageTitle>
 
@@ -15,7 +16,7 @@
     <div class="d-flex align-items-center gap-3">
         @if (user?.LogoUrl is not null)
         {
-            <img src="@user.LogoUrl" alt="Profile logo" style="width: 72px; height: 72px; object-fit: contain;" />
+            <img src="@BlobSasService.GetSasUrl(user.LogoUrl)" alt="Profile logo" style="width: 72px; height: 72px; object-fit: contain;" />
         }
         <h1 class="mb-0">My Profile</h1>
     </div>

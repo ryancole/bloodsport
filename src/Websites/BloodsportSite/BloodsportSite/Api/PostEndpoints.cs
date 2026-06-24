@@ -29,7 +29,7 @@ namespace BloodsportSite.Api
             [Microsoft.AspNetCore.Mvc.FromForm] string title,
             [Microsoft.AspNetCore.Mvc.FromForm] string markdown)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             title = title.Trim();
@@ -71,7 +71,7 @@ namespace BloodsportSite.Api
             [Microsoft.AspNetCore.Mvc.FromForm] string title,
             [Microsoft.AspNetCore.Mvc.FromForm] string markdown)
         {
-            if (!context.User.IsInRole("Bloodsport.Admin"))
+            if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             title = title.Trim();
@@ -155,7 +155,7 @@ namespace BloodsportSite.Api
             if (comment is null)
                 return Results.NotFound();
 
-            var isAdmin = context.User.IsInRole("Bloodsport.Admin");
+            var isAdmin = context.User.IsInRole("Champions.Admin");
             var isOwner = comment.User.EntraObjectId == oid;
 
             if (!isAdmin && !isOwner)
