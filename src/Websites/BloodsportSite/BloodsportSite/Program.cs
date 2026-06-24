@@ -83,7 +83,8 @@ namespace BloodsportSite
             builder
                 .Services
                 .AddTransient<TeamLogoService>()
-                .AddTransient<UserLogoService>();
+                .AddTransient<UserLogoService>()
+                .AddSingleton<BlobSasService>();
 
             builder
                 .Services
