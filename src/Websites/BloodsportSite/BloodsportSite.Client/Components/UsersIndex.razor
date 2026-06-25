@@ -31,37 +31,7 @@ else
                 </span>
             }
         </div>
-        @if (totalPages > 1)
-        {
-            var windowStart = Math.Max(1, Math.Min(page - 2, totalPages - 4));
-            var windowEnd = Math.Min(totalPages, windowStart + 4);
-
-            <nav>
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item @(page == 1 ? "disabled" : "")">
-                        <button class="page-link" @onclick="() => GoToPage(page - 1)">Previous</button>
-                    </li>
-                    @if (windowStart > 1)
-                    {
-                        <li class="page-item disabled"><span class="page-link">…</span></li>
-                    }
-                    @for (var p = windowStart; p <= windowEnd; p++)
-                    {
-                        var pageNum = p;
-                        <li class="page-item @(page == pageNum ? "active" : "")">
-                            <button class="page-link" @onclick="() => GoToPage(pageNum)">@pageNum</button>
-                        </li>
-                    }
-                    @if (windowEnd < totalPages)
-                    {
-                        <li class="page-item disabled"><span class="page-link">…</span></li>
-                    }
-                    <li class="page-item @(page == totalPages ? "disabled" : "")">
-                        <button class="page-link" @onclick="() => GoToPage(page + 1)">Next</button>
-                    </li>
-                </ul>
-            </nav>
-        }
+        <Pager CurrentPage="page" TotalPages="totalPages" OnPageChanged="GoToPage" />
     </div>
 
     @if (!filtered.Any())
@@ -84,14 +54,7 @@ else
                     <tr>
                         <td>
                             <a href="/users/@user.Id" class="d-flex align-items-center gap-2">
-                                @if (user.FlagUrl is not null)
-                                {
-                                    <img src="@user.FlagUrl" width="28" height="18" style="object-fit:cover;flex-shrink:0;border-radius:2px;border:2px solid #f0b429;box-shadow:1px 1px 2px rgba(0,0,0,0.2);" alt="" />
-                                }
-                                else
-                                {
-                                    <span style="display:inline-block;width:28px;height:18px;flex-shrink:0;background:#dee2e6;border-radius:2px;"></span>
-                                }
+                                <UserFlag FlagUrl="@user.FlagUrl" />
                                 @user.DisplayName
                             </a>
                         </td>
@@ -106,14 +69,7 @@ else
                                 {
                                     var team = user.Teams[i];
                                     <a href="/teams/@team.Id" class="d-inline-flex align-items-center gap-1">
-                                        @if (team.FlagUrl is not null)
-                                        {
-                                            <img src="@team.FlagUrl" width="28" height="18" style="object-fit:cover;flex-shrink:0;border-radius:2px;border:2px solid #f0b429;box-shadow:1px 1px 2px rgba(0,0,0,0.2);" alt="" />
-                                        }
-                                        else
-                                        {
-                                            <span style="display:inline-block;width:28px;height:18px;flex-shrink:0;background:#dee2e6;border-radius:2px;"></span>
-                                        }
+                                        <TeamFlag FlagUrl="@team.FlagUrl" />
                                         @team.Name
                                     </a>@(i < user.Teams.Count - 1 ? ", " : "")
                                 }

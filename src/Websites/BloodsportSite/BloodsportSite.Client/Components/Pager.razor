@@ -1,0 +1,41 @@
+@{
+    var windowStart = Math.Max(1, Math.Min(CurrentPage - Window / 2, TotalPages - Window + 1));
+    var windowEnd = Math.Min(TotalPages, windowStart + Window - 1);
+}
+
+@if (TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="() => OnPageChanged.InvokeAsync(CurrentPage - 1)">Previous</button>
+            </li>
+            @if (windowStart > 1)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+            @for (var p = windowStart; p <= windowEnd; p++)
+            {
+                var pageNum = p;
+                <li class="page-item @(CurrentPage == pageNum ? "active" : "")">
+                    <button class="page-link" @onclick="() => OnPageChanged.InvokeAsync(pageNum)">@pageNum</button>
+                </li>
+            }
+            @if (windowEnd < TotalPages)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="() => OnPageChanged.InvokeAsync(CurrentPage + 1)">Next</button>
+            </li>
+        </ul>
+    </nav>
+}
+
+@code {
+    private const int Window = 5;
+
+    [Parameter, EditorRequired] public int CurrentPage { get; set; }
+    [Parameter, EditorRequired] public int TotalPages { get; set; }
+    [Parameter, EditorRequired] public EventCallback<int> OnPageChanged { get; set; }
+}

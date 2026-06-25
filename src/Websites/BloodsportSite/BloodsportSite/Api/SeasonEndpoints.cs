@@ -11,6 +11,8 @@ namespace BloodsportSite.Api
     {
         public static IEndpointRouteBuilder MapSeasons(this IEndpointRouteBuilder endpoints)
         {
+            endpoints.MapGet("/seasons", ListAsync);
+
             endpoints.MapPost("/seasons/create", CreateAsync)
                 .RequireAuthorization();
 
@@ -33,6 +35,27 @@ namespace BloodsportSite.Api
                 .RequireAuthorization();
 
             return endpoints;
+        }
+
+        private static async Task<IResult> ListAsync(IDbContextFactory<SqlDbContext> dbFactory)
+        {
+            await using var db = await dbFactory.CreateDbContextAsync();
+            var seasons = await db.Seasons
+                .OrderByDescending(s => s.DateCreated)
+                .ToListAsync();
+
+            var result = seasons.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.Status,
+                s.RegistrationOpen,
+                s.EstimatedDateEnd,
+                s.Length,
+                s.DateCreated,
+            });
+
+            return Results.Ok(result);
         }
 
         // Admin: create a season
