@@ -1,0 +1,13 @@
+<span class="badge @BadgeClass">@Status</span>
+
+@code {
+    [Parameter, EditorRequired] public PlayoffStatus Status { get; set; }
+
+    private string BadgeClass => Status switch
+    {
+        PlayoffStatus.Active => "bg-primary",
+        PlayoffStatus.Upcoming => "bg-secondary",
+        PlayoffStatus.Completed => "bg-dark",
+        _ => "bg-secondary"
+    };
+}

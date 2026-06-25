@@ -1,0 +1,5 @@
+<span class="badge @(Status switch { SeasonStatus.PreSeason => "bg-warning text-dark", SeasonStatus.Active => "bg-success", _ => "bg-secondary" })">@Status</span>
+
+@code {
+    [Parameter] public SeasonStatus Status { get; set; }
+}
