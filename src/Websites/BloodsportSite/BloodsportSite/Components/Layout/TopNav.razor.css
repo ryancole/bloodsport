@@ -19,7 +19,7 @@
 }
 
 .top-nav-brand:hover .top-nav-logo {
-    filter: sepia(1) saturate(3) hue-rotate(350deg) brightness(0.95) drop-shadow(0 0 8px rgba(220, 160, 40, 0.7));
+    filter: drop-shadow(0 0 8px rgba(0, 237, 255, 0.8)) brightness(1.1);
 }
 
 .top-nav-logo {
@@ -35,10 +35,14 @@
 }
 
 .top-nav-links ::deep .nav-link {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: rgba(255, 255, 255, 0.75);
     padding: 0.35rem 0.75rem;
     border-radius: 4px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     white-space: nowrap;
     text-decoration: none;
 }
@@ -49,8 +53,8 @@
 }
 
 .top-nav-links ::deep .nav-link.active {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.2);
+    color: #00edff;
+    background-color: rgba(0, 237, 255, 0.12);
 }
 
 .top-nav-separator {
