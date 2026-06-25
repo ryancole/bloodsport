@@ -9,6 +9,7 @@ using BloodsportSite.Components;
 using Bloodsport.Common.Email;
 using BloodsportSite.Services;
 using Camille.RiotGames;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -24,6 +25,19 @@ namespace BloodsportSite
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder
+                .Services
+                .AddApplicationInsightsTelemetry(options =>
+                    options.ConnectionString = builder.Configuration.GetConnectionString("ApplicationInsights"));
+
+            builder
+                .Services
+                .AddHttpContextAccessor();
+
+            builder
+                .Services
+                .AddSingleton<ITelemetryInitializer, AuthenticatedUserTelemetryInitializer>();
+
             builder
                 .Services
                 .AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
