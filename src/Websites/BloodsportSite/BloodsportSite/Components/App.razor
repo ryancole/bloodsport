@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject IConfiguration Configuration
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,6 +16,17 @@
 	<ImportMap />
 	<link rel="icon" type="image/png" href="favicon.png" />
 	<HeadOutlet />
+	<script src="https://js.monitor.azure.com/scripts/b/ai.3.gbl.min.js"></script>
+	<script>
+		var appInsights = new Microsoft.ApplicationInsights.ApplicationInsights({
+			config: {
+				connectionString: "@Configuration.GetConnectionString("ApplicationInsights")",
+				enableAutoRouteTracking: true
+			}
+		});
+		appInsights.loadAppInsights();
+		appInsights.trackPageView();
+	</script>
 </head>
 
 <body>
