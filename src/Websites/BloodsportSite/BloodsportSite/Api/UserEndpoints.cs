@@ -21,7 +21,8 @@ namespace BloodsportSite.Api
         }
 
         private static async Task<IResult> ListAsync(
-            IDbContextFactory<SqlDbContext> dbFactory)
+            IDbContextFactory<SqlDbContext> dbFactory,
+            BlobSasService blobSasService)
         {
             await using var db = await dbFactory.CreateDbContextAsync();
             var users = await db.Users
@@ -36,7 +37,7 @@ namespace BloodsportSite.Api
                 u.Id,
                 u.DisplayName,
                 u.DateCreated,
-                FlagUrl = u.LogoUrl?.Replace("/original.", "/flag."),
+                FlagUrl = blobSasService.GetSasUrl(u.LogoUrl?.Replace("/original.", "/flag.")),
                 Teams = u.RiotAccounts
                     .SelectMany(a => a.TeamMemberships)
                     .Select(m => m.Team)
@@ -46,7 +47,7 @@ namespace BloodsportSite.Api
                     {
                         t.Id,
                         t.Name,
-                        FlagUrl = t.LogoUrl?.Replace("/original.", "/flag."),
+                        FlagUrl = blobSasService.GetSasUrl(t.LogoUrl?.Replace("/original.", "/flag.")),
                     }),
             });
 
