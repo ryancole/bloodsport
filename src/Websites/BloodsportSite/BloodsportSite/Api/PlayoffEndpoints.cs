@@ -12,6 +12,8 @@ namespace BloodsportSite.Api
     {
         public static IEndpointRouteBuilder MapPlayoffs(this IEndpointRouteBuilder endpoints)
         {
+            endpoints.MapGet("/playoffs", ListAsync);
+
             endpoints.MapPost("/playoffs/{id}/build-bracket", BuildBracketAsync)
                 .RequireAuthorization();
 
@@ -25,6 +27,29 @@ namespace BloodsportSite.Api
                 .RequireAuthorization();
 
             return endpoints;
+        }
+
+        private static async Task<IResult> ListAsync(IDbContextFactory<SqlDbContext> dbFactory)
+        {
+            await using var db = await dbFactory.CreateDbContextAsync();
+            var playoffs = await db.Playoffs
+                .Include(p => p.Season)
+                .Include(p => p.PlayoffTeams)
+                .OrderByDescending(p => p.DateCreated)
+                .ToListAsync();
+
+            var result = playoffs.Select(p => new
+            {
+                p.Id,
+                p.Name,
+                SeasonId = p.Season.Id,
+                SeasonName = p.Season.Name,
+                p.Status,
+                TeamCount = p.PlayoffTeams.Count,
+                p.DateCreated,
+            });
+
+            return Results.Ok(result);
         }
 
         // Admin: queue the StartPlayoff function for a playoff
