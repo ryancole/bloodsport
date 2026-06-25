@@ -1,6 +1,10 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Exo 2', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background-color: #ffffff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Rajdhani', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 a, .btn-link {

@@ -35,10 +35,14 @@
 }
 
 .top-nav-links ::deep .nav-link {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: rgba(255, 255, 255, 0.75);
     padding: 0.35rem 0.75rem;
     border-radius: 4px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     white-space: nowrap;
     text-decoration: none;
 }
