@@ -95,22 +95,22 @@ Each Azure service that connects to SQL uses its **system-assigned managed ident
 
 ```sql
 -- Blazor App Service
-CREATE USER [bloodsport-app] FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER [bloodsport-app];
-ALTER ROLE db_datawriter ADD MEMBER [bloodsport-app];
+CREATE USER [champions-app] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [champions-app];
+ALTER ROLE db_datawriter ADD MEMBER [champions-app];
 
 -- Function App (if it also needs SQL access)
-CREATE USER [bloodsport-functions] FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER [bloodsport-functions];
-ALTER ROLE db_datawriter ADD MEMBER [bloodsport-functions];
+CREATE USER [champions-func] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [champions-func];
+ALTER ROLE db_datawriter ADD MEMBER [champions-func];
 ```
 
 ```sql
 -- GitHub Actions deploy identity (needs DDL access to run migrations)
-CREATE USER [bloodsport-github-deploy] FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER [bloodsport-github-deploy];
-ALTER ROLE db_datawriter ADD MEMBER [bloodsport-github-deploy];
-ALTER ROLE db_ddladmin ADD MEMBER [bloodsport-github-deploy];
+CREATE USER [champions-github-actions] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [champions-github-actions];
+ALTER ROLE db_datawriter ADD MEMBER [champions-github-actions];
+ALTER ROLE db_ddladmin ADD MEMBER [champions-github-actions];
 ```
 
 Replace the bracketed names with the exact names of your App Service, Function App, and Entra app registration resources. These commands must be run against the target **database** (not `master`) while connected as an Entra admin.
