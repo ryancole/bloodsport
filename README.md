@@ -191,6 +191,17 @@ Add these to the repo under **Settings → Secrets and variables → Actions**:
      --id <AZURE_CLIENT_ID> `
      --parameters '{\"name\": \"github-master-branch\", \"issuer\": \"https://token.actions.githubusercontent.com\", \"subject\": \"repo:ryancole/bloodsport:ref:refs/heads/master\", \"audiences\": [\"api://AzureADTokenExchange\"]}'
    ```
-3. Grant the App Registration **Website Contributor** role on both the Function App and the App Service:
+3. Grant the App Registration **Contributor** role on the subscription so the workflow can find and deploy to resources:
+
+   ```powershell
+   az role assignment create `
+     --role "Contributor" `
+     --assignee <AZURE_CLIENT_ID> `
+     --scope "/subscriptions/<AZURE_SUBSCRIPTION_ID>"
+   ```
+
+   Without this step, the OIDC login will succeed but fail immediately with "No subscriptions found".
+
+4. Grant the App Registration **Website Contributor** role on both the Function App and the App Service:
    - Go to each resource → **Access control (IAM) → Add role assignment**
    - Role: `Website Contributor`, assign to the App Registration (search by name)
