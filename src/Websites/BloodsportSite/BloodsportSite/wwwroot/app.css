@@ -8,17 +8,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a, .btn-link {
-    color: #0097b2;
+    color: #1e3a5c;
+}
+
+a:hover {
+    color: #1e3a5c;
+    text-decoration: underline;
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #0097b2;
-    border-color: #007f99;
+    color: #1a1209;
+    background-color: #c8aa5a;
+    border-color: #b8963e;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00d4f0;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #c8aa5a;
 }
 
 .content {
@@ -253,14 +258,21 @@ h3 {
 }
 
 .site-footer {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     padding: 1rem 1.5rem;
     margin-top: 2rem;
     border-top: 1px solid var(--bs-border-color, #dee2e6);
     font-size: 13px;
     color: var(--bs-secondary-color, #6c757d);
+}
+
+.site-footer-social {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: center;
 }
 
 .site-footer-name {
@@ -271,6 +283,7 @@ h3 {
 .site-footer-top {
     color: var(--bs-secondary-color, #6c757d);
     text-decoration: none;
+    text-align: right;
 }
 
 .site-footer-top:hover {
@@ -289,5 +302,17 @@ h3 {
 
 .site-footer-reddit:hover {
     color: #FF4500;
+    text-decoration: none;
+}
+
+.site-footer-email {
+    display: flex;
+    align-items: center;
+    color: var(--bs-secondary-color, #6c757d);
+    text-decoration: none;
+}
+
+.site-footer-email:hover {
+    color: var(--bs-body-color);
     text-decoration: none;
 }
