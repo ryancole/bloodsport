@@ -1,0 +1,56 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Buttons, Badges & Cards" subtitle="Core primitives — variants, sizes, states" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin:0; background:var(--cal-bg); font-family:var(--cal-font-body);
+         padding:28px; display:flex; flex-direction:column; gap:24px; }
+  .row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .lbl { font-family:var(--cal-font-mono); font-size:10px; letter-spacing:0.24em;
+         text-transform:uppercase; color:var(--cal-text-faint); width:100%; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
+         height:42px; padding:0 20px; font-family:var(--cal-font-display); font-weight:700;
+         font-size:14px; letter-spacing:0.02em; text-transform:uppercase; border:1px solid transparent;
+         border-radius:var(--cal-radius-sm); cursor:pointer; }
+  .b-primary { background:var(--cal-cyan); color:var(--cal-text-inverse); }
+  .b-gradient{ background:var(--cal-gradient); color:var(--cal-text-inverse); }
+  .b-secondary{ background:transparent; color:var(--cal-text); border-color:var(--cal-border-strong); }
+  .b-ghost { background:transparent; color:var(--cal-text-muted); }
+  .badge { display:inline-flex; align-items:center; gap:6px; height:22px; padding:0 10px;
+           border-radius:var(--cal-radius-pill); font-family:var(--cal-font-mono); font-weight:600;
+           font-size:11px; letter-spacing:0.14em; text-transform:uppercase; line-height:1; }
+  .dot { width:6px; height:6px; border-radius:50%; }
+  .card { background:var(--cal-surface-2); border:1px solid var(--cal-border);
+          border-radius:var(--cal-radius-lg); box-shadow:var(--cal-shadow-lg), var(--cal-edge-top);
+          padding:18px 20px; position:relative; overflow:hidden; width:200px; }
+  .keyline { position:absolute; top:0; left:0; right:0; height:2px; background:var(--cal-gradient); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="lbl">Buttons</span>
+    <span class="btn b-primary">Join league</span>
+    <span class="btn b-gradient">Watch live →</span>
+    <span class="btn b-secondary">Standings</span>
+    <span class="btn b-ghost">Cancel</span>
+  </div>
+  <div class="row">
+    <span class="lbl">Badges</span>
+    <span class="badge" style="background:var(--cal-magenta-ghost);color:var(--cal-magenta)"><span class="dot" style="background:var(--cal-magenta)"></span>Live</span>
+    <span class="badge" style="background:var(--cal-cyan-ghost);color:var(--cal-cyan)"><span class="dot" style="background:var(--cal-cyan)"></span>W</span>
+    <span class="badge" style="background:var(--cal-magenta-ghost);color:var(--cal-magenta)"><span class="dot" style="background:var(--cal-magenta)"></span>L</span>
+    <span class="badge" style="background:var(--cal-surface-3);color:var(--cal-text-muted)">Group A</span>
+    <span class="badge" style="background:transparent;color:var(--cal-text-muted);border:1px solid var(--cal-border-strong)">Round 16</span>
+  </div>
+  <div class="row">
+    <span class="lbl">Card</span>
+    <div class="card">
+      <span class="keyline"></span>
+      <div style="font-family:var(--cal-font-display);font-weight:800;font-size:18px;color:var(--cal-text)">Quarter-finals</div>
+      <div style="font-family:var(--cal-font-mono);font-size:11px;letter-spacing:0.18em;color:var(--cal-text-faint);text-transform:uppercase;margin-top:6px">Sat · 20:00</div>
+    </div>
+  </div>
+</body>
+</html>

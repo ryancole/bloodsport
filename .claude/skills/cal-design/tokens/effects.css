@@ -1,0 +1,40 @@
+/* ============================================================
+   CAL · EFFECTS — radii, shadows, motion
+   Cards are dark slabs with hairline borders and deep ambient
+   shadows. Corners are moderately soft; the icon tile echoes
+   the favicon's ~22% rounding. Motion is quick and confident.
+   ============================================================ */
+
+:root {
+  /* --- Radii --- */
+  --cal-radius-xs:   6px;
+  --cal-radius-sm:   10px;
+  --cal-radius-md:   14px;
+  --cal-radius-lg:   18px;
+  --cal-radius-xl:   24px;
+  --cal-radius-tile: 22%;  /* the favicon mark tile */
+  --cal-radius-pill: 999px;
+
+  /* --- Shadows (ambient, dark) --- */
+  --cal-shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.35);
+  --cal-shadow-md:  0 8px 24px rgba(0, 0, 0, 0.40);
+  --cal-shadow-lg:  0 16px 40px rgba(0, 0, 0, 0.45);
+  --cal-shadow-xl:  0 24px 60px rgba(0, 0, 0, 0.50);
+
+  /* Inset hairline that gives dark cards a crisp top edge */
+  --cal-edge-top:   inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* --- Motion --- */
+  --cal-ease:        cubic-bezier(0.22, 1, 0.36, 1); /* confident ease-out */
+  --cal-ease-inout:  cubic-bezier(0.65, 0, 0.35, 1);
+  --cal-dur-fast:    120ms;
+  --cal-dur:         200ms;
+  --cal-dur-slow:    360ms;
+
+  /* --- Focus ring --- */
+  --cal-ring: 0 0 0 2px var(--cal-bg), 0 0 0 4px var(--cal-cyan);
+
+  /* --- Semantic aliases --- */
+  --radius-card:   var(--cal-radius-lg);
+  --shadow-card:   var(--cal-shadow-lg);
+}

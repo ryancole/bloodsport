@@ -1,0 +1,25 @@
+/* ============================================================
+   CAL · SPACING & LAYOUT
+   4px base grid. Generous, airy padding on dark surfaces.
+   ============================================================ */
+
+:root {
+  --cal-space-0:  0;
+  --cal-space-1:  4px;
+  --cal-space-2:  8px;
+  --cal-space-3:  12px;
+  --cal-space-4:  16px;
+  --cal-space-5:  20px;
+  --cal-space-6:  24px;
+  --cal-space-8:  32px;
+  --cal-space-10: 40px;
+  --cal-space-12: 48px;
+  --cal-space-16: 64px;
+  --cal-space-20: 80px;
+  --cal-space-24: 96px;
+
+  /* --- Layout --- */
+  --cal-container:  1200px; /* max content width */
+  --cal-gutter:     24px;   /* page side padding */
+  --cal-section-y:  96px;   /* vertical rhythm between sections */
+}

@@ -1,0 +1,52 @@
+/* ============================================================
+   CAL · TYPOGRAPHY
+   Archivo — bold, slightly-condensed grotesque for the wordmark,
+   headings and body. JetBrains Mono — technical labels, data,
+   eyebrows, scores. Uppercase + wide tracking is the brand voice.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* --- Families --- */
+  --cal-font-display: 'Archivo', system-ui, sans-serif; /* headings + wordmark */
+  --cal-font-body:    'Archivo', system-ui, sans-serif; /* body copy */
+  --cal-font-mono:    'JetBrains Mono', ui-monospace, monospace; /* labels, data */
+
+  /* --- Weights --- */
+  --cal-w-regular: 400;
+  --cal-w-medium:  500;
+  --cal-w-semibold:600;
+  --cal-w-bold:    700;
+  --cal-w-black:   900; /* the logo / hero weight */
+
+  /* --- Type scale (display = Archivo, tight tracking) --- */
+  --cal-text-7xl: 76px; /* hero wordmark */
+  --cal-text-6xl: 60px;
+  --cal-text-5xl: 48px;
+  --cal-text-4xl: 38px; /* section heads (preview "The glitch, distilled") */
+  --cal-text-3xl: 30px;
+  --cal-text-2xl: 24px;
+  --cal-text-xl:  20px;
+  --cal-text-lg:  18px;
+  --cal-text-md:  16px; /* body default */
+  --cal-text-sm:  14px;
+  --cal-text-xs:  13px; /* mono labels */
+  --cal-text-2xs: 11px; /* eyebrows, meta */
+
+  /* --- Line heights --- */
+  --cal-leading-tight:  1.05; /* display */
+  --cal-leading-snug:   1.25;
+  --cal-leading-normal: 1.55; /* body */
+
+  /* --- Tracking --- */
+  --cal-track-tight:  -0.01em; /* large display */
+  --cal-track-normal: 0;
+  --cal-track-wide:   0.24em;  /* mono eyebrows / labels */
+  --cal-track-wider:  0.32em;  /* wordmark lockup tagline */
+
+  /* --- Semantic aliases --- */
+  --font-heading: var(--cal-font-display);
+  --font-body:    var(--cal-font-body);
+  --font-mono:    var(--cal-font-mono);
+}
