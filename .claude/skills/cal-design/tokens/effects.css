@@ -1,0 +1,28 @@
+/* ============================================================
+   EFFECTS — shadows, edges, motion. Champions Amateur League.
+   Deep ambient shadows + a 1px top inset highlight on raised
+   surfaces. Brand keyline = 2px gradient bar atop cards.
+   ============================================================ */
+:root {
+  /* ---- Elevation shadows ---- */
+  --cal-shadow-sm:  0 2px 8px rgba(0,0,0,0.35);
+  --cal-shadow-md:  0 8px 24px rgba(0,0,0,0.40);
+  --cal-shadow-lg:  0 16px 40px rgba(0,0,0,0.45);
+
+  /* ---- Inset top-edge highlight (catches "light" on cards) ---- */
+  --cal-edge-top:   inset 0 1px 0 rgba(255,255,255,0.04); /* @kind shadow */
+
+  /* ---- Glows (neon focus / emphasis) ---- */
+  --cal-glow-cyan:    0 0 16px rgba(0,229,255,0.35);
+  --cal-glow-magenta: 0 0 16px rgba(255,46,152,0.35);
+
+  /* ---- Focus ring ---- */
+  --cal-focus-ring: 0 0 0 2px var(--cal-bg), 0 0 0 4px var(--cal-cyan);
+
+  /* ---- Motion ---- */
+  --cal-ease:      cubic-bezier(0.22, 1, 0.36, 1); /* @kind other */ /* signature ease-out */
+  --cal-ease-in:   cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+  --cal-dur:       200ms; /* @kind other */
+  --cal-dur-fast:  120ms; /* @kind other */
+  --cal-dur-slow:  320ms; /* @kind other */
+}

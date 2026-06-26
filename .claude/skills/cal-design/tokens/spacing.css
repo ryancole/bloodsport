@@ -1,0 +1,34 @@
+/* ============================================================
+   SPACING, RADII & LAYOUT — Champions Amateur League
+   8px-ish rhythm with a few tighter dashboard steps (14px gutter).
+   ============================================================ */
+:root {
+  /* ---- Spacing scale ---- */
+  --cal-space-1:  4px;
+  --cal-space-2:  6px;
+  --cal-space-3:  8px;
+  --cal-space-4:  10px;
+  --cal-space-5:  12px;
+  --cal-space-6:  14px;  /* the signature dashboard gutter */
+  --cal-space-7:  18px;
+  --cal-space-8:  20px;
+  --cal-space-9:  24px;
+  --cal-space-10: 32px;
+  --cal-space-12: 48px;
+
+  /* ---- Corner radii ---- */
+  --cal-radius-xs:   6px;
+  --cal-radius-sm:   10px;
+  --cal-radius-md:   14px;
+  --cal-radius-lg:   18px;  /* default card radius */
+  --cal-radius-pill: 999px;
+
+  /* ---- Layout ---- */
+  --cal-maxw-content: 1200px; /* main column width */
+  --cal-nav-height:   3.5rem; /* sticky top nav */
+
+  /* ---- Semantic aliases ---- */
+  --gutter:        var(--cal-space-6);
+  --radius-card:   var(--cal-radius-lg);
+  --radius-control:var(--cal-radius-sm);
+}

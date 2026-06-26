@@ -1,0 +1,338 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/core/**",
+              "components/data/**",
+              "components/forms/**",
+              "ui_kits/cal-web/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Archivo|JetBrains Mono|Rajdhani|Exo 2))/i]",
+        "message": "Font not provided by the design system. Available: Archivo, JetBrains Mono, Rajdhani, Exo 2."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|tone|style|key|ref|className|style|children)$/]",
+        "message": "<Badge> doesn't accept that prop. Declared props: children, tone, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:neutral|cyan|magenta|success|warning|danger)$/]",
+        "message": "<Badge> tone must be one of 'neutral' | 'cyan' | 'magenta' | 'success' | 'warning' | 'danger'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|variant|size|disabled|type|iconLeft|iconRight|style|onClick|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: children, variant, size, disabled, type, iconLeft, iconRight, style, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|neon|secondary|ghost|danger)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'neon' | 'secondary' | 'ghost' | 'danger'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='type'] > Literal[value!=/^(?:button|submit|reset)$/]",
+        "message": "<Button> type must be one of 'button' | 'submit' | 'reset'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|eyebrow|action|keyline|elevation|padded|style|bodyStyle|key|ref|className|style|children)$/]",
+        "message": "<Card> doesn't accept that prop. Declared props: children, eyebrow, action, keyline, elevation, padded, style, bodyStyle."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute[name.name='elevation'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Card> elevation must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Eyebrow'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|tracking|color|style|key|ref|className|style|children)$/]",
+        "message": "<Eyebrow> doesn't accept that prop. Declared props: children, tracking, color, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Eyebrow'] > JSXAttribute[name.name='tracking'] > Literal[value!=/^(?:normal|wide|xwide)$/]",
+        "message": "<Eyebrow> tracking must be one of 'normal' | 'wide' | 'xwide'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Eyebrow'] > JSXAttribute[name.name='color'] > Literal[value!=/^(?:faint|muted|cyan|magenta)$/]",
+        "message": "<Eyebrow> color must be one of 'faint' | 'muted' | 'cyan' | 'magenta'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Input'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|hint|invalid|key|ref|className|style|children)$/]",
+        "message": "<Input> doesn't accept that prop. Declared props: label, hint, invalid."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:value|label|style|key|ref|className|style|children)$/]",
+        "message": "<StatCard> doesn't accept that prop. Declared props: value, label, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TeamFlag'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|logoUrl|size|style|key|ref|className|style|children)$/]",
+        "message": "<TeamFlag> doesn't accept that prop. Declared props: name, logoUrl, size, style."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Badge": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": []
+      },
+      "Card": {
+        "replaces": []
+      },
+      "Eyebrow": {
+        "replaces": []
+      },
+      "Input": {
+        "replaces": []
+      },
+      "StatCard": {
+        "replaces": []
+      },
+      "TeamFlag": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--accent-primary",
+      "--accent-secondary",
+      "--border-default",
+      "--cal-bg",
+      "--cal-border",
+      "--cal-border-faint",
+      "--cal-border-strong",
+      "--cal-cyan",
+      "--cal-cyan-ghost",
+      "--cal-danger",
+      "--cal-danger-ghost",
+      "--cal-dur",
+      "--cal-dur-fast",
+      "--cal-dur-slow",
+      "--cal-ease",
+      "--cal-ease-in",
+      "--cal-edge-top",
+      "--cal-focus-ring",
+      "--cal-font-accent",
+      "--cal-font-display",
+      "--cal-font-heading",
+      "--cal-font-mono",
+      "--cal-glow-cyan",
+      "--cal-glow-magenta",
+      "--cal-gradient",
+      "--cal-gradient-soft",
+      "--cal-info",
+      "--cal-leading-normal",
+      "--cal-leading-snug",
+      "--cal-leading-tight",
+      "--cal-magenta",
+      "--cal-magenta-ghost",
+      "--cal-maxw-content",
+      "--cal-nav-height",
+      "--cal-radius-lg",
+      "--cal-radius-md",
+      "--cal-radius-pill",
+      "--cal-radius-sm",
+      "--cal-radius-xs",
+      "--cal-shadow-lg",
+      "--cal-shadow-md",
+      "--cal-shadow-sm",
+      "--cal-space-1",
+      "--cal-space-10",
+      "--cal-space-12",
+      "--cal-space-2",
+      "--cal-space-3",
+      "--cal-space-4",
+      "--cal-space-5",
+      "--cal-space-6",
+      "--cal-space-7",
+      "--cal-space-8",
+      "--cal-space-9",
+      "--cal-success",
+      "--cal-success-ghost",
+      "--cal-surface-1",
+      "--cal-surface-2",
+      "--cal-surface-3",
+      "--cal-text",
+      "--cal-text-body",
+      "--cal-text-faint",
+      "--cal-text-h1",
+      "--cal-text-h2",
+      "--cal-text-h3",
+      "--cal-text-hero",
+      "--cal-text-inverse",
+      "--cal-text-label",
+      "--cal-text-micro",
+      "--cal-text-muted",
+      "--cal-text-sm",
+      "--cal-text-title",
+      "--cal-tracking-eyebrow",
+      "--cal-tracking-label",
+      "--cal-tracking-nav",
+      "--cal-tracking-normal",
+      "--cal-tracking-tight",
+      "--cal-w-black",
+      "--cal-w-bold",
+      "--cal-w-extrabold",
+      "--cal-w-medium",
+      "--cal-w-regular",
+      "--cal-w-semibold",
+      "--cal-warning",
+      "--cal-warning-ghost",
+      "--font-body",
+      "--font-data",
+      "--font-heading",
+      "--gutter",
+      "--radius-card",
+      "--radius-control",
+      "--surface-card",
+      "--surface-page",
+      "--surface-raised",
+      "--text-body",
+      "--text-label",
+      "--text-secondary"
+    ],
+    "tokenKinds": {
+      "--cal-bg": "color",
+      "--cal-surface-1": "color",
+      "--cal-surface-2": "color",
+      "--cal-surface-3": "color",
+      "--cal-border": "color",
+      "--cal-border-strong": "color",
+      "--cal-border-faint": "color",
+      "--cal-text": "font",
+      "--cal-text-muted": "font",
+      "--cal-text-faint": "font",
+      "--cal-text-inverse": "font",
+      "--cal-cyan": "color",
+      "--cal-cyan-ghost": "color",
+      "--cal-magenta": "color",
+      "--cal-magenta-ghost": "color",
+      "--cal-success": "color",
+      "--cal-success-ghost": "color",
+      "--cal-warning": "color",
+      "--cal-warning-ghost": "color",
+      "--cal-danger": "color",
+      "--cal-danger-ghost": "color",
+      "--cal-info": "color",
+      "--cal-gradient": "color",
+      "--cal-gradient-soft": "color",
+      "--text-body": "font",
+      "--text-secondary": "font",
+      "--text-label": "font",
+      "--surface-page": "color",
+      "--surface-card": "color",
+      "--surface-raised": "color",
+      "--border-default": "color",
+      "--accent-primary": "color",
+      "--accent-secondary": "color",
+      "--cal-font-display": "font",
+      "--cal-font-heading": "font",
+      "--cal-font-mono": "font",
+      "--cal-font-accent": "font",
+      "--cal-w-regular": "font",
+      "--cal-w-medium": "font",
+      "--cal-w-semibold": "font",
+      "--cal-w-bold": "font",
+      "--cal-w-extrabold": "font",
+      "--cal-w-black": "font",
+      "--cal-text-hero": "font",
+      "--cal-text-h1": "font",
+      "--cal-text-h2": "font",
+      "--cal-text-h3": "font",
+      "--cal-text-title": "font",
+      "--cal-text-body": "font",
+      "--cal-text-sm": "font",
+      "--cal-text-label": "font",
+      "--cal-text-micro": "font",
+      "--cal-leading-tight": "font",
+      "--cal-leading-snug": "font",
+      "--cal-leading-normal": "font",
+      "--cal-tracking-tight": "font",
+      "--cal-tracking-normal": "font",
+      "--cal-tracking-nav": "font",
+      "--cal-tracking-label": "font",
+      "--cal-tracking-eyebrow": "font",
+      "--font-body": "font",
+      "--font-heading": "font",
+      "--font-data": "font",
+      "--cal-space-1": "spacing",
+      "--cal-space-2": "spacing",
+      "--cal-space-3": "spacing",
+      "--cal-space-4": "spacing",
+      "--cal-space-5": "spacing",
+      "--cal-space-6": "spacing",
+      "--cal-space-7": "spacing",
+      "--cal-space-8": "spacing",
+      "--cal-space-9": "spacing",
+      "--cal-space-10": "spacing",
+      "--cal-space-12": "spacing",
+      "--cal-radius-xs": "radius",
+      "--cal-radius-sm": "radius",
+      "--cal-radius-md": "radius",
+      "--cal-radius-lg": "radius",
+      "--cal-radius-pill": "radius",
+      "--cal-maxw-content": "spacing",
+      "--cal-nav-height": "spacing",
+      "--gutter": "color",
+      "--radius-card": "radius",
+      "--radius-control": "radius",
+      "--cal-shadow-sm": "shadow",
+      "--cal-shadow-md": "shadow",
+      "--cal-shadow-lg": "shadow",
+      "--cal-edge-top": "shadow",
+      "--cal-glow-cyan": "shadow",
+      "--cal-glow-magenta": "shadow",
+      "--cal-focus-ring": "color",
+      "--cal-ease": "other",
+      "--cal-ease-in": "other",
+      "--cal-dur": "other",
+      "--cal-dur-fast": "other",
+      "--cal-dur-slow": "other"
+    },
+    "fontFamilies": [
+      "Archivo",
+      "Exo 2",
+      "JetBrains Mono",
+      "Rajdhani"
+    ]
+  }
+}

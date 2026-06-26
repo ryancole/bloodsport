@@ -1,0 +1,25 @@
+<!-- @dsCard group="Colors" viewport="700x160" name="Surfaces" subtitle="Dark canvas → raised card surfaces" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sw { border-radius: var(--cal-radius-md); border: 1px solid var(--cal-border); overflow: hidden; box-shadow: var(--cal-shadow-sm), var(--cal-edge-top); }
+  .chip { height: 64px; }
+  .meta { padding: 8px 10px; }
+  .name { font-family: var(--cal-font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cal-text); }
+  .hex { font-family: var(--cal-font-mono); font-size: 11px; color: var(--cal-text-faint); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw"><div class="chip" style="background:var(--cal-bg)"></div><div class="meta"><div class="name">BG</div><div class="hex">#0B0E14</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cal-surface-1)"></div><div class="meta"><div class="name">Surface 1</div><div class="hex">#11151F</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cal-surface-2)"></div><div class="meta"><div class="name">Surface 2</div><div class="hex">#161B27</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cal-surface-3)"></div><div class="meta"><div class="name">Surface 3</div><div class="hex">#1D2433</div></div></div>
+  </div>
+</body>
+</html>
