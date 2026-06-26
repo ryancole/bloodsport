@@ -415,7 +415,7 @@ else
             WinnerUrl: r.WinnerTeamId is not null ? $"/teams/{r.WinnerTeamId}" : null,
             WinnerLogoUrl: r.WinnerTeam?.LogoUrl,
             Context: r.SeasonWeekMatchup.SeasonWeek.Season.Name,
-            ContextUrl: null,
+            ContextUrl: $"/seasons/{r.SeasonWeekMatchup.SeasonWeek.SeasonId}",
             TimeAgo: FormatTimeAgo(r.DateCreated),
             Date: r.DateCreated
         ));

@@ -18,6 +18,8 @@ namespace Bloodsport.Entity.Database
 
         public required string Name { get; set; }
 
+        public required string RiotRegion { get; set; }
+
         public SeasonStatus Status { get; set; } = SeasonStatus.Upcoming;
 
         public DateTime? EstimatedDateEnd { get; set; }

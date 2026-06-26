@@ -16,7 +16,7 @@
                     <PlayoffStatusBadge Status="playoff.Status" />
                 </div>
                 @{ var dateEnd = playoff.PlayoffRounds.Select(r => r.DateEnd).Where(d => d.HasValue).Max(d => d); }
-                <span class="dpp-date"><span class="dpp-date-label">started</span> @playoff.DateCreated.ToLocalTime().ToString("MMM d, yyyy")</span>
+                <span class="dpp-date"><span class="dpp-date-label">starts</span> @playoff.DateCreated.ToLocalTime().ToString("MMM d, yyyy")</span>
                 <span class="dpp-date"><span class="dpp-date-label">ends</span> @(dateEnd.HasValue ? dateEnd.Value.ToLocalTime().ToString("MMM d, yyyy") : "TBD")</span>
             </div>
         }

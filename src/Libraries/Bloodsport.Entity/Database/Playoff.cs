@@ -12,6 +12,8 @@ namespace Bloodsport.Entity.Database
 
         public required string Name { get; set; }
 
+        public required string RiotRegion { get; set; }
+
         public long? RiotProviderId { get; set; }
 
         public long? RiotTournamentId { get; set; }
