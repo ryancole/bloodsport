@@ -10,8 +10,11 @@ else
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Region</th>
                 <th>Season</th>
                 <th>Status</th>
+                <th>Teams</th>
+                <th>Created</th>
             </tr>
         </thead>
         <tbody>
@@ -19,8 +22,11 @@ else
             {
                 <tr>
                     <td><a href="/playoffs/@playoff.Id">@playoff.Name</a></td>
+                    <td>@playoff.RiotRegion</td>
                     <td><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></td>
                     <td><PlayoffStatusBadge Status="playoff.Status" /></td>
+                    <td>@playoff.PlayoffTeams.Count</td>
+                    <td>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                 </tr>
             }
         </tbody>
