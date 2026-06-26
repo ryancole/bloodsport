@@ -1,51 +1,97 @@
 @using Bloodsport.Entity.Database
 
-<div class="dashboard-panel">
-    <h2 class="dashboard-panel-title">Recent seasons</h2>
+<div class="db-card dsp">
+    <div class="db-card-keyline"></div>
+    <div class="db-card-head">
+        <span class="db-eyebrow">Recent seasons</span>
+        <a href="/seasons" class="db-see-all">All →</a>
+    </div>
     @if (Seasons.Count == 0)
     {
-        <p class="text-muted">No seasons yet.</p>
+        <p class="db-empty">No seasons yet.</p>
     }
     else
     {
-        @foreach (var season in Seasons)
-        {
-            <div class="dashboard-list-item">
-                <a href="/seasons/@season.Id" class="dashboard-list-name">@season.Name</a>
-                <div class="dsp-badges">
-                    <SeasonStatusBadge Status="season.Status" />
-                    @if (season.RegistrationOpen)
-                    {
-                        <span class="badge bg-success">Registration Open</span>
-                    }
+        <div class="dsp-list">
+            @foreach (var season in Seasons)
+            {
+                <div class="dsp-row">
+                    <a href="/seasons/@season.Id" class="dsp-name">@season.Name</a>
+                    <div class="dsp-badges">
+                        <span class="dsp-badge @SeasonBadgeClass(season.Status)">@season.Status</span>
+                        @if (season.RegistrationOpen)
+                        {
+                            <span class="dsp-badge dsp-badge--reg">Reg. Open</span>
+                        }
+                    </div>
+                    <span class="dsp-date">
+                        <span class="dsp-date-label">starts</span>
+                        @(season.EstimatedDateStart.HasValue ? season.EstimatedDateStart.Value.ToLocalTime().ToString("MMM d, yyyy") : "TBD")
+                    </span>
+                    <span class="dsp-date">
+                        <span class="dsp-date-label">ends</span>
+                        @(season.EstimatedDateEnd.HasValue ? season.EstimatedDateEnd.Value.ToLocalTime().ToString("MMM d, yyyy") : "TBD")
+                    </span>
                 </div>
-                <span class="dsp-date"><span class="dsp-date-label">starts</span> @(season.EstimatedDateStart.HasValue ? season.EstimatedDateStart.Value.ToLocalTime().ToString("MMM d, yyyy") : "TBD")</span>
-                <span class="dsp-date"><span class="dsp-date-label">ends</span> @(season.EstimatedDateEnd.HasValue ? season.EstimatedDateEnd.Value.ToLocalTime().ToString("MMM d, yyyy") : "TBD")</span>
-            </div>
-        }
+            }
+        </div>
     }
 </div>
 
 <style>
-    .dsp-badges {
-        display: flex;
+    .dsp-list { padding: 8px 0 4px; }
+    .dsp-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
         align-items: center;
-        gap: 6px;
-        flex-shrink: 0;
+        gap: 10px;
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--cal-border-faint);
+        transition: background var(--cal-dur-fast) var(--cal-ease);
     }
-
-    .dsp-date {
-        font-size: 12px;
-        color: var(--bs-secondary-color, #6c757d);
-        flex-shrink: 0;
+    .dsp-row:last-child { border-bottom: none; }
+    .dsp-row:hover { background: var(--cal-surface-3); }
+    .dsp-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--cal-text);
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
-        text-align: right;
+        min-width: 0;
+        transition: color var(--cal-dur) var(--cal-ease);
     }
-
-    .dsp-date-label {
-        font-size: 11px;
+    .dsp-name:hover { color: var(--cal-cyan); }
+    .dsp-badges { display: flex; gap: 6px; flex-shrink: 0; }
+    .dsp-badge {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: var(--cal-radius-pill);
+        font-family: var(--cal-font-mono);
+        font-weight: 600;
+        font-size: 10px;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        white-space: nowrap;
+        background: var(--cal-surface-3);
+        color: var(--cal-text-muted);
+    }
+    .dsp-badge--active { background: var(--cal-cyan-ghost); color: var(--cal-cyan); }
+    .dsp-badge--preseason { background: rgba(255,176,32,0.12); color: #FFB020; }
+    .dsp-badge--reg { background: rgba(33,208,122,0.12); color: #21D07A; }
+    .dsp-date {
+        font-family: var(--cal-font-mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--cal-text-faint);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .dsp-date-label {
+        text-transform: uppercase;
         opacity: 0.6;
         margin-right: 3px;
     }
@@ -53,4 +99,11 @@
 
 @code {
     [Parameter, EditorRequired] public List<Season> Seasons { get; set; } = [];
+
+    private static string SeasonBadgeClass(SeasonStatus status) => status switch
+    {
+        SeasonStatus.Active    => "dsp-badge--active",
+        SeasonStatus.PreSeason => "dsp-badge--preseason",
+        _                      => "",
+    };
 }

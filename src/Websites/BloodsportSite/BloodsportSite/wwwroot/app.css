@@ -1,6 +1,42 @@
+/* ── CAL Design System tokens ── */
+:root {
+    --cal-bg:            #0B0E14;
+    --cal-surface-1:     #11151F;
+    --cal-surface-2:     #161B27;
+    --cal-surface-3:     #1D2433;
+    --cal-border:        #232A38;
+    --cal-border-strong: #323B4D;
+    --cal-border-faint:  #1A2030;
+    --cal-text:          #F4F5F7;
+    --cal-text-muted:    #8B93A3;
+    --cal-text-faint:    #5B6373;
+    --cal-text-inverse:  #0B0E14;
+    --cal-cyan:          #00E5FF;
+    --cal-cyan-ghost:    rgba(0, 229, 255, 0.12);
+    --cal-magenta:       #FF2E98;
+    --cal-magenta-ghost: rgba(255, 46, 152, 0.12);
+    --cal-gradient:      linear-gradient(105deg, #00E5FF 0%, #FF2E98 100%);
+    --cal-gradient-soft: linear-gradient(105deg, rgba(0,229,255,0.18) 0%, rgba(255,46,152,0.18) 100%);
+    --cal-shadow-sm:     0 2px 8px rgba(0,0,0,0.35);
+    --cal-shadow-md:     0 8px 24px rgba(0,0,0,0.40);
+    --cal-shadow-lg:     0 16px 40px rgba(0,0,0,0.45);
+    --cal-edge-top:      inset 0 1px 0 rgba(255,255,255,0.04);
+    --cal-radius-xs:     6px;
+    --cal-radius-sm:     10px;
+    --cal-radius-md:     14px;
+    --cal-radius-lg:     18px;
+    --cal-radius-pill:   999px;
+    --cal-ease:          cubic-bezier(0.22, 1, 0.36, 1);
+    --cal-dur:           200ms;
+    --cal-dur-fast:      120ms;
+    --cal-font-display:  'Archivo', system-ui, sans-serif;
+    --cal-font-mono:     'JetBrains Mono', ui-monospace, monospace;
+}
+
 html, body {
-    font-family: 'Exo 2', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: #ffffff;
+    font-family: var(--cal-font-display);
+    background-color: var(--cal-bg);
+    color: var(--cal-text);
 }
 
 h1, h2, h3, h4, h5, h6 {
