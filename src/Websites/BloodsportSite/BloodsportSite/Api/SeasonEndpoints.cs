@@ -87,7 +87,7 @@ namespace BloodsportSite.Api
                 Name = name,
                 Length = length,
                 EstimatedDateStart = parsedStartDate,
-                RiotRegion = RegionalRoute.AMERICAS.ToString(),
+                RiotRegion = TournamentRegion.NA.ToString(),
             };
 
             db.Seasons.Add(season);
@@ -267,7 +267,7 @@ namespace BloodsportSite.Api
                 Season = season,
                 Name = $"{season.Name} Playoffs",
                 Status = PlayoffStatus.Upcoming,
-                RiotRegion = RegionalRoute.AMERICAS.ToString(),
+                RiotRegion = TournamentRegion.NA.ToString(),
             };
 
             db.Playoffs.Add(playoff);

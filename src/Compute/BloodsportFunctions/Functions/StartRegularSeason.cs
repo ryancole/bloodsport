@@ -134,7 +134,6 @@ public class StartRegularSeason
             var callbackUrl = _config["RiotApi:RegularSeasonCallback"]
                 ?? throw new InvalidOperationException("RiotApi:RegularSeasonCallback is not configured.");
 
-            var region = _config["RiotApi:Region"] ?? "NA";
             var route = Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
 
             long providerId;
@@ -143,14 +142,14 @@ public class StartRegularSeason
             if (RiotApiEndpoints.UseStub)
             {
                 providerId = await _riotApi.TournamentStubV5().RegisterProviderDataAsync(route,
-                    new StubNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
+                    new StubNs.ProviderRegistrationParametersV5 { Region = season.RiotRegion, Url = callbackUrl });
                 tournamentId = await _riotApi.TournamentStubV5().RegisterTournamentAsync(route,
                     new StubNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = season.Name });
             }
             else
             {
                 providerId = await _riotApi.TournamentV5().RegisterProviderDataAsync(route,
-                    new TournNs.ProviderRegistrationParametersV5 { Region = region, Url = callbackUrl });
+                    new TournNs.ProviderRegistrationParametersV5 { Region = season.RiotRegion, Url = callbackUrl });
                 tournamentId = await _riotApi.TournamentV5().RegisterTournamentAsync(route,
                     new TournNs.TournamentRegistrationParametersV5 { ProviderId = (int)providerId, Name = season.Name });
             }

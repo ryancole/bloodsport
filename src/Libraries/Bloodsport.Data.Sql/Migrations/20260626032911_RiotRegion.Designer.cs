@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    [Migration("20260626030126_RiotRegion")]
+    [Migration("20260626032911_RiotRegion")]
     partial class RiotRegion
     {
         /// <inheritdoc />
