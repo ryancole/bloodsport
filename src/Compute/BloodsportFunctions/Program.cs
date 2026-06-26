@@ -26,7 +26,9 @@ public class Program
 
         builder
             .Services
-            .AddDbContextFactory<SqlDbContext>(options => options.UseSqlServer(builder.Configuration["SqlConnectionString"]));
+            .AddDbContextFactory<SqlDbContext>(options => options.UseSqlServer(
+                builder.Configuration["SqlConnectionString"],
+                sql => sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
         builder
             .Services

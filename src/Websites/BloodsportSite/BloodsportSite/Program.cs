@@ -156,6 +156,7 @@ namespace BloodsportSite
             var migrationAssemblyName = contextTypeInfo.Assembly.GetName();
 
             options.MigrationsAssembly(migrationAssemblyName.Name);
+            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         }
 
         private static readonly string[] _adjectives = [
