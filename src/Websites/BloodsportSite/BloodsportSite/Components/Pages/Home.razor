@@ -4,99 +4,111 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
 
-<PageTitle>Dashboard | BSAL</PageTitle>
+<PageTitle>Dashboard | CAL</PageTitle>
 
 @if (seasons is null)
 {
-    <p><em>Loading...</em></p>
+    <div class="db-loading">
+        <span class="db-loading-text">Loading...</span>
+    </div>
 }
 else
 {
-    <div class="dashboard-stat-row">
-        <div class="dashboard-stat-card">
-            <span class="dashboard-stat-label">Active seasons</span>
-            <span class="dashboard-stat-value">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
+    <!-- stat row -->
+    <div class="db-stat-row">
+        <div class="db-stat-card">
+            <div class="db-stat-keyline"></div>
+            <span class="db-stat-num">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
+            <span class="db-stat-label">Active seasons</span>
         </div>
-        <div class="dashboard-stat-card">
-            <span class="dashboard-stat-label">Active playoffs</span>
-            <span class="dashboard-stat-value">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
+        <div class="db-stat-card">
+            <div class="db-stat-keyline"></div>
+            <span class="db-stat-num">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
+            <span class="db-stat-label">Active playoffs</span>
         </div>
-        <div class="dashboard-stat-card">
-            <span class="dashboard-stat-label">Results this week</span>
-            <span class="dashboard-stat-value">@resultsThisWeek</span>
+        <div class="db-stat-card">
+            <div class="db-stat-keyline"></div>
+            <span class="db-stat-num">@resultsThisWeek</span>
+            <span class="db-stat-label">Results this week</span>
         </div>
     </div>
 
-    <div class="dashboard-panels">
+    <!-- seasons + playoffs panels -->
+    <div class="db-panels">
         <DashboardSeasonsPanel Seasons="seasons" />
         <DashboardPlayoffsPanel Playoffs="activePlayoffs" />
     </div>
 
+    <!-- news -->
     @if (recentPosts.Count > 0)
     {
-        <div class="dashboard-feed-section mb-3">
-            <h2 class="dashboard-panel-title">Latest news</h2>
-            <div class="d-flex flex-column">
+        <div class="db-card db-news mb">
+            <div class="db-card-keyline"></div>
+            <div class="db-card-head">
+                <span class="db-eyebrow">Latest news</span>
+                <a href="/news" class="db-see-all">All news →</a>
+            </div>
+            <div class="db-news-list">
                 @foreach (var post in recentPosts)
                 {
-                    <div class="dashboard-news-item">
-                        <div class="d-flex align-items-baseline gap-2">
-                            <a href="/news/@post.Id" class="dashboard-news-title">@post.Title</a>
-                            <div class="dashboard-news-meta flex-shrink-0">
-                                <span>@post.User.DisplayName</span>
-                                <span>·</span>
-                                <span>@post.DateCreated.ToString("MMM d, yyyy")</span>
-                                <span>·</span>
-                                <a href="/news/@post.Id#comments">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
-                            </div>
+                    <div class="db-news-item">
+                        <div class="db-news-meta">
+                            <span class="db-news-author">@post.User.DisplayName</span>
+                            <span class="db-sep">·</span>
+                            <span>@post.DateCreated.ToString("MMM d, yyyy")</span>
+                            <span class="db-sep">·</span>
+                            <a href="/news/@post.Id#comments" class="db-news-comments">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
                         </div>
-                        <p class="dashboard-news-excerpt">@Excerpt(post.Markdown)</p>
+                        <a href="/news/@post.Id" class="db-news-title">@post.Title</a>
+                        <p class="db-news-excerpt">@Excerpt(post.Markdown)</p>
                     </div>
                 }
-            </div>
-            <div class="mt-2">
-                <a href="/news" class="small">All news →</a>
             </div>
         </div>
     }
 
-    <div class="dashboard-feed-section">
-        <h2 class="dashboard-panel-title">Recent activity</h2>
-
+    <!-- activity feed -->
+    <div class="db-card db-activity">
+        <div class="db-card-keyline"></div>
+        <div class="db-card-head">
+            <span class="db-eyebrow">Recent activity</span>
+        </div>
         @if (activityFeed.Count == 0)
         {
-            <p class="text-muted">No results yet.</p>
+            <p class="db-empty">No results yet.</p>
         }
         else
         {
-            <div class="dashboard-feed">
+            <div class="db-feed">
                 @foreach (var item in activityFeed)
                 {
-                    <div class="dashboard-feed-item">
-                        <span class="badge @(item.IsPlayoff ? "dashboard-badge-playoff" : "dashboard-badge-regular") dashboard-feed-type">@(item.IsPlayoff ? "Playoff" : "Regular")</span>
-                        <div class="dashboard-feed-winner-col">
+                    <div class="db-feed-row">
+                        <span class="db-feed-badge @(item.IsPlayoff ? "db-feed-badge--playoff" : "db-feed-badge--regular")">
+                            @(item.IsPlayoff ? "Playoff" : "Regular")
+                        </span>
+                        <div class="db-feed-winner">
                             @if (item.WinnerName is not null)
                             {
-                                <a href="@item.WinnerUrl" class="dashboard-feed-winner d-inline-flex align-items-center gap-2">
+                                <a href="@item.WinnerUrl" class="db-feed-winner-link">
                                     <TeamFlag LogoUrl="@item.WinnerLogoUrl" />
                                     @item.WinnerName
                                 </a>
                             }
                             else
                             {
-                                <span class="dashboard-feed-no-result">—</span>
+                                <span class="db-feed-no-result">—</span>
                             }
                         </div>
-                        <a href="@item.MatchupUrl" class="dashboard-feed-matchup">@item.MatchupName</a>
+                        <a href="@item.MatchupUrl" class="db-feed-matchup">@item.MatchupName</a>
                         @if (item.ContextUrl is not null)
                         {
-                            <a href="@item.ContextUrl" class="dashboard-feed-context">@item.Context</a>
+                            <a href="@item.ContextUrl" class="db-feed-context">@item.Context</a>
                         }
                         else
                         {
-                            <span class="dashboard-feed-context">@item.Context</span>
+                            <span class="db-feed-context">@item.Context</span>
                         }
-                        <span class="dashboard-feed-time" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
+                        <span class="db-feed-time" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
                     </div>
                 }
             </div>
@@ -105,229 +117,253 @@ else
 }
 
 <style>
-    .dashboard-stat-row {
+    /* ── layout ── */
+    .db-loading {
+        padding: 48px 0;
         display: flex;
-        gap: 12px;
-        margin-bottom: 1.5rem;
+        align-items: center;
+        justify-content: center;
+    }
+    .db-loading-text {
+        font-family: var(--cal-font-mono);
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--cal-text-faint);
     }
 
-    .dashboard-stat-card {
-        flex: 1;
-        background: var(--bs-tertiary-bg, #f8f9fa);
-        border-radius: 8px;
-        padding: 1rem 1.25rem;
+    /* ── stat row ── */
+    .db-stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+    .db-stat-card {
+        background: var(--cal-surface-2);
+        border: 1px solid var(--cal-border);
+        border-radius: var(--cal-radius-lg);
+        box-shadow: var(--cal-shadow-md), var(--cal-edge-top);
+        padding: 24px 22px 20px;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 6px;
+        position: relative;
+        overflow: hidden;
     }
-
-    .dashboard-stat-label {
-        font-size: 13px;
-        color: var(--bs-secondary-color, #6c757d);
-        font-weight: 500;
+    .db-stat-keyline {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: var(--cal-gradient);
     }
-
-    .dashboard-stat-value {
-        font-size: 28px;
-        font-weight: 500;
-        line-height: 1.1;
+    .db-stat-num {
+        font-family: var(--cal-font-display);
+        font-weight: 900;
+        font-size: 44px;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        background: var(--cal-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
-
-    .dashboard-panels {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .dashboard-panel {
-        flex: 1;
-        border: 1px solid var(--bs-border-color, #dee2e6);
-        border-radius: 8px;
-        padding: 1rem 1.25rem;
-    }
-
-    .dashboard-panel-title {
-        font-size: 14px;
+    .db-stat-label {
+        font-family: var(--cal-font-mono);
+        font-size: 11px;
         font-weight: 600;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--bs-secondary-color, #6c757d);
-        margin-bottom: 0.75rem;
+        color: var(--cal-text-faint);
     }
 
-    .dashboard-list-item {
+    /* ── shared card ── */
+    .db-card {
+        background: var(--cal-surface-2);
+        border: 1px solid var(--cal-border);
+        border-radius: var(--cal-radius-lg);
+        box-shadow: var(--cal-shadow-lg), var(--cal-edge-top);
+        position: relative;
+        overflow: hidden;
+    }
+    .db-card.mb { margin-bottom: 14px; }
+    .db-card-keyline {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: var(--cal-gradient);
+    }
+    .db-card-head {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 8px;
-        padding: 6px 0;
-        border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+        padding: 18px 20px 0;
     }
-
-    .dashboard-list-item:last-child {
-        border-bottom: none;
+    .db-eyebrow {
+        font-family: var(--cal-font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--cal-text-faint);
     }
-
-    .dashboard-list-name {
-        font-size: 14px;
-        font-weight: 500;
+    .db-see-all {
+        font-family: var(--cal-font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--cal-cyan);
         text-decoration: none;
-        flex: 1;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        transition: color var(--cal-dur) var(--cal-ease);
+    }
+    .db-see-all:hover { color: var(--cal-text); }
+    .db-empty {
+        padding: 20px;
+        font-size: 14px;
+        color: var(--cal-text-faint);
+        margin: 0;
     }
 
-    .dashboard-list-meta {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-shrink: 0;
+    /* ── panels ── */
+    .db-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
     }
 
-    .dashboard-list-sub {
-        font-size: 12px;
-        color: var(--bs-secondary-color, #6c757d);
-    }
-
-    .dashboard-feed-section {
-        border: 1px solid var(--bs-border-color, #dee2e6);
-        border-radius: 8px;
-        padding: 1rem 1.25rem;
-    }
-
-    .dashboard-feed {
+    /* ── news ── */
+    .db-news-list { padding: 8px 0 4px; }
+    .db-news-item {
         display: flex;
         flex-direction: column;
+        gap: 5px;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--cal-border-faint);
+    }
+    .db-news-item:last-child { border-bottom: none; }
+    .db-news-meta {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-family: var(--cal-font-mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--cal-text-faint);
+    }
+    .db-news-author { color: var(--cal-text-muted); }
+    .db-sep { opacity: 0.4; }
+    .db-news-comments {
+        color: var(--cal-text-faint);
+        text-decoration: none;
+        transition: color var(--cal-dur) var(--cal-ease);
+    }
+    .db-news-comments:hover { color: var(--cal-cyan); }
+    .db-news-title {
+        font-family: var(--cal-font-display);
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--cal-text);
+        text-decoration: none;
+        line-height: 1.3;
+        transition: color var(--cal-dur) var(--cal-ease);
+    }
+    .db-news-title:hover { color: var(--cal-cyan); }
+    .db-news-excerpt {
+        font-size: 13px;
+        color: var(--cal-text-muted);
+        line-height: 1.55;
+        margin: 0;
     }
 
-    .dashboard-feed-item {
+    /* ── activity feed ── */
+    .db-activity { margin-bottom: 14px; }
+    .db-feed { padding: 8px 0 4px; }
+    .db-feed-row {
         display: grid;
-        grid-template-columns: 70px 180px 1fr 160px 60px;
+        grid-template-columns: 76px 176px 1fr 160px 60px;
         align-items: center;
         gap: 12px;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+        padding: 9px 20px;
+        border-bottom: 1px solid var(--cal-border-faint);
+        transition: background var(--cal-dur-fast) var(--cal-ease);
     }
-
-    .dashboard-feed-item:last-child {
-        border-bottom: none;
+    .db-feed-row:last-child { border-bottom: none; }
+    .db-feed-row:hover { background: var(--cal-surface-3); }
+    .db-feed-badge {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: var(--cal-radius-pill);
+        font-family: var(--cal-font-mono);
+        font-weight: 600;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        white-space: nowrap;
     }
-
-    .dashboard-feed-type {
-        font-weight: 500;
-        justify-self: start;
+    .db-feed-badge--regular {
+        background: var(--cal-cyan-ghost);
+        color: var(--cal-cyan);
     }
-
-    .dashboard-feed-winner-col {
+    .db-feed-badge--playoff {
+        background: var(--cal-magenta-ghost);
+        color: var(--cal-magenta);
+    }
+    .db-feed-winner {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         min-width: 0;
     }
-
-    .dashboard-feed-winner {
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .dashboard-feed-no-result {
-        color: var(--bs-secondary-color, #6c757d);
-    }
-
-    .dashboard-feed-matchup {
-        font-size: 13px;
-        color: var(--bs-link-color, #0d6efd);
-        text-decoration: none;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .dashboard-feed-matchup:hover {
-        text-decoration: underline;
-    }
-
-    .dashboard-feed-context {
-        font-size: 12px;
-        color: var(--bs-secondary-color, #6c757d);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        text-decoration: none;
-    }
-
-    a.dashboard-feed-context {
-        color: var(--bs-link-color, #0d6efd);
-    }
-
-    a.dashboard-feed-context:hover {
-        text-decoration: underline;
-    }
-
-    .dashboard-feed-time {
-        font-size: 12px;
-        color: var(--bs-secondary-color, #6c757d);
-        text-align: right;
-        white-space: nowrap;
-        text-decoration: underline dotted;
-        text-underline-offset: 3px;
-        cursor: default;
-    }
-
-    .dashboard-news-item {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid var(--bs-border-color, #dee2e6);
-    }
-
-    .dashboard-news-item:last-child {
-        border-bottom: none;
-    }
-
-    .dashboard-news-meta {
-        display: flex;
-        gap: 0.3rem;
-        font-size: 12px;
-        color: var(--bs-secondary-color, #6c757d);
-    }
-
-    .dashboard-news-title {
+    .db-feed-winner-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
         font-size: 14px;
         font-weight: 600;
+        color: var(--cal-text);
         text-decoration: none;
-        color: var(--bs-body-color, #212529);
-        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color var(--cal-dur) var(--cal-ease);
     }
-
-    .dashboard-news-title:hover {
-        color: #c0392b;
-    }
-
-    .dashboard-news-excerpt {
-        margin: 0;
+    .db-feed-winner-link:hover { color: var(--cal-cyan); }
+    .db-feed-no-result { color: var(--cal-text-faint); }
+    .db-feed-matchup {
         font-size: 13px;
-        color: #555;
-        line-height: 1.5;
+        color: var(--cal-text-muted);
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color var(--cal-dur) var(--cal-ease);
     }
-
-    .dashboard-badge-regular {
-        background-color: #E6F1FB;
-        color: #185FA5;
-        font-weight: 500;
+    .db-feed-matchup:hover { color: var(--cal-cyan); }
+    .db-feed-context {
+        font-family: var(--cal-font-mono);
+        font-size: 11px;
+        letter-spacing: 0.10em;
+        color: var(--cal-text-faint);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-decoration: none;
+        transition: color var(--cal-dur) var(--cal-ease);
     }
-
-    .dashboard-badge-playoff {
-        background-color: #EEEDFE;
-        color: #3C3489;
-        font-weight: 500;
+    a.db-feed-context:hover { color: var(--cal-text-muted); }
+    .db-feed-time {
+        font-family: var(--cal-font-mono);
+        font-size: 11px;
+        letter-spacing: 0.10em;
+        color: var(--cal-text-faint);
+        text-align: right;
+        white-space: nowrap;
+        cursor: default;
     }
 </style>
 
