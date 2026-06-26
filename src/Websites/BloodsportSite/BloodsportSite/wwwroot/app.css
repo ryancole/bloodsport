@@ -15,12 +15,20 @@
     --cal-cyan-ghost:    rgba(0, 229, 255, 0.12);
     --cal-magenta:       #FF2E98;
     --cal-magenta-ghost: rgba(255, 46, 152, 0.12);
+    --cal-success:       #21D07A;
+    --cal-success-ghost: rgba(33, 208, 122, 0.12);
+    --cal-warning:       #FFB020;
+    --cal-warning-ghost: rgba(255, 176, 32, 0.12);
+    --cal-danger:        #FF4D4D;
+    --cal-danger-ghost:  rgba(255, 77, 77, 0.12);
     --cal-gradient:      linear-gradient(105deg, #00E5FF 0%, #FF2E98 100%);
     --cal-gradient-soft: linear-gradient(105deg, rgba(0,229,255,0.18) 0%, rgba(255,46,152,0.18) 100%);
     --cal-shadow-sm:     0 2px 8px rgba(0,0,0,0.35);
     --cal-shadow-md:     0 8px 24px rgba(0,0,0,0.40);
     --cal-shadow-lg:     0 16px 40px rgba(0,0,0,0.45);
     --cal-edge-top:      inset 0 1px 0 rgba(255,255,255,0.04);
+    --cal-glow-cyan:     0 0 16px rgba(0,229,255,0.35);
+    --cal-glow-magenta:  0 0 16px rgba(255,46,152,0.35);
     --cal-radius-xs:     6px;
     --cal-radius-sm:     10px;
     --cal-radius-md:     14px;
@@ -30,7 +38,9 @@
     --cal-dur:           200ms;
     --cal-dur-fast:      120ms;
     --cal-font-display:  'Archivo', system-ui, sans-serif;
+    --cal-font-heading:  'Rajdhani', 'Archivo', system-ui, sans-serif;
     --cal-font-mono:     'JetBrains Mono', ui-monospace, monospace;
+    --cal-font-accent:   'Exo 2', 'Rajdhani', sans-serif;
 }
 
 html, body {
@@ -40,26 +50,18 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Rajdhani', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--cal-font-heading);
+    color: var(--cal-text);
 }
 
 a, .btn-link {
-    color: #1e3a5c;
+    color: var(--cal-cyan);
+    text-decoration: none;
 }
 
 a:hover {
-    color: #1e3a5c;
+    color: var(--cal-cyan);
     text-decoration: underline;
-}
-
-.btn-primary {
-    color: #1a1209;
-    background-color: #c8aa5a;
-    border-color: #b8963e;
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #c8aa5a;
 }
 
 .content {
@@ -73,32 +75,197 @@ h1:focus {
 h1 {
     font-weight: 700;
     letter-spacing: -0.02em;
-    border-left: 4px solid #cc006e;
+    border-left: 4px solid var(--cal-magenta);
     padding-left: 0.6rem;
 }
 
 h2 {
     font-weight: 600;
     letter-spacing: -0.01em;
-    border-left: 3px solid rgba(204, 0, 110, 0.5);
+    border-left: 3px solid rgba(255, 46, 152, 0.4);
     padding-left: 0.5rem;
 }
 
 h3 {
     font-weight: 600;
-    color: #444;
+    color: var(--cal-text-muted);
 }
 
+/* ── Bootstrap overrides — buttons ── */
+.btn {
+    font-family: var(--cal-font-display);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border-radius: var(--cal-radius-sm);
+    transition: filter var(--cal-dur) var(--cal-ease), transform var(--cal-dur-fast) var(--cal-ease), background var(--cal-dur) var(--cal-ease), border-color var(--cal-dur) var(--cal-ease), color var(--cal-dur) var(--cal-ease);
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary, .btn-primary:focus {
+    background: var(--cal-cyan);
+    border-color: var(--cal-cyan);
+    color: var(--cal-text-inverse);
+}
+.btn-primary:hover { background: var(--cal-cyan); border-color: var(--cal-cyan); color: var(--cal-text-inverse); filter: brightness(1.08); }
+
+.btn-secondary {
+    background: var(--cal-surface-3);
+    border-color: var(--cal-border-strong);
+    color: var(--cal-text-muted);
+}
+.btn-secondary:hover, .btn-secondary:focus {
+    background: var(--cal-surface-3);
+    border-color: var(--cal-border-strong);
+    color: var(--cal-text);
+    filter: brightness(1.12);
+}
+
+.btn-success { background: var(--cal-success); border-color: var(--cal-success); color: var(--cal-text-inverse); }
+.btn-success:hover { background: var(--cal-success); border-color: var(--cal-success); color: var(--cal-text-inverse); filter: brightness(1.08); }
+
+.btn-outline-primary { border-color: var(--cal-cyan); color: var(--cal-cyan); background: transparent; }
+.btn-outline-primary:hover, .btn-outline-primary:focus { background: var(--cal-cyan-ghost); border-color: var(--cal-cyan); color: var(--cal-cyan); }
+
+.btn-outline-secondary { border-color: var(--cal-border-strong); color: var(--cal-text-muted); background: transparent; }
+.btn-outline-secondary:hover, .btn-outline-secondary:focus { background: var(--cal-surface-3); border-color: var(--cal-border-strong); color: var(--cal-text); }
+
+.btn-outline-success { border-color: var(--cal-success); color: var(--cal-success); background: transparent; }
+.btn-outline-success:hover { background: var(--cal-success-ghost); border-color: var(--cal-success); color: var(--cal-success); }
+
+.btn-outline-danger { border-color: var(--cal-danger); color: var(--cal-danger); background: transparent; }
+.btn-outline-danger:hover, .btn-outline-danger:focus { background: var(--cal-danger-ghost); border-color: var(--cal-danger); color: var(--cal-danger); }
+
+.btn-outline-light { border-color: var(--cal-border-strong); color: var(--cal-text); background: transparent; }
+.btn-outline-light:hover { background: var(--cal-surface-3); color: var(--cal-text); }
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 2px var(--cal-bg), 0 0 0 4px var(--cal-cyan);
+}
+
+/* ── Bootstrap overrides — forms ── */
+.form-control, .form-select {
+    background-color: var(--cal-surface-1);
+    border-color: var(--cal-border-strong);
+    color: var(--cal-text);
+    border-radius: var(--cal-radius-sm);
+}
+.form-control:focus, .form-select:focus {
+    background-color: var(--cal-surface-1);
+    border-color: var(--cal-cyan);
+    color: var(--cal-text);
+    box-shadow: 0 0 0 3px var(--cal-cyan-ghost);
+}
+.form-control::placeholder { color: var(--cal-text-faint); }
+
+/* ── Bootstrap overrides — tables ── */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: var(--cal-surface-3);
+    --bs-table-hover-bg: var(--cal-surface-3);
+    --bs-table-border-color: var(--cal-border-faint);
+    --bs-table-color: var(--cal-text);
+    color: var(--cal-text);
+    border-color: var(--cal-border-faint);
+}
+.table thead th {
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cal-text-faint);
+    border-bottom: 1px solid var(--cal-border-strong) !important;
+    padding: 10px 12px;
+}
+.table td {
+    padding: 10px 12px;
+    vertical-align: middle;
+    border-bottom-color: var(--cal-border-faint);
+    color: var(--cal-text-muted);
+}
+.table td a { color: var(--cal-text); text-decoration: none; transition: color var(--cal-dur) var(--cal-ease); }
+.table td a:hover { color: var(--cal-cyan); text-decoration: none; }
+.table tbody tr { transition: background var(--cal-dur-fast) var(--cal-ease); }
+.table tbody tr:hover td { background: var(--cal-surface-3); }
+
+/* ── Bootstrap overrides — alerts ── */
+.alert { border-radius: var(--cal-radius-md); padding: 12px 16px; }
+.alert-warning { background: var(--cal-warning-ghost); border-color: rgba(255,176,32,0.3); color: var(--cal-warning); }
+.alert-warning strong { color: var(--cal-text); }
+.alert-danger  { background: var(--cal-danger-ghost);  border-color: rgba(255,77,77,0.3);   color: var(--cal-danger);  }
+.alert-success { background: var(--cal-success-ghost); border-color: rgba(33,208,122,0.3);  color: var(--cal-success); }
+.alert-info    { background: var(--cal-cyan-ghost);    border-color: rgba(0,229,255,0.3);   color: var(--cal-cyan);    }
+
+/* ── Bootstrap overrides — cards ── */
+.card {
+    background: var(--cal-surface-2);
+    border: 1px solid var(--cal-border);
+    border-radius: var(--cal-radius-lg);
+    box-shadow: var(--cal-shadow-lg), var(--cal-edge-top);
+    color: var(--cal-text);
+}
+.card-body { padding: 20px; }
+.card-title { font-family: var(--cal-font-heading); font-weight: 700; font-size: 16px; color: var(--cal-text); }
+.card-text { color: var(--cal-text-muted); }
+
+/* ── Bootstrap overrides — pagination ── */
+.pagination { --bs-pagination-bg: var(--cal-surface-2); --bs-pagination-border-color: var(--cal-border); --bs-pagination-color: var(--cal-text-muted); --bs-pagination-hover-bg: var(--cal-surface-3); --bs-pagination-hover-border-color: var(--cal-border-strong); --bs-pagination-hover-color: var(--cal-text); --bs-pagination-active-bg: var(--cal-cyan); --bs-pagination-active-border-color: var(--cal-cyan); --bs-pagination-active-color: var(--cal-text-inverse); --bs-pagination-disabled-bg: var(--cal-surface-1); --bs-pagination-disabled-color: var(--cal-text-faint); --bs-pagination-disabled-border-color: var(--cal-border); }
+
+/* ── Bootstrap overrides — definition lists ── */
+dl.row dt {
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cal-text-faint);
+    padding-top: 4px;
+}
+dl.row dd { color: var(--cal-text-muted); margin-bottom: 10px; }
+dl.row dd a { color: var(--cal-text); }
+dl.row dd a:hover { color: var(--cal-cyan); }
+
+/* ── Bootstrap overrides — misc utilities ── */
+.text-muted { color: var(--cal-text-muted) !important; }
+.text-success { color: var(--cal-success) !important; }
+.text-danger  { color: var(--cal-danger)  !important; }
+
+/* ── CAL badge chip (replaces Bootstrap .badge) ── */
+.cal-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: var(--cal-radius-pill);
+    font-family: var(--cal-font-mono);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    background: var(--cal-surface-3);
+    color: var(--cal-text-muted);
+    border: 1px solid transparent;
+}
+.cal-badge--cyan    { background: var(--cal-cyan-ghost);    color: var(--cal-cyan);    }
+.cal-badge--magenta { background: var(--cal-magenta-ghost); color: var(--cal-magenta); }
+.cal-badge--success { background: var(--cal-success-ghost); color: var(--cal-success); }
+.cal-badge--warning { background: var(--cal-warning-ghost); color: var(--cal-warning); }
+.cal-badge--danger  { background: var(--cal-danger-ghost);  color: var(--cal-danger);  }
+.cal-badge--outline { background: transparent; color: var(--cal-text-muted); border-color: var(--cal-border-strong); }
+
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+    outline: 1px solid var(--cal-success);
 }
 
 .invalid {
-    outline: 1px solid #e50000;
+    outline: 1px solid var(--cal-danger);
 }
 
 .validation-message {
-    color: #e50000;
+    color: var(--cal-danger);
 }
 
 .blazor-error-boundary {
@@ -130,34 +297,53 @@ h3 {
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    background: linear-gradient(135deg, #7b5800 0%, #c8960c 40%, #ffd700 60%, #c8960c 80%, #7b5800 100%);
-    border-radius: 0.5rem;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    box-shadow: 0 2px 12px rgba(200, 150, 12, 0.45);
+    background: var(--cal-surface-2);
+    border: 1px solid var(--cal-border);
+    border-radius: var(--cal-radius-lg);
+    color: var(--cal-text);
+    box-shadow: var(--cal-shadow-lg), var(--cal-edge-top), var(--cal-glow-magenta);
+    position: relative;
+    overflow: hidden;
+}
+.grand-final-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--cal-gradient);
 }
 
 .grand-final-trophy {
     font-size: 2rem;
     line-height: 1;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
 }
 
 .grand-final-title {
-    font-size: 1.1rem;
+    font-family: var(--cal-font-heading);
+    font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    background: var(--cal-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .grand-final-subtitle {
-    font-size: 0.85rem;
-    opacity: 0.85;
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cal-text-faint);
 }
 
 .grand-final-matchup-title {
+    font-family: var(--cal-font-display);
     font-size: 1.75rem;
-    font-weight: 700;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--cal-text);
 }
 
 /* News index */
@@ -170,7 +356,7 @@ h3 {
     flex-direction: column;
     gap: 0.35rem;
     padding: 2rem 0;
-    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    border-bottom: 1px solid var(--cal-border-faint);
 }
 
 .news-item:first-child {
@@ -182,12 +368,13 @@ h3 {
     font-weight: 700;
     line-height: 1.25;
     letter-spacing: -0.02em;
-    color: var(--bs-body-color, #212529);
+    color: var(--cal-text);
     text-decoration: none;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .news-item-title:hover {
-    color: #cc006e;
+    color: var(--cal-cyan);
     text-decoration: none;
 }
 
@@ -195,56 +382,62 @@ h3 {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.8rem;
-    color: var(--bs-secondary-color, #6c757d);
-    letter-spacing: 0.02em;
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    color: var(--cal-text-faint);
+    letter-spacing: 0.14em;
     text-transform: uppercase;
 }
 
 .news-item-meta a {
-    color: var(--bs-secondary-color, #6c757d);
+    color: var(--cal-text-faint);
     text-decoration: none;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .news-item-meta a:hover {
-    color: var(--bs-body-color, #212529);
-    text-decoration: underline;
+    color: var(--cal-text-muted);
+    text-decoration: none;
 }
 
 .news-item-meta-sep {
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 .news-item-excerpt {
     margin: 0;
-    color: #444;
+    color: var(--cal-text-muted);
     line-height: 1.6;
     font-size: 0.97rem;
 }
 
 .news-item-read-more {
-    font-size: 0.85rem;
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
     font-weight: 600;
-    color: #cc006e;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cal-cyan);
     text-decoration: none;
     margin-top: 0.1rem;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .news-item-read-more:hover {
-    text-decoration: underline;
-    color: #a8005a;
+    color: var(--cal-text);
+    text-decoration: none;
 }
 
 /* Post comments */
 .post-comments {
     max-width: 680px;
-    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    border-top: 1px solid var(--cal-border-faint);
     padding-top: 2rem;
 }
 
 .post-comment {
     padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    border-bottom: 1px solid var(--cal-border-faint);
 }
 
 .post-comment:last-child {
@@ -255,42 +448,47 @@ h3 {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.8rem;
-    color: var(--bs-secondary-color, #6c757d);
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    color: var(--cal-text-faint);
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.14em;
     margin-bottom: 0.35rem;
 }
 
 .post-comment-meta a {
-    color: var(--bs-secondary-color, #6c757d);
+    color: var(--cal-text-faint);
     text-decoration: none;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .post-comment-meta a:hover {
-    color: var(--bs-body-color, #212529);
-    text-decoration: underline;
+    color: var(--cal-text-muted);
+    text-decoration: none;
 }
 
 .post-comment-body {
     margin: 0;
     line-height: 1.6;
+    color: var(--cal-text-muted);
 }
 
 .post-comment-delete {
     background: none;
     border: none;
     padding: 0;
-    font-size: 0.8rem;
-    color: var(--bs-secondary-color, #6c757d);
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--cal-text-faint);
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .post-comment-delete:hover {
-    color: #cc006e;
-    text-decoration: underline;
+    color: var(--cal-cyan);
+    text-decoration: none;
 }
 
 .site-footer {
@@ -299,9 +497,9 @@ h3 {
     align-items: center;
     padding: 1rem 1.5rem;
     margin-top: 2rem;
-    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    border-top: 1px solid var(--cal-border-faint);
     font-size: 13px;
-    color: var(--bs-secondary-color, #6c757d);
+    color: var(--cal-text-faint);
 }
 
 .site-footer-social {
@@ -312,28 +510,38 @@ h3 {
 }
 
 .site-footer-name {
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cal-text-faint);
 }
 
 .site-footer-top {
-    color: var(--bs-secondary-color, #6c757d);
+    color: var(--cal-text-faint);
     text-decoration: none;
     text-align: right;
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .site-footer-top:hover {
-    text-decoration: underline;
-    color: var(--bs-body-color);
+    color: var(--cal-cyan);
+    text-decoration: none;
 }
 
 .site-footer-reddit {
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    color: var(--bs-secondary-color, #6c757d);
+    color: var(--cal-text-faint);
     text-decoration: none;
     font-size: 0.875rem;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .site-footer-reddit:hover {
@@ -344,11 +552,12 @@ h3 {
 .site-footer-email {
     display: flex;
     align-items: center;
-    color: var(--bs-secondary-color, #6c757d);
+    color: var(--cal-text-faint);
     text-decoration: none;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .site-footer-email:hover {
-    color: var(--bs-body-color);
+    color: var(--cal-text-muted);
     text-decoration: none;
 }

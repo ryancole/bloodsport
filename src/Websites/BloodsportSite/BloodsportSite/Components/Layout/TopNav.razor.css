@@ -1,5 +1,8 @@
 .top-nav {
-    background-color: #2a2a2a;
+    background-color: rgba(11, 14, 20, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--cal-border-faint);
     display: flex;
     align-items: center;
     height: 3.5rem;
@@ -8,7 +11,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
 }
 
 .top-nav-brand {
@@ -19,7 +22,7 @@
 }
 
 .top-nav-brand:hover .top-nav-logo {
-    filter: drop-shadow(0 0 8px rgba(200, 170, 90, 0.8)) brightness(1.1);
+    filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) brightness(1.1);
 }
 
 .top-nav-logo {
@@ -35,53 +38,57 @@
 }
 
 .top-nav-links ::deep .nav-link {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: var(--cal-font-heading);
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
+    color: var(--cal-text-muted);
     padding: 0.35rem 0.75rem;
-    border-radius: 4px;
+    border-radius: var(--cal-radius-xs);
     font-size: 0.85rem;
     white-space: nowrap;
     text-decoration: none;
+    transition: color var(--cal-dur) var(--cal-ease), background var(--cal-dur) var(--cal-ease);
 }
 
 .top-nav-links ::deep .nav-link:hover {
-    color: #c8aa5a;
-    background-color: rgba(200, 170, 90, 0.1);
+    color: var(--cal-cyan);
+    background-color: var(--cal-cyan-ghost);
 }
 
 .top-nav-links ::deep .nav-link.active {
-    color: #c8aa5a;
-    background-color: rgba(200, 170, 90, 0.12);
+    color: var(--cal-cyan);
+    background-color: var(--cal-cyan-ghost);
 }
 
 .top-nav-separator {
     width: 1px;
     height: 1.25rem;
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: var(--cal-border);
     margin: 0 0.5rem;
 }
 
 .top-nav-breadcrumbs {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
+    font-family: var(--cal-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--cal-text-faint);
 }
 
 .top-nav-breadcrumbs:not(:empty) {
-    border-left: 1px solid rgba(255, 255, 255, 0.25);
+    border-left: 1px solid var(--cal-border);
     padding-left: 1rem;
     margin-left: 0.5rem;
 }
 
 .top-nav-breadcrumbs ::deep a {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--cal-text-faint);
     text-decoration: none;
+    transition: color var(--cal-dur) var(--cal-ease);
 }
 
 .top-nav-breadcrumbs ::deep a:hover {
-    color: white;
+    color: var(--cal-text-muted);
 }
 
 .top-nav-auth {
@@ -92,12 +99,18 @@
 }
 
 .top-nav-auth ::deep a {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.9rem;
+    color: var(--cal-text-muted);
+    font-family: var(--cal-font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
     text-decoration: none;
+    transition: color var(--cal-dur) var(--cal-ease);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .top-nav-auth ::deep a:hover {
-    color: white;
-    text-decoration: underline;
+    color: var(--cal-text);
+    text-decoration: none;
 }

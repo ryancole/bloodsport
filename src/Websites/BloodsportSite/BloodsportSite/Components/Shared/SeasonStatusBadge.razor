@@ -1,7 +1,16 @@
 @using Bloodsport.Entity.Database
 
-<span class="badge @(Status switch { SeasonStatus.PreSeason => "bg-warning text-dark", SeasonStatus.Active => "bg-success", _ => "bg-secondary" })">@Status</span>
+<span class="cal-badge @BadgeClass">@Status</span>
 
 @code {
     [Parameter] public SeasonStatus Status { get; set; }
+
+    private string BadgeClass => Status switch
+    {
+        SeasonStatus.Active    => "cal-badge--cyan",
+        SeasonStatus.Upcoming  => "cal-badge--warning",
+        SeasonStatus.PreSeason => "cal-badge--warning",
+        SeasonStatus.Completed => "",
+        _                      => "",
+    };
 }
