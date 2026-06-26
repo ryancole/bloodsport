@@ -160,19 +160,19 @@ else
                             @reg.Season.Status
                             @if (reg.Season.RegistrationOpen)
                             {
-                                <span class="badge bg-success ms-2">Registration Open</span>
+                                <span class="cal-badge cal-badge--success ms-2">Reg. Open</span>
                             }
                         </td>
                         <td>
                             @if (seasonResults.TryGetValue(reg.Season.Id, out var result))
                             {
-                                <span class="text-success fw-semibold">@result.WinCount W</span>
-                                <span class="text-muted mx-1">/</span>
-                                <span class="text-danger fw-semibold">@result.LoseCount L</span>
+                                <span style="color:var(--cal-success);font-weight:700">@result.WinCount W</span>
+                                <span style="color:var(--cal-text-faint);margin:0 4px">/</span>
+                                <span style="color:var(--cal-danger);font-weight:700">@result.LoseCount L</span>
                             }
                             else
                             {
-                                <span class="text-muted">—</span>
+                                <span style="color:var(--cal-text-faint)">—</span>
                             }
                         </td>
                         <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
@@ -219,7 +219,7 @@ else
                         <td><a href="/playoffs/@entry.PlayoffId">@entry.Playoff.Name</a></td>
                         <td><a href="/seasons/@entry.Playoff.SeasonId">@entry.Playoff.Season.Name</a></td>
                         <td>@entry.Seed</td>
-                        <td><span class="badge @StatusBadgeClass(entry.Playoff.Status)">@entry.Playoff.Status</span></td>
+                        <td><span class="cal-badge @StatusBadgeClass(entry.Playoff.Status)">@entry.Playoff.Status</span></td>
                     </tr>
                 }
             </tbody>
@@ -231,10 +231,10 @@ else
 @code {
     private static string StatusBadgeClass(PlayoffStatus status) => status switch
     {
-        PlayoffStatus.Upcoming => "bg-secondary",
-        PlayoffStatus.Active => "bg-success",
-        PlayoffStatus.Completed => "bg-dark",
-        _ => "bg-secondary"
+        PlayoffStatus.Active    => "cal-badge--magenta",
+        PlayoffStatus.Upcoming  => "cal-badge--warning",
+        PlayoffStatus.Completed => "",
+        _                       => "",
     };
 
     [Parameter] public long Id { get; set; }

@@ -1,9 +1,10 @@
-**Badge** — compact status / category chip, JetBrains Mono caps with wide tracking. The visual shorthand for state across CAL surfaces (LIVE, W/L, seeds, tags).
+Pill status chip in uppercase JetBrains Mono — labels league state with a ghost fill and colored text.
 
 ```jsx
-<Badge tone="live">Live</Badge>
-<Badge tone="win" dot>W</Badge>
-<Badge tone="outline">Group A</Badge>
+<Badge tone="cyan">Regular</Badge>
+<Badge tone="magenta">Playoff</Badge>
+<Badge tone="success">Reg. Open</Badge>
+<Badge tone="warning">Preseason</Badge>
 ```
 
-Tones: `live` (pulsing magenta) · `win` (cyan) · `loss` (magenta) · `neutral` · `outline`.
+Tones: `neutral`, `cyan` (regular season / active), `magenta` (playoffs / champion), `success` (registration open / win), `warning` (preseason / pending), `danger` (loss / eliminated).

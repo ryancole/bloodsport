@@ -1,93 +1,86 @@
 import React from 'react';
 
 /**
- * CAL Button — the primary action primitive.
- * Variants: "primary" (cyan fill), "gradient" (cyan→magenta), "secondary"
- * (hairline outline), "ghost" (text only). Sizes: sm | md | lg.
+ * CAL Button — Rajdhani uppercase action button.
+ * Variants: primary (solid cyan), neon (cyan ghost), secondary (outline),
+ * ghost (text only), danger. Sizes: sm, md, lg.
  */
 export function Button({
   children,
   variant = 'primary',
   size = 'md',
   disabled = false,
+  type = 'button',
   iconLeft = null,
   iconRight = null,
-  onClick,
-  type = 'button',
+  style = {},
   ...rest
 }) {
   const sizes = {
-    sm: { padding: '0 14px', height: 34, fontSize: 13 },
-    md: { padding: '0 20px', height: 42, fontSize: 14 },
-    lg: { padding: '0 28px', height: 52, fontSize: 16 },
-  };
-
-  const base = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    height: sizes[size].height,
-    padding: sizes[size].padding,
-    fontFamily: 'var(--cal-font-display)',
-    fontWeight: 700,
-    fontSize: sizes[size].fontSize,
-    letterSpacing: '0.02em',
-    textTransform: 'uppercase',
-    border: '1px solid transparent',
-    borderRadius: 'var(--cal-radius-sm)',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    opacity: disabled ? 0.45 : 1,
-    transition: 'transform var(--cal-dur-fast) var(--cal-ease), filter var(--cal-dur) var(--cal-ease), background var(--cal-dur) var(--cal-ease)',
-    whiteSpace: 'nowrap',
+    sm: { height: 30, padding: '0 12px', fontSize: 12 },
+    md: { height: 38, padding: '0 18px', fontSize: 13 },
+    lg: { height: 46, padding: '0 26px', fontSize: 15 },
   };
 
   const variants = {
     primary: {
       background: 'var(--cal-cyan)',
       color: 'var(--cal-text-inverse)',
+      border: '1px solid var(--cal-cyan)',
     },
-    gradient: {
-      background: 'var(--cal-gradient)',
-      color: 'var(--cal-text-inverse)',
+    neon: {
+      background: 'var(--cal-cyan-ghost)',
+      color: 'var(--cal-cyan)',
+      border: '1px solid rgba(0,229,255,0.45)',
     },
     secondary: {
-      background: 'transparent',
+      background: 'var(--cal-surface-3)',
       color: 'var(--cal-text)',
-      borderColor: 'var(--cal-border-strong)',
+      border: '1px solid var(--cal-border-strong)',
     },
     ghost: {
       background: 'transparent',
       color: 'var(--cal-text-muted)',
+      border: '1px solid transparent',
+    },
+    danger: {
+      background: 'var(--cal-danger-ghost)',
+      color: 'var(--cal-danger)',
+      border: '1px solid rgba(255,77,77,0.45)',
     },
   };
 
-  const [hover, setHover] = React.useState(false);
-  const [press, setPress] = React.useState(false);
-
-  const hoverStyle = !disabled && hover
-    ? (variant === 'secondary'
-        ? { borderColor: 'var(--cal-cyan)', color: 'var(--cal-cyan)' }
-        : variant === 'ghost'
-          ? { color: 'var(--cal-text)' }
-          : { filter: 'brightness(1.08)' })
-    : null;
+  const s = sizes[size] || sizes.md;
+  const v = variants[variant] || variants.primary;
 
   return (
     <button
       type={type}
       disabled={disabled}
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => { setHover(false); setPress(false); }}
-      onMouseDown={() => setPress(true)}
-      onMouseUp={() => setPress(false)}
       style={{
-        ...base,
-        ...variants[variant],
-        ...hoverStyle,
-        transform: press && !disabled ? 'translateY(1px) scale(0.99)' : 'none',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        height: s.height,
+        padding: s.padding,
+        fontSize: s.fontSize,
+        fontFamily: 'var(--cal-font-heading)',
+        fontWeight: 600,
+        letterSpacing: '0.05em',
+        textTransform: 'uppercase',
+        borderRadius: 'var(--cal-radius-sm)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.45 : 1,
+        whiteSpace: 'nowrap',
+        transition: 'filter var(--cal-dur) var(--cal-ease), transform var(--cal-dur-fast) var(--cal-ease), background var(--cal-dur) var(--cal-ease)',
+        ...v,
+        ...style,
       }}
+      onMouseDown={(e) => { if (!disabled) e.currentTarget.style.transform = 'translateY(1px)'; }}
+      onMouseUp={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+      onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.filter = 'brightness(1.12)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
       {...rest}
     >
       {iconLeft}

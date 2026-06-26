@@ -1,6 +1,8 @@
-**Input** — dark field (`--cal-surface-1`) with a strong hairline that lights cyan on focus plus a soft cyan glow ring. Optional mono caps `label` and `hint`.
+Dark labelled text field. Surface-1 fill, border lifts to cyan with a ghost ring on focus.
 
 ```jsx
-<Input label="Team name" placeholder="e.g. Neon Foxes" />
-<Input label="Invite code" mono placeholder="CAL-XXXX" hint="6 characters" />
+<Input label="Team name" placeholder="Void Reavers" />
+<Input label="Lobby code" invalid hint="Code expired" />
 ```
+
+Wraps `<input>`, so `value`, `onChange`, `type`, `placeholder` etc. pass through. Add `label`, `hint`, `invalid`.

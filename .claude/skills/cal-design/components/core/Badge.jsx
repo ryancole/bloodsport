@@ -1,56 +1,40 @@
 import React from 'react';
 
 /**
- * CAL Badge — compact status / category chip in mono caps.
- * tone: "live" (pulsing magenta) | "win" (cyan) | "loss" (magenta) |
- * "neutral" | "outline".
+ * CAL Badge — pill status chip in JetBrains Mono.
+ * Ghost-fill + colored text. Maps to league statuses (regular/playoff/
+ * registration/preseason/win/loss).
  */
-export function Badge({ children, tone = 'neutral', dot = false, ...rest }) {
+export function Badge({ children, tone = 'neutral', style = {}, ...rest }) {
   const tones = {
-    live:    { bg: 'var(--cal-magenta-ghost)', fg: 'var(--cal-magenta)', bd: 'transparent' },
-    win:     { bg: 'var(--cal-cyan-ghost)',    fg: 'var(--cal-cyan)',    bd: 'transparent' },
-    loss:    { bg: 'var(--cal-magenta-ghost)', fg: 'var(--cal-magenta)', bd: 'transparent' },
-    neutral: { bg: 'var(--cal-surface-3)',     fg: 'var(--cal-text-muted)', bd: 'transparent' },
-    outline: { bg: 'transparent',              fg: 'var(--cal-text-muted)', bd: 'var(--cal-border-strong)' },
+    neutral:  { background: 'var(--cal-surface-3)',     color: 'var(--cal-text-muted)' },
+    cyan:     { background: 'var(--cal-cyan-ghost)',    color: 'var(--cal-cyan)' },
+    magenta:  { background: 'var(--cal-magenta-ghost)', color: 'var(--cal-magenta)' },
+    success:  { background: 'var(--cal-success-ghost)', color: 'var(--cal-success)' },
+    warning:  { background: 'var(--cal-warning-ghost)', color: 'var(--cal-warning)' },
+    danger:   { background: 'var(--cal-danger-ghost)',  color: 'var(--cal-danger)' },
   };
   const t = tones[tone] || tones.neutral;
-
   return (
     <span
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
-        height: 22,
-        padding: '0 10px',
-        background: t.bg,
-        color: t.fg,
-        border: `1px solid ${t.bd}`,
+        height: 20,
+        padding: '0 8px',
         borderRadius: 'var(--cal-radius-pill)',
         fontFamily: 'var(--cal-font-mono)',
         fontWeight: 600,
-        fontSize: 11,
-        letterSpacing: '0.14em',
+        fontSize: 10,
+        letterSpacing: '0.12em',
         textTransform: 'uppercase',
-        lineHeight: 1,
         whiteSpace: 'nowrap',
+        ...t,
+        ...style,
       }}
       {...rest}
     >
-      {(dot || tone === 'live') && (
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: t.fg,
-            boxShadow: tone === 'live' ? `0 0 0 0 ${t.fg}` : 'none',
-            animation: tone === 'live' ? 'cal-pulse 1.6s var(--cal-ease-inout) infinite' : 'none',
-          }}
-        />
-      )}
       {children}
-      <style>{`@keyframes cal-pulse{0%{box-shadow:0 0 0 0 rgba(255,46,152,.5)}70%{box-shadow:0 0 0 6px rgba(255,46,152,0)}100%{box-shadow:0 0 0 0 rgba(255,46,152,0)}}`}</style>
     </span>
   );
 }

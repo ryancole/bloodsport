@@ -1,0 +1,25 @@
+<!-- @dsCard group="Colors" viewport="700x160" name="Brand Neon" subtitle="Cyan = regular season · Magenta = playoffs" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sw { border-radius: var(--cal-radius-md); border: 1px solid var(--cal-border); overflow: hidden; box-shadow: var(--cal-shadow-sm), var(--cal-edge-top); }
+  .chip { height: 64px; }
+  .meta { padding: 8px 10px; background: var(--cal-surface-2); }
+  .name { font-family: var(--cal-font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cal-text); }
+  .hex { font-family: var(--cal-font-mono); font-size: 11px; color: var(--cal-text-faint); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw"><div class="chip" style="background:var(--cal-cyan); box-shadow: var(--cal-glow-cyan)"></div><div class="meta"><div class="name">Cyan</div><div class="hex">#00E5FF</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cal-cyan-ghost)"></div><div class="meta"><div class="name">Cyan Ghost</div><div class="hex">12% α</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cal-magenta); box-shadow: var(--cal-glow-magenta)"></div><div class="meta"><div class="name">Magenta</div><div class="hex">#FF2E98</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--cal-magenta-ghost)"></div><div class="meta"><div class="name">Magenta Ghost</div><div class="hex">12% α</div></div></div>
+  </div>
+</body>
+</html>

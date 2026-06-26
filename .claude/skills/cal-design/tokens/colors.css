@@ -1,59 +1,52 @@
 /* ============================================================
-   CAL · COLOR SYSTEM
-   A cool near-black ground lit by a two-tone RGB-split palette:
-   cyan + magenta. Born from the glitched "C" mark.
+   COLORS — Champions Amateur League
+   Dark esports surface system + neon cyan/magenta brand.
    ============================================================ */
-
 :root {
-  /* --- Ground / surfaces (cool near-blacks) --- */
-  --cal-bg:            #0B0E14; /* page ground — the favicon tile */
-  --cal-surface-1:     #11151F; /* raised panel */
-  --cal-surface-2:     #161B27; /* card */
-  --cal-surface-3:     #1D2433; /* hover / elevated card */
-  --cal-overlay:       #0A0D13; /* scrims, deep wells */
+  /* ---- Base canvas & surfaces ---- */
+  --cal-bg:             #0B0E14; /* page background — near-black navy */
+  --cal-surface-1:      #11151F; /* lowest raised surface */
+  --cal-surface-2:      #161B27; /* default card surface */
+  --cal-surface-3:      #1D2433; /* hover / inset surface */
 
-  /* --- Lines --- */
-  --cal-border:        #232A38; /* default hairline */
-  --cal-border-strong: #323B4D; /* emphasized divider */
-  --cal-border-faint:  #1A2030; /* barely-there separation */
+  /* ---- Borders ---- */
+  --cal-border:         #232A38; /* default hairline */
+  --cal-border-strong:  #323B4D; /* emphasized / focus ring base */
+  --cal-border-faint:   #1A2030; /* internal row dividers */
 
-  /* --- Text --- */
-  --cal-text:          #F4F5F7; /* primary — the logo white */
-  --cal-text-muted:    #8B93A3; /* secondary / body-dim */
-  --cal-text-faint:    #5B6373; /* eyebrows, captions, meta */
-  --cal-text-inverse:  #0B0E14; /* on bright accent fills */
+  /* ---- Text ---- */
+  --cal-text:           #F4F5F7; /* primary text */
+  --cal-text-muted:     #8B93A3; /* secondary text */
+  --cal-text-faint:     #5B6373; /* labels, meta, disabled */
+  --cal-text-inverse:   #0B0E14; /* text on bright fills */
 
-  /* --- Brand accents (the glitch) --- */
-  --cal-cyan:          #00E5FF;
-  --cal-cyan-dim:      #15A6B8;
-  --cal-cyan-ghost:    rgba(0, 229, 255, 0.12);
+  /* ---- Brand neon ---- */
+  --cal-cyan:           #00E5FF; /* primary brand / regular-season */
+  --cal-cyan-ghost:     rgba(0, 229, 255, 0.12);
+  --cal-magenta:        #FF2E98; /* secondary brand / playoffs */
+  --cal-magenta-ghost:  rgba(255, 46, 152, 0.12);
 
-  --cal-magenta:       #FF2E98;
-  --cal-magenta-dim:   #C21F73;
-  --cal-magenta-ghost: rgba(255, 46, 152, 0.12);
+  /* ---- Semantic status ---- */
+  --cal-success:        #21D07A; /* registration open, wins */
+  --cal-success-ghost:  rgba(33, 208, 122, 0.12);
+  --cal-warning:        #FFB020; /* preseason, pending */
+  --cal-warning-ghost:  rgba(255, 176, 32, 0.12);
+  --cal-danger:         #FF4D4D; /* losses, errors, eliminate */
+  --cal-danger-ghost:   rgba(255, 77, 77, 0.12);
+  --cal-info:           var(--cal-cyan);
 
-  /* The signature split gradient — cyan → magenta */
-  --cal-gradient:      linear-gradient(105deg, #00E5FF 0%, #FF2E98 100%);
-  --cal-gradient-soft: linear-gradient(105deg, rgba(0,229,255,0.18) 0%, rgba(255,46,152,0.18) 100%);
+  /* ---- Signature gradients ---- */
+  --cal-gradient:       linear-gradient(105deg, #00E5FF 0%, #FF2E98 100%); /* @kind color */
+  --cal-gradient-soft:  linear-gradient(105deg, rgba(0,229,255,0.18) 0%, rgba(255,46,152,0.18) 100%); /* @kind color */
 
-  /* --- Functional / status --- */
-  --cal-win:           #00E5FF; /* wins read cyan */
-  --cal-loss:          #FF2E98; /* losses read magenta */
-  --cal-draw:          #8B93A3; /* draws read neutral */
-  --cal-success:       #21D07A;
-  --cal-warning:       #FFB020;
-  --cal-danger:        #FF4D4D;
-  --cal-live:          #FF2E98; /* "LIVE" pulse */
-
-  /* --- Glows (use sparingly, on accent elements) --- */
-  --cal-glow-cyan:     0 0 24px rgba(0, 229, 255, 0.45);
-  --cal-glow-magenta:  0 0 24px rgba(255, 46, 152, 0.45);
-
-  /* --- Semantic aliases --- */
-  --surface-page:      var(--cal-bg);
-  --surface-card:      var(--cal-surface-2);
-  --text-primary:      var(--cal-text);
-  --text-secondary:    var(--cal-text-muted);
-  --accent:            var(--cal-cyan);
-  --accent-2:          var(--cal-magenta);
+  /* ---- Semantic aliases (use these in components) ---- */
+  --text-body:          var(--cal-text);
+  --text-secondary:     var(--cal-text-muted);
+  --text-label:         var(--cal-text-faint);
+  --surface-page:       var(--cal-bg);
+  --surface-card:       var(--cal-surface-2);
+  --surface-raised:     var(--cal-surface-3);
+  --border-default:     var(--cal-border);
+  --accent-primary:     var(--cal-cyan);
+  --accent-secondary:   var(--cal-magenta);
 }

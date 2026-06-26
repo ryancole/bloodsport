@@ -1,0 +1,23 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Elevation & Card Anatomy" subtitle="Shadow + inset edge + gradient keyline" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; display: flex; gap: 18px; align-items: center; }
+  .card { flex: 1; background: var(--cal-surface-2); border: 1px solid var(--cal-border); border-radius: var(--cal-radius-lg); position: relative; overflow: hidden; padding: 20px 18px; }
+  .card::before { content:""; position:absolute; top:0;left:0;right:0;height:2px; background: var(--cal-gradient); }
+  .sm { box-shadow: var(--cal-shadow-sm), var(--cal-edge-top); }
+  .md { box-shadow: var(--cal-shadow-md), var(--cal-edge-top); }
+  .lg { box-shadow: var(--cal-shadow-lg), var(--cal-edge-top); }
+  .eyebrow { font-family: var(--cal-font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cal-text-faint); }
+  .title { font-size: 15px; font-weight: 700; color: var(--cal-text); margin-top: 8px; }
+</style>
+</head>
+<body>
+  <div class="card sm"><div class="eyebrow">Shadow SM</div><div class="title">Stat tile</div></div>
+  <div class="card md"><div class="eyebrow">Shadow MD</div><div class="title">Panel</div></div>
+  <div class="card lg"><div class="eyebrow">Shadow LG</div><div class="title">Feature card</div></div>
+</body>
+</html>

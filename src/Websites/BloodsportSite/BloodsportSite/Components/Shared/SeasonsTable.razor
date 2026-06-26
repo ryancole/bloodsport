@@ -24,11 +24,11 @@ else
                         <a href="/seasons/@season.Id">@season.Name</a>
                         @if (season.RegistrationOpen)
                         {
-                            <span class="badge bg-success ms-2">Registration Open</span>
+                            <span class="cal-badge cal-badge--success ms-2">Reg. Open</span>
                         }
                     </td>
                     <td>@season.RiotRegion</td>
-                    <td><span class="badge @StatusBadgeClass(season.Status)">@season.Status</span></td>
+                    <td><span class="cal-badge @StatusBadgeClass(season.Status)">@season.Status</span></td>
                     <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
                     <td>@season.Length weeks</td>
                 </tr>
@@ -42,10 +42,10 @@ else
 
     private static string StatusBadgeClass(SeasonStatus status) => status switch
     {
-        SeasonStatus.Active => "bg-primary",
-        SeasonStatus.PreSeason => "bg-info text-dark",
-        SeasonStatus.Upcoming => "bg-secondary",
-        SeasonStatus.Completed => "bg-dark",
-        _ => "bg-secondary"
+        SeasonStatus.Active    => "cal-badge--cyan",
+        SeasonStatus.PreSeason => "cal-badge--warning",
+        SeasonStatus.Upcoming  => "cal-badge--warning",
+        SeasonStatus.Completed => "",
+        _                      => "",
     };
 }

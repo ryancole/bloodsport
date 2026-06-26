@@ -1,13 +1,17 @@
-import React from 'react';
+import * as React from 'react';
 
+/**
+ * Dark text field with optional mono label and hint; border lifts to cyan on focus.
+ *
+ * @startingPoint section="Forms" subtitle="Dark labelled text field" viewport="700x140"
+ */
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  /** Mono caps label above the field. */
-  label?: string | null;
-  /** Helper text below the field. */
-  hint?: string | null;
-  /** Use the mono family for the value (codes, scores). @default false */
-  mono?: boolean;
+  /** Mono uppercase label above the field. */
+  label?: React.ReactNode;
+  /** Helper or error text below the field. */
+  hint?: React.ReactNode;
+  /** Red border + hint when true. @default false */
+  invalid?: boolean;
 }
 
-/** Dark text field with a cyan focus ring. */
 export function Input(props: InputProps): JSX.Element;

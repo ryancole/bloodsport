@@ -1,9 +1,9 @@
-**Card** — the dark slab that holds nearly all CAL content. Hairline border, soft inset top edge, deep ambient shadow. Add `accent` for a colored top keyline; set `interactive` for clickable cards that lift on hover.
+The standard CAL dark panel — surface-2 with a gradient keyline, used for every dashboard module. Optional `eyebrow` + `action` header.
 
 ```jsx
-<Card accent="gradient" interactive>
-  <h3>Quarter-finals</h3>
+<Card eyebrow="Recent Seasons" action={<a href="/seasons">All →</a>}>
+  <SeasonRow ... />
 </Card>
 ```
 
-Padding defaults to 24px. Don't stack glows — at most one accent per card.
+Props: `eyebrow` (mono label), `action` (right-aligned header node), `keyline` (default true), `elevation` (`sm|md|lg`), `padded` (default true). Set `padded={false}` for edge-to-edge lists and pad rows individually.

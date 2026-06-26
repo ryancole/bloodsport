@@ -1,12 +1,16 @@
-import React from 'react';
+import * as React from 'react';
 
+/**
+ * Pill status chip (JetBrains Mono, uppercase). Conveys league status —
+ * regular season, playoffs, registration, win/loss.
+ *
+ * @startingPoint section="Core" subtitle="Mono pill status chip" viewport="700x100"
+ */
 export interface BadgeProps {
   children: React.ReactNode;
-  /** @default "neutral" */
-  tone?: 'live' | 'win' | 'loss' | 'neutral' | 'outline';
-  /** Show a leading status dot. "live" always pulses. */
-  dot?: boolean;
+  /** Status tone. @default "neutral" */
+  tone?: 'neutral' | 'cyan' | 'magenta' | 'success' | 'warning' | 'danger';
+  style?: React.CSSProperties;
 }
 
-/** Compact status / category chip in mono caps. */
 export function Badge(props: BadgeProps): JSX.Element;

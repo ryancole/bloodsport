@@ -1,4 +1,4 @@
-<span class="badge @(IsOpen ? "bg-success" : "bg-danger")">@(IsOpen ? "Open" : "Closed")</span>
+<span class="cal-badge @(IsOpen ? "cal-badge--success" : "cal-badge--danger")">@(IsOpen ? "Open" : "Closed")</span>
 
 @code {
     [Parameter] public bool IsOpen { get; set; }

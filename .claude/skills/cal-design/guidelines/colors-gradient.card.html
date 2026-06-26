@@ -1,0 +1,23 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Signature Gradient" subtitle="Cyan→magenta keyline — the CAL signature" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; }
+  .stack { display: flex; flex-direction: column; gap: 12px; }
+  .bar { height: 28px; border-radius: var(--cal-radius-sm); display: flex; align-items: center; padding: 0 12px; }
+  .lab { font-family: var(--cal-font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; mix-blend-mode: difference; }
+  .keyline-demo { height: 40px; background: var(--cal-surface-2); border: 1px solid var(--cal-border); border-radius: var(--cal-radius-md); position: relative; overflow: hidden; display:flex; align-items:center; padding:0 14px; }
+  .keyline-demo::before { content:""; position:absolute; top:0; left:0; right:0; height:2px; background: var(--cal-gradient); }
+  .keyline-demo span { font-family: var(--cal-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cal-text-faint); }
+</style>
+</head>
+<body>
+  <div class="stack">
+    <div class="bar" style="background:var(--cal-gradient)"><span class="lab">--cal-gradient · 105°</span></div>
+    <div class="keyline-demo"><span>2px keyline atop every card</span></div>
+  </div>
+</body>
+</html>

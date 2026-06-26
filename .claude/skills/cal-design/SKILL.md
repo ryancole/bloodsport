@@ -1,17 +1,31 @@
 ---
 name: cal-design
-description: Use this skill to generate well-branded interfaces and assets for CAL (Champions Amateur League), either for production or throwaway prototypes/mocks/etc. Contains essential design guidelines, colors, type, fonts, assets, and UI kit components for prototyping. The look is a dark cool-black ground with a cyan/magenta RGB-split "glitch" wordmark.
+description: Use this skill to generate well-branded interfaces and assets for Champions Amateur League (CAL) — a competitive League of Legends amateur league platform — for production or throwaway prototypes/mocks. Contains CAL's design guidelines, colors, type, fonts, logo assets, design tokens, and reusable UI kit components for prototyping its dark neon esports dashboard look.
 user-invocable: true
 ---
 
-Read the `readme.md` file within this skill, and explore the other available files (`styles.css` + `tokens/`, `components/`, `ui_kits/`, `guidelines/`, `assets/`).
+# Champions Amateur League (CAL) — Design Skill
 
-If creating visual artifacts (slides, mocks, throwaway prototypes, etc), copy assets out and create static HTML files for the user to view, linking `styles.css` for the real tokens. If working on production code, copy assets and read the rules here to become an expert in designing with this brand.
+**Where summoners become champions.** CAL is a dark, neon esports dashboard for running *League of Legends* amateur seasons and playoffs. The signature look: near-black navy surfaces, a **cyan→magenta** gradient keyline, condensed UPPERCASE Rajdhani headings, heavy Archivo display numerals, and JetBrains Mono labels.
 
-Core rules to honor:
-- Cool near-black ground (`#0B0E14`); two accents only — cyan `#00E5FF` + magenta `#FF2E98` — plus their gradient.
-- Archivo for structure, JetBrains Mono (wide uppercase tracking) for labels/data.
-- The "glitch" (`text-shadow: -N 0 cyan, N 0 magenta` on white) is for the wordmark and hero headlines only — never body or small text.
-- Dark slab cards, hairline borders, ambient shadows, no emoji, numbers as heroes.
+## Start here
 
-If the user invokes this skill without other guidance, ask them what they want to build, ask a few questions, and act as an expert designer who outputs HTML artifacts _or_ production code, depending on the need.
+1. **Read `readme.md`** — the full design guide: brand context, content/voice rules, visual foundations, iconography, and a file-by-file index. This is your source of truth.
+2. **Skim the tokens** in `tokens/` (`colors.css`, `typography.css`, `spacing.css`, `effects.css`) so you use the real CSS custom properties instead of inventing values.
+3. **Browse the specimen cards** in `guidelines/` and the component demos in `components/*/` to see the system in use.
+
+## How to build
+
+- **Always link `styles.css`** (the single entry point — it `@import`s the webfonts and every token file), then style with the `--cal-*` custom properties. Never hard-code hexes that already exist as tokens.
+- **Throwaway visuals (slides, mocks, prototypes):** copy the assets you need out of `assets/` and write self-contained static **HTML** files for the user to view. Reference `styles.css` with a relative path.
+- **Production code:** read the rules here and reuse the token variables + component patterns to become an expert in designing with this brand. The reusable React primitives live in `components/` (`Button`, `Badge`, `Card`, `Eyebrow`, `StatCard`, `Input`, `TeamFlag`).
+- **Stay on-brand:** dark mode only; cyan = primary/regular-season, magenta = playoffs; status = green/amber/red; badges are mono UPPERCASE ghost-fill pills; cards carry the 2px gradient keyline; motion is quick `cubic-bezier(0.22,1,0.36,1)` ease-out, no bounces. **No emoji** in UI copy. Voice is declarative and ruleset-precise.
+
+## Assets & icons
+
+- **Logo:** `assets/logo/CAL-masthead-*.png` (neon "CAL" glitch masthead) — present on a dark surface. `assets/favicon.svg` for the favicon.
+- **Icons:** CAL has no custom icon set. Prefer typography/labels/badges; when an icon is truly needed, use thin-stroke single-color line icons (Lucide is the recommended match) and flag it as a substitution.
+
+## If invoked with no specific task
+
+Ask the user what they want to build or design, ask a few clarifying questions (audience, surface, fidelity, production vs. mock), then act as an expert CAL designer who outputs either HTML artifacts or production code depending on the need.

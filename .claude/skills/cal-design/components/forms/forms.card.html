@@ -1,31 +1,33 @@
-<!-- @dsCard group="Components" viewport="700x200" name="Input" subtitle="Dark field with cyan focus ring" -->
+<!-- @dsCard group="Components" viewport="700x220" name="Forms — Inputs" subtitle="Dark labelled text fields with cyan focus" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<link rel="stylesheet" href="../../styles.css">
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
 <style>
-  body { margin:0; background:var(--cal-bg); padding:28px; display:flex; gap:24px; }
-  .field { display:flex; flex-direction:column; gap:8px; width:240px; }
-  .l { font-family:var(--cal-font-mono); font-weight:600; font-size:11px; letter-spacing:0.18em;
-       text-transform:uppercase; color:var(--cal-text-faint); }
-  .i { height:44px; padding:0 14px; background:var(--cal-surface-1); color:var(--cal-text);
-       border:1px solid var(--cal-border-strong); border-radius:var(--cal-radius-sm);
-       font-family:var(--cal-font-body); font-size:15px; }
-  .i.focus { border-color:var(--cal-cyan); box-shadow:0 0 0 3px var(--cal-cyan-ghost); }
-  .i.mono { font-family:var(--cal-font-mono); }
-  .hint { font-size:12px; color:var(--cal-text-faint); }
+  body { margin: 0; padding: 22px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 </style>
 </head>
 <body>
-  <div class="field">
-    <span class="l">Team name</span>
-    <div class="i" style="display:flex;align-items:center;color:var(--cal-text-muted)">Neon Foxes</div>
-  </div>
-  <div class="field">
-    <span class="l">Invite code</span>
-    <div class="i mono focus" style="display:flex;align-items:center">CAL-7F2K<span style="width:1px;height:18px;background:var(--cal-cyan);margin-left:2px"></span></div>
-    <span class="hint">6 characters · focused</span>
-  </div>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { Input } = window.ChampionsAmateurLeagueDesignSystem_df3b47;
+    function Demo() {
+      return (
+        <div className="row">
+          <Input label="Team name" placeholder="Void Reavers" defaultValue="Void Reavers" />
+          <Input label="Lobby code" placeholder="4F2A-9KQ7" />
+          <Input label="Summoner name" placeholder="hide on bush #KR1" hint="Riot ID — name and tag" />
+          <Input label="Roster size" invalid defaultValue="2" hint="Need at least 5 players" />
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+  </script>
 </body>
 </html>

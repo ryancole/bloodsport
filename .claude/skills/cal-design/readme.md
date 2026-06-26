@@ -1,70 +1,89 @@
-# CAL — Champions Amateur League · Design System
+# Champions Amateur League — Design System
 
-A dark, high-contrast brand built around one idea: the **RGB-split glitch**. White Archivo type lit by a cyan (`#00E5FF`) fringe on the left and a magenta (`#FF2E98`) fringe on the right, sitting on a cool near-black ground (`#0B0E14`). It started as a favicon mark — a glitched "C" tile — and this system extends that language into a full product surface for an open, competitive amateur sports/gaming league.
+> **Where summoners become champions.**
 
-**Origin asset:** `assets/cal-masthead.png` (the original navbar logo) and `assets/cal-mark.png` / `assets/favicon.ico` (the derived app mark).
+Champions Amateur League (**CAL**) is a community-run, competitive *League of Legends* amateur league. The platform lets organizers run **seasons** (round-robin regular play) and single-elimination **playoffs**, while players form **teams**, link their **Riot accounts**, and track standings, brackets, and match results.
+
+This design system captures CAL's visual + verbal identity: a **dark esports dashboard** built on a neon **cyan→magenta** signature, condensed display type, and a precise, ruleset-style voice.
 
 ---
 
-## Index / manifest
+## Sources
 
-- **`styles.css`** — the single entry point consumers link. `@import`s the four token files.
-- **`tokens/`** — `colors.css`, `typography.css`, `spacing.css`, `effects.css`.
-- **`assets/`** — `cal-masthead.png` (wordmark), `cal-mark.png` (180px tile), `favicon.ico`, `favicon-32.png`.
-- **`components/`** — reusable React primitives:
-  - `core/` — **Button**, **Badge**, **Card**
-  - `brand/` — **GlitchText** (the signature wordmark/headline treatment)
-  - `data/` — **StatBlock**
-  - `forms/` — **Input**
-- **`ui_kits/website/`** — interactive CAL site: Home, Standings, Live match.
-- **`guidelines/`** — foundation specimen cards (Colors, Type, Spacing, Brand).
-- **`SKILL.md`** — Agent-Skill manifest for downloading into Claude Code.
+This system was reverse-engineered from the live product. If you have access, explore these to go deeper:
+
+- **Codebase (attached):** `Websites/BloodsportSite/` — an ASP.NET Core / **Blazor** (.NET 10) app. The flagship `Components/Pages/Home.razor` dashboard and `wwwroot/app.css` are the source of truth for the dark token system; layout lives in `Components/Layout/`.
+- **GitHub:** [`ryancole/bloodsport`](https://github.com/ryancole/bloodsport) — the same application (domain models, EF data layer, Blazor site). The repo README covers the stack and Azure/Entra deployment. Browse it to understand data shapes (Season, Team, Playoff, RiotAccount) behind the UI.
+
+> Note: the product began life as "Bloodsport / BSAL" and was rebranded to **Champions Amateur League (CAL)**. Some legacy page titles still read "BSAL" — treat **CAL / Champions Amateur League** as canonical.
 
 ---
 
 ## Content fundamentals
 
-The voice is **terse, confident, broadcast-sport**. Short declaratives, present tense, occasional fragments used as punctuation: "Open brackets. Real stakes." Headlines speak directly to the competitor ("Where amateurs become champions.", "Enter your team"). It addresses **you**, never "users".
+How CAL writes.
 
-- **Casing:** Display headlines are sentence case but set in UPPERCASE via the glitch treatment. Labels, eyebrows, scores, metadata are **UPPERCASE mono with wide tracking** (`0.18em`–`0.32em`).
-- **Numbers are heroes.** Scores, standings, viewer counts, prize pools are set large in Archivo Black or mono with tabular figures. Let data carry the page.
-- **No emoji.** Status is shown with colored dots, badges, and mono labels — not emoji. (Unicode geometric marks like ⬤ ▰ are acceptable as compact event glyphs in dense data views.)
-- **No filler.** Eyebrows are 2–4 words ("Season 04 · Now live"). Don't pad.
+- **Two registers, one product.** Marketing surfaces (tagline, hero) are **aspirational and terse**; functional surfaces (rules, format, dashboards) are **declarative and exact**.
+- **Tagline voice:** *"Where summoners become champions."* — short, second-nature *LoL* vocabulary ("summoners"), no hype words, ends on the brand noun.
+- **Rules/format voice:** numbered clauses (`1.10`, `2.20`), third person, present tense, no hedging. e.g. *"Playoff matchups are best-of-one. One loss and a team is eliminated from the bracket."* Declarative sentences state the rule, then a plain-language consequence.
+- **Casing:** UI labels, nav, badges and eyebrows are **UPPERCASE** with wide tracking (the mono/Rajdhani treatment). Body copy and titles are sentence case.
+- **Person:** product speaks *about* teams and players in the **third person** ("teams are seeded…"), not "you". Reserve "you" for direct CTAs.
+- **Data is terse and abbreviated:** `W 5 — L 1`, `Best of One`, `Reg. Open`, `Active`, `4F2A-9KQ7`. Mono, uppercase, no full sentences.
+- **No emoji.** None in product copy. The one decorative exception in the live app is a 🏆 on the Grand Final banner — used sparingly as an event flourish, never in running text.
+- **Vibe:** competitive, official, a little bit *arcade*. Think tournament broadcast lower-thirds, not a casual social app.
 
 ---
 
 ## Visual foundations
 
-- **Ground:** cool near-black `#0B0E14`. Surfaces step up in lightness — `surface-1 #11151F` (wells/fields), `surface-2 #161B27` (cards), `surface-3 #1D2433` (hover). Never pure black, never warm.
-- **Accents:** exactly two — **cyan `#00E5FF`** and **magenta `#FF2E98`** — plus the `105°` cyan→magenta **gradient** for hero CTAs and card keylines. Use accents as *signal*, not decoration; most of any screen is dark neutral.
-- **The glitch** is the one signature move: `text-shadow: -Npx 0 cyan, Npx 0 magenta` on white text, where N ≈ 4.5% of font size. Wordmark, hero headlines, section heads only — **never on body or small text** (it muddies). Implemented as `GlitchText`.
-- **Type:** **Archivo** (400–900) for everything structural; **JetBrains Mono** (400–700) for labels, data, eyebrows. Display tracking is tight (`-0.01em`); mono tracking is wide.
-- **Cards:** dark slabs — `surface-2`, 1px `--cal-border` hairline, `--cal-radius-lg` (18px) corners, a deep ambient shadow (`0 16px 40px rgba(0,0,0,.45)`) and an `inset 0 1px 0 rgba(255,255,255,.04)` top edge for a crisp lit lip. Optional 2px gradient/cyan/magenta **keyline** across the top.
-- **Borders:** hairlines do the dividing work (`--cal-border` / `--cal-border-faint`), not heavy rules. Tables separate rows with `border-faint` only.
-- **Corners:** 6 → 24px scale; the **icon tile uses `22%`** rounding (the favicon ratio).
-- **Shadows:** ambient and dark only (no colored drop shadows). Reserve **glows** (`--cal-glow-*`) for genuinely active/live elements.
-- **Transparency & blur:** the sticky nav uses `rgba(11,14,20,.82)` + `backdrop-filter: blur(12px)`. Ghost tints (`--cal-*-ghost`, 12%) back badges.
-- **Motion:** quick and confident. `--cal-ease` (`cubic-bezier(.22,1,.36,1)`), 120–360ms. Buttons brighten on hover and nudge down 1px on press; interactive cards lift `-2px`. The only looping animation is the **LIVE pulse** (expanding magenta ring, 1.6s).
-- **Hover/press:** fills brighten (`filter: brightness(1.08)`); outlines and ghost text light **cyan**; press = `translateY(1px)`.
-- **Focus:** cyan border + soft cyan glow ring (`0 0 0 3px var(--cal-cyan-ghost)`).
-- **Imagery:** photography (when used) should be cool-toned, high-contrast, slightly desaturated to sit in the dark world. No warm/sepia grades. This system ships no stock imagery — drop real photos into card/hero slots.
+The complete answer to "what does CAL look like?"
+
+- **Surface & mood.** Near-black navy canvas (`--cal-bg #0B0E14`) with a tight ladder of raised surfaces (`surface-1/2/3`). Everything is **dark mode only**. Cards float on deep ambient shadow plus a 1px inset top highlight (`--cal-edge-top`) that simulates light catching the top edge.
+- **Color.** Two neon brand hues — **cyan `#00E5FF`** (regular season / primary / links / focus) and **magenta `#FF2E98`** (playoffs / secondary). The **cyan→magenta 105° gradient** (`--cal-gradient`) is the signature, used as big stat numerals (background-clipped text) and as a **2px keyline** across the top of every card. Status colors: green `#21D07A` (win / registration open), amber `#FFB020` (preseason / pending), red `#FF4D4D` (loss / eliminated). *(An older championship-gold accent was retired with its legacy wordmark logos — the system is now neon-forward.)*
+- **Type.** Three families do the work: **Archivo** (body + heavy 900 display numerals, tracking `-0.02em`), **Rajdhani** (condensed UPPERCASE headings and nav, tracking `0.04em`), **JetBrains Mono** (eyebrows, labels, data, codes — UPPERCASE, tracking `0.12–0.24em`). Exo 2 is an occasional sci-fi accent. Headings are tight and condensed; labels are wide and monospaced — the contrast *is* the identity.
+- **Spacing & layout.** Compact dashboard rhythm on a ~14px signature gutter (`--cal-space-6`). Main content column maxes at `1200px`; a `3.5rem` sticky top nav. Dense grids of stat tiles, panels, and list rows.
+- **Radii.** Soft but not pill-y for containers: `xs 6 / sm 10 / md 14 / lg 18` (cards default to **18px**); full pills only for badges.
+- **Cards.** Surface-2 fill, 1px `--cal-border` hairline, `radius-lg`, shadow (`sm/md/lg`) + `--cal-edge-top`, and the gradient keyline on top. An optional header pairs a mono **eyebrow** (left) with an action link (right).
+- **Badges.** Pill, mono, UPPERCASE, **ghost-fill** (12% alpha of the hue) with the saturated hue as text — never solid fills. They map to league state.
+- **Borders & dividers.** Internal list rows separate with the faintest border (`--cal-border-faint`); emphasized edges use `--cal-border-strong`.
+- **Motion.** Subtle and quick. Signature ease-out `cubic-bezier(0.22, 1, 0.36, 1)`, `200ms` default (`120ms` fast). Color/background transitions on hover; **no** bounces, no infinite decorative loops.
+- **Hover states.** Links and list items shift toward cyan; rows lift to `surface-3`; buttons brighten ~12%. **Press:** buttons nudge down 1px (`translateY(1px)`).
+- **Focus.** Neon ring — `0 0 0 2px var(--cal-bg), 0 0 0 4px var(--cal-cyan)`; inputs lift their border to cyan with a soft cyan ghost halo.
+- **Glow.** Reserved, used sparingly on neon emphasis (`--cal-glow-cyan/magenta`) — e.g. a logo hover or a live indicator, not on every element.
+- **Imagery.** Largely UI-driven (no photography in the core product). Team/player identity is expressed through small square **TeamFlag** avatars (logo image, or a gradient tile with initials). Backgrounds stay flat dark — texture comes from the gradient keylines and neon, not patterns.
 
 ---
 
 ## Iconography
 
-CAL has **no custom icon font**. Approach:
-- **Status & events** are communicated with colored **dots, badges, and mono labels** rather than pictographic icons (see `Badge`, the LIVE pulse, the match timeline).
-- Team crests are **monogram tiles** (2-letter, Archivo Black on a solid accent), not logos — a deliberate amateur-league convention.
-- Where line icons are genuinely needed (nav chevrons, arrows), use a **single inline glyph** (`→`) or pull **Lucide** from CDN (`https://unpkg.com/lucide-static`) at a 1.75px stroke to match the type weight. **Flag any Lucide use** — it's a substitution, not a bespoke set.
-- **No emoji** anywhere in product UI.
+- **The brand has no custom icon font or large SVG icon set.** The live product is mostly typographic; what few glyphs exist are **inline single-purpose SVGs** (e.g. the Reddit and email marks in the footer, drawn as small `viewBox="0 0 20 20"` circles).
+- **Approach for new work:** prefer **typography, mono labels, and badges** over decorative icons. When an icon is genuinely needed, use a **thin-stroke, single-color** line icon that reads at small sizes on dark — [Lucide](https://lucide.dev) (CDN: `https://unpkg.com/lucide-static`) is the closest match to the product's clean, geometric feel and is the recommended substitute. **Flag any icon set as a substitution** — there is no official CAL icon library to match against.
+- **No emoji as UI** (the lone 🏆 Grand Final flourish aside). Avoid unicode-glyph icons.
+- **Logo:** the primary mark is the **CAL neon masthead** (`assets/logo/CAL-masthead-*.png`) — a chromatic-aberration "CAL" glitch over "CHAMPIONS AMATEUR LEAGUE", shown on a `#2a2a2a` bar in the nav. `assets/favicon.svg` is the offset-"CAL" favicon. Always present the masthead on a dark surface.
 
 ---
 
-## Fonts — substitution note
+## What's in here (index)
 
-Both families are **Google Fonts**, imported at the top of `tokens/typography.css`:
-- **Archivo** — display + body. (The original masthead is a bold condensed grotesque; Archivo is the closest free match and the working brand face.)
-- **JetBrains Mono** — labels/data.
+**Foundations (root + `tokens/`)**
+- `styles.css` — the single entry point consumers link. `@import`s the webfonts + every token file. *Imports nothing inline.*
+- `tokens/colors.css` — surfaces, borders, text, neon brand, semantic status, gradients + semantic aliases.
+- `tokens/typography.css` — font families, weights, type scale, tracking.
+- `tokens/spacing.css` — spacing scale, radii, layout maxima.
+- `tokens/effects.css` — shadows, inset edge, glows, focus ring, motion (ease/duration).
+- `tokens/base.css` — element resets / dark defaults.
 
-No binary font files are vendored — consumers pull them from Google Fonts at runtime. If you need offline/self-hosted webfonts, ask and I'll vendor the `woff2` files and rewrite the `@font-face` rules.
+**Specimen cards (`guidelines/`)** — populate the Design System tab. Groups: **Colors** (surfaces, brand, semantic, gradient, text), **Type** (display, headings, mono, scale), **Spacing** (scale, radii, elevation), **Brand** (logo, voice).
+
+**Components (`components/`)** — namespace `window.ChampionsAmateurLeagueDesignSystem_df3b47`
+- `core/` — `Button`, `Badge`, `Card`, `Eyebrow`, `StatCard`
+- `forms/` — `Input`
+- `data/` — `TeamFlag`
+
+**Assets (`assets/`)** — `logo/` (CAL neon masthead at multiple sizes), `favicon.svg` / `favicon.png`.
+
+---
+
+## Status / roadmap
+
+Built: tokens, foundation cards, and the core component set. **Not yet built:** a full product **UI kit** (dashboard / season / playoff screens) and `SKILL.md`. Pick these up next to complete the system.
