@@ -1,0 +1,117 @@
+name: Deploy All
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef --version 10.0.8
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Restore dependencies
+        run: dotnet restore src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj
+
+      - name: Enable public network access
+        run: az sql server update --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_SQL_SERVER_NAME }} --enable-public-network true
+
+      - name: Add runner IP to SQL firewall
+        run: |
+          $ip = (Invoke-RestMethod -Uri "https://api.ipify.org")
+          echo "RUNNER_IP=$ip" >> $env:GITHUB_ENV
+          az sql server firewall-rule create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --server ${{ secrets.AZURE_SQL_SERVER_NAME }} --name github-actions-runner --start-ip-address $ip --end-ip-address $ip
+
+      - name: Wait for firewall rule to propagate
+        run: Start-Sleep -Seconds 10
+
+      - name: Run migrations
+        env:
+          CONNECTION_STRING: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+        run: dotnet ef database update --project src/Libraries/Bloodsport.Data.Sql/Bloodsport.Data.Sql.csproj --startup-project src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj --connection "$env:CONNECTION_STRING"
+
+      - name: Remove runner IP from SQL firewall
+        if: always()
+        run: az sql server firewall-rule delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --server ${{ secrets.AZURE_SQL_SERVER_NAME }} --name github-actions-runner
+
+      - name: Disable public network access
+        if: always()
+        run: az sql server update --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_SQL_SERVER_NAME }} --enable-public-network false
+
+  deploy-functions:
+    runs-on: windows-latest
+    needs: migrate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Publish
+        run: dotnet publish src/Compute/BloodsportFunctions/BloodsportFunctions.csproj --configuration Release --output ./publish
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
+          package: ./publish
+
+  deploy-site:
+    runs-on: windows-latest
+    needs: migrate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Publish
+        run: dotnet publish src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj --configuration Release --output ./publish
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_SITE_APP_NAME }}
+          package: ./publish
