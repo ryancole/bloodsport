@@ -3,6 +3,7 @@ using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.ServiceBus;
 using Bloodsport.Entity.Database;
+using Camille.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodsportSite.Api
@@ -86,6 +87,7 @@ namespace BloodsportSite.Api
                 Name = name,
                 Length = length,
                 EstimatedDateStart = parsedStartDate,
+                RiotRegion = RegionalRoute.AMERICAS.ToString(),
             };
 
             db.Seasons.Add(season);
@@ -265,6 +267,7 @@ namespace BloodsportSite.Api
                 Season = season,
                 Name = $"{season.Name} Playoffs",
                 Status = PlayoffStatus.Upcoming,
+                RiotRegion = RegionalRoute.AMERICAS.ToString(),
             };
 
             db.Playoffs.Add(playoff);
