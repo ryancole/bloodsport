@@ -37,10 +37,10 @@
     --cal-ease:          cubic-bezier(0.22, 1, 0.36, 1);
     --cal-dur:           200ms;
     --cal-dur-fast:      120ms;
-    --cal-font-display:  'Archivo', system-ui, sans-serif;
-    --cal-font-heading:  'Rajdhani', 'Archivo', system-ui, sans-serif;
-    --cal-font-mono:     'JetBrains Mono', ui-monospace, monospace;
-    --cal-font-accent:   'Exo 2', 'Rajdhani', sans-serif;
+    --cal-font-display:  system-ui, sans-serif;
+    --cal-font-heading:  system-ui, sans-serif;
+    --cal-font-mono:     ui-monospace, monospace;
+    --cal-font-accent:   system-ui, sans-serif;
 }
 
 html, body {
@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--cal-text);
 }
 
-a, .btn-link {
+a {
     color: var(--cal-cyan);
     text-decoration: none;
 }
@@ -91,147 +91,7 @@ h3 {
     color: var(--cal-text-muted);
 }
 
-/* ── Bootstrap overrides — buttons ── */
-.btn {
-    font-family: var(--cal-font-display);
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    border-radius: var(--cal-radius-sm);
-    transition: filter var(--cal-dur) var(--cal-ease), transform var(--cal-dur-fast) var(--cal-ease), background var(--cal-dur) var(--cal-ease), border-color var(--cal-dur) var(--cal-ease), color var(--cal-dur) var(--cal-ease);
-}
-.btn:active { transform: translateY(1px); }
-
-.btn-primary, .btn-primary:focus {
-    background: var(--cal-cyan);
-    border-color: var(--cal-cyan);
-    color: var(--cal-text-inverse);
-}
-.btn-primary:hover { background: var(--cal-cyan); border-color: var(--cal-cyan); color: var(--cal-text-inverse); filter: brightness(1.08); }
-
-.btn-secondary {
-    background: var(--cal-surface-3);
-    border-color: var(--cal-border-strong);
-    color: var(--cal-text-muted);
-}
-.btn-secondary:hover, .btn-secondary:focus {
-    background: var(--cal-surface-3);
-    border-color: var(--cal-border-strong);
-    color: var(--cal-text);
-    filter: brightness(1.12);
-}
-
-.btn-success { background: var(--cal-success); border-color: var(--cal-success); color: var(--cal-text-inverse); }
-.btn-success:hover { background: var(--cal-success); border-color: var(--cal-success); color: var(--cal-text-inverse); filter: brightness(1.08); }
-
-.btn-outline-primary { border-color: var(--cal-cyan); color: var(--cal-cyan); background: transparent; }
-.btn-outline-primary:hover, .btn-outline-primary:focus { background: var(--cal-cyan-ghost); border-color: var(--cal-cyan); color: var(--cal-cyan); }
-
-.btn-outline-secondary { border-color: var(--cal-border-strong); color: var(--cal-text-muted); background: transparent; }
-.btn-outline-secondary:hover, .btn-outline-secondary:focus { background: var(--cal-surface-3); border-color: var(--cal-border-strong); color: var(--cal-text); }
-
-.btn-outline-success { border-color: var(--cal-success); color: var(--cal-success); background: transparent; }
-.btn-outline-success:hover { background: var(--cal-success-ghost); border-color: var(--cal-success); color: var(--cal-success); }
-
-.btn-outline-danger { border-color: var(--cal-danger); color: var(--cal-danger); background: transparent; }
-.btn-outline-danger:hover, .btn-outline-danger:focus { background: var(--cal-danger-ghost); border-color: var(--cal-danger); color: var(--cal-danger); }
-
-.btn-outline-light { border-color: var(--cal-border-strong); color: var(--cal-text); background: transparent; }
-.btn-outline-light:hover { background: var(--cal-surface-3); color: var(--cal-text); }
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 2px var(--cal-bg), 0 0 0 4px var(--cal-cyan);
-}
-
-/* ── Bootstrap overrides — forms ── */
-.form-control, .form-select {
-    background-color: var(--cal-surface-1);
-    border-color: var(--cal-border-strong);
-    color: var(--cal-text);
-    border-radius: var(--cal-radius-sm);
-}
-.form-control:focus, .form-select:focus {
-    background-color: var(--cal-surface-1);
-    border-color: var(--cal-cyan);
-    color: var(--cal-text);
-    box-shadow: 0 0 0 3px var(--cal-cyan-ghost);
-}
-.form-control::placeholder { color: var(--cal-text-faint); }
-
-/* ── Bootstrap overrides — tables ── */
-.table {
-    --bs-table-bg: transparent;
-    --bs-table-striped-bg: var(--cal-surface-3);
-    --bs-table-hover-bg: var(--cal-surface-3);
-    --bs-table-border-color: var(--cal-border-faint);
-    --bs-table-color: var(--cal-text);
-    color: var(--cal-text);
-    border-color: var(--cal-border-faint);
-}
-.table thead th {
-    font-family: var(--cal-font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--cal-text-faint);
-    border-bottom: 1px solid var(--cal-border-strong) !important;
-    padding: 10px 12px;
-}
-.table td {
-    padding: 10px 12px;
-    vertical-align: middle;
-    border-bottom-color: var(--cal-border-faint);
-    color: var(--cal-text-muted);
-}
-.table td a { color: var(--cal-text); text-decoration: none; transition: color var(--cal-dur) var(--cal-ease); }
-.table td a:hover { color: var(--cal-cyan); text-decoration: none; }
-.table tbody tr { transition: background var(--cal-dur-fast) var(--cal-ease); }
-.table tbody tr:hover td { background: var(--cal-surface-3); }
-
-/* ── Bootstrap overrides — alerts ── */
-.alert { border-radius: var(--cal-radius-md); padding: 12px 16px; }
-.alert-warning { background: var(--cal-warning-ghost); border-color: rgba(255,176,32,0.3); color: var(--cal-warning); }
-.alert-warning strong { color: var(--cal-text); }
-.alert-danger  { background: var(--cal-danger-ghost);  border-color: rgba(255,77,77,0.3);   color: var(--cal-danger);  }
-.alert-success { background: var(--cal-success-ghost); border-color: rgba(33,208,122,0.3);  color: var(--cal-success); }
-.alert-info    { background: var(--cal-cyan-ghost);    border-color: rgba(0,229,255,0.3);   color: var(--cal-cyan);    }
-
-/* ── Bootstrap overrides — cards ── */
-.card {
-    background: var(--cal-surface-2);
-    border: 1px solid var(--cal-border);
-    border-radius: var(--cal-radius-lg);
-    box-shadow: var(--cal-shadow-lg), var(--cal-edge-top);
-    color: var(--cal-text);
-}
-.card-body { padding: 20px; }
-.card-title { font-family: var(--cal-font-heading); font-weight: 700; font-size: 16px; color: var(--cal-text); }
-.card-text { color: var(--cal-text-muted); }
-
-/* ── Bootstrap overrides — pagination ── */
-.pagination { --bs-pagination-bg: var(--cal-surface-2); --bs-pagination-border-color: var(--cal-border); --bs-pagination-color: var(--cal-text-muted); --bs-pagination-hover-bg: var(--cal-surface-3); --bs-pagination-hover-border-color: var(--cal-border-strong); --bs-pagination-hover-color: var(--cal-text); --bs-pagination-active-bg: var(--cal-cyan); --bs-pagination-active-border-color: var(--cal-cyan); --bs-pagination-active-color: var(--cal-text-inverse); --bs-pagination-disabled-bg: var(--cal-surface-1); --bs-pagination-disabled-color: var(--cal-text-faint); --bs-pagination-disabled-border-color: var(--cal-border); }
-
-/* ── Bootstrap overrides — definition lists ── */
-dl.row dt {
-    font-family: var(--cal-font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--cal-text-faint);
-    padding-top: 4px;
-}
-dl.row dd { color: var(--cal-text-muted); margin-bottom: 10px; }
-dl.row dd a { color: var(--cal-text); }
-dl.row dd a:hover { color: var(--cal-cyan); }
-
-/* ── Bootstrap overrides — misc utilities ── */
-.text-muted { color: var(--cal-text-muted) !important; }
-.text-success { color: var(--cal-success) !important; }
-.text-danger  { color: var(--cal-danger)  !important; }
-
-/* ── CAL badge chip (replaces Bootstrap .badge) ── */
+/* ── CAL badge chip ── */
 .cal-badge {
     display: inline-flex;
     align-items: center;
@@ -277,19 +137,6 @@ dl.row dd a:hover { color: var(--cal-cyan); }
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
-
-.darker-border-checkbox.form-check-input {
-    border-color: #929292;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
-}
 
 /* Grand Final banner */
 .grand-final-banner {

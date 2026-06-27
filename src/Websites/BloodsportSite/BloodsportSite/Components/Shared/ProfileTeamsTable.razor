@@ -1,14 +1,14 @@
 @using Bloodsport.Entity.Database
 
-<h2 class="mt-4">Teams</h2>
+<h2>Teams</h2>
 
 @if (TeamRows.Count == 0)
 {
-    <p class="text-muted">No teams.</p>
+    <p>No teams.</p>
 }
 else
 {
-    <table class="table">
+    <table>
         <thead>
             <tr>
                 <th>Team</th>
@@ -20,7 +20,7 @@ else
             @foreach (var row in TeamRows)
             {
                 <tr>
-                    <td><a href="/teams/@row.Team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@row.Team.LogoUrl" />@row.Team.Name</a></td>
+                    <td><a href="/teams/@row.Team.Id"><TeamFlag LogoUrl="@row.Team.LogoUrl" />@row.Team.Name</a></td>
                     <td>@row.Role</td>
                     <td>@row.Team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                 </tr>

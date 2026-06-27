@@ -12,7 +12,7 @@
 
 @if (notFound)
 {
-    <p class="text-muted">Matchup not found.</p>
+    <p>Matchup not found.</p>
 }
 else if (matchup is null)
 {
@@ -27,12 +27,12 @@ else
     var isGrandFinal = round.PlayoffMatchups.Count == 1;
 
     <SectionContent SectionName="breadcrumbs">
-        <nav class="small"><a href="/playoffs">Playoffs</a> / <a href="/playoffs/@playoff.Id">@playoff.Name</a> / @round.Name / @teamOneName vs @teamTwoName</nav>
+        <nav><a href="/playoffs">Playoffs</a> / <a href="/playoffs/@playoff.Id">@playoff.Name</a> / @round.Name / @teamOneName vs @teamTwoName</nav>
     </SectionContent>
 
     @if (isGrandFinal)
     {
-        <div class="grand-final-banner mb-3">
+        <div class="grand-final-banner">
             <span class="grand-final-trophy">🏆</span>
             <div>
                 <div class="grand-final-title">Grand Final</div>
@@ -41,21 +41,21 @@ else
             <span class="grand-final-trophy">🏆</span>
         </div>
 
-        <h1 class="mb-1 grand-final-matchup-title">@teamOneName vs @teamTwoName</h1>
+        <h1 class="grand-final-matchup-title">@teamOneName vs @teamTwoName</h1>
     }
     else
     {
-        <h1 class="mb-1">@teamOneName vs @teamTwoName</h1>
-        <p class="text-muted mb-1">@round.Name &mdash; @playoff.Name</p>
+        <h1>@teamOneName vs @teamTwoName</h1>
+        <p>@round.Name &mdash; @playoff.Name</p>
     }
 
     @if (round.DateEnd.HasValue)
     {
-        <p class="text-muted small mb-4">Round ends @round.DateEnd.Value.ToLocalTime().ToString("MMMM d, yyyy")</p>
+        <p>Round ends @round.DateEnd.Value.ToLocalTime().ToString("MMMM d, yyyy")</p>
     }
     else
     {
-        <p class="text-muted small mb-4">Round end date not yet set</p>
+        <p>Round end date not yet set</p>
     }
 
     @* Tournament Lobby *@
@@ -68,7 +68,7 @@ else
     var result = matchup.PlayoffRoundMatchupResults.FirstOrDefault();
     @if (result?.WinningTeam is not null)
     {
-        <div class="alert alert-success mb-4">
+        <div>
             <strong>@result.WinningTeam.Team?.Name</strong> wins this matchup.
         </div>
     }
@@ -80,14 +80,14 @@ else
     @* Lobby Events *@
     @if (isManager && lobbyEvents.Count > 0)
     {
-        <div class="card border-0 bg-body-secondary rounded-3 mb-4 p-4">
-            <div class="text-uppercase fw-semibold small text-muted letter-spacing-1 mb-3">Lobby Events (@lobbyEvents.Count)</div>
-            <table class="table table-sm mb-0">
+        <div>
+            <div>Lobby Events (@lobbyEvents.Count)</div>
+            <table>
                 <thead>
                     <tr>
-                        <th class="text-muted fw-normal small">Time</th>
-                        <th class="text-muted fw-normal small">Event</th>
-                        <th class="text-muted fw-normal small">Player</th>
+                        <th>Time</th>
+                        <th>Event</th>
+                        <th>Player</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,9 +100,9 @@ else
                             ? DateTimeOffset.FromUnixTimeMilliseconds(ms).LocalDateTime.ToString("MMM d, h:mm:ss tt")
                             : evt.Timestamp;
                         <tr>
-                            <td class="small text-muted text-nowrap">@time</td>
-                            <td class="small font-monospace">@evt.EventType</td>
-                            <td class="small">@displayName</td>
+                            <td>@time</td>
+                            <td>@evt.EventType</td>
+                            <td>@displayName</td>
                         </tr>
                     }
                 </tbody>
@@ -113,21 +113,21 @@ else
     @* Teams *@
     @if (!matchup.PlayoffRoundMatchupResults.Any())
     {
-        <div class="alert alert-warning small mb-4">
+        <div>
             <strong>Locked-in rosters enforced.</strong>
             Only Riot IDs on each team's locked-in roster are permitted in the tournament lobby. Players not on the roster below will be blocked from joining.
         </div>
     }
-    <div class="row g-0 mb-4 align-items-stretch">
-        <div class="col-md-5">
+    <div>
+        <div>
             <TeamSeasonRosterCard TeamId="@(matchup.TeamOne?.TeamId ?? 0)" TeamName="@teamOneName" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-primary-subtle text-primary-emphasis" UserIds="@rosterUserIds" />
         </div>
 
-        <div class="col-md-2 d-flex align-items-center justify-content-center py-4">
-            <div class="fw-black fs-2 text-muted lh-1">VS</div>
+        <div>
+            <div>VS</div>
         </div>
 
-        <div class="col-md-5">
+        <div>
             <TeamSeasonRosterCard TeamId="@(matchup.TeamTwo?.TeamId ?? 0)" TeamName="@teamTwoName" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-danger-subtle text-danger-emphasis" UserIds="@rosterUserIds" />
         </div>
     </div>

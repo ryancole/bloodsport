@@ -6,7 +6,7 @@
 
 <PageTitle>Playoffs | BSAL</PageTitle>
 
-<h1 class="mb-4">Playoffs</h1>
+<h1>Playoffs</h1>
 
 @if (playoffs is null)
 {
@@ -14,10 +14,10 @@
 }
 else
 {
-    <h2 class="h5 mb-2">Active Playoffs</h2>
+    <h2>Active Playoffs</h2>
     <PlayoffsTable Playoffs="activePlayoffs" />
 
-    <h2 class="h5 mb-2 mt-4">Past Playoffs</h2>
+    <h2>Past Playoffs</h2>
     <PlayoffsTable Playoffs="pastPlayoffs" />
 }
 

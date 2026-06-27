@@ -14,7 +14,7 @@
 
 @if (notFound)
 {
-    <p class="text-muted">Post not found.</p>
+    <p>Post not found.</p>
 }
 else if (post is null)
 {
@@ -23,12 +23,12 @@ else if (post is null)
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav class="small"><a href="/news">News</a> / @post.Title</nav>
+        <nav><a href="/news">News</a> / @post.Title</nav>
     </SectionContent>
 
-    <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
         <div>
-            <h1 class="mb-1">@post.Title</h1>
+            <h1>@post.Title</h1>
             <div class="news-item-meta">
                 <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
                 <span class="news-item-meta-sep">·</span>
@@ -37,45 +37,45 @@ else
         </div>
         <AuthorizeView Roles="Champions.Admin">
             <Authorized>
-                <a href="/news/@post.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="/news/@post.Id/edit">Edit</a>
             </Authorized>
         </AuthorizeView>
     </div>
 
-    <div class="post-content mb-5">
+    <div class="post-content">
         @renderedHtml
     </div>
 
     <section class="post-comments" id="comments">
-        <h2 class="h5 mb-3">@(comments.Count == 1 ? "1 Comment" : $"{comments.Count} Comments")</h2>
+        <h2>@(comments.Count == 1 ? "1 Comment" : $"{comments.Count} Comments")</h2>
 
         @if (commentError is not null)
         {
-            <div class="alert alert-danger py-2 px-3 small mb-3">@commentError</div>
+            <div>@commentError</div>
         }
 
         <AuthorizeView>
             <Authorized>
-                <form method="post" action="/api/posts/@post.Id/comments" class="mb-4">
+                <form method="post" action="/api/posts/@post.Id/comments">
                     <AntiforgeryToken />
-                    <div class="mb-2">
-                        <textarea name="body" class="form-control" rows="3" placeholder="Write a comment..." required></textarea>
+                    <div>
+                        <textarea name="body" rows="3" placeholder="Write a comment..." required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-sm btn-primary">Post Comment</button>
+                    <button type="submit">Post Comment</button>
                 </form>
             </Authorized>
             <NotAuthorized>
-                <p class="text-muted small mb-4"><a href="/auth/login">Log in</a> to leave a comment.</p>
+                <p><a href="/auth/login">Log in</a> to leave a comment.</p>
             </NotAuthorized>
         </AuthorizeView>
 
         @if (comments.Count == 0)
         {
-            <p class="text-muted small">No comments yet. Be the first!</p>
+            <p>No comments yet. Be the first!</p>
         }
         else
         {
-            <div class="d-flex flex-column gap-3">
+            <div>
                 @foreach (var comment in comments)
                 {
                     <div class="post-comment">
@@ -85,7 +85,7 @@ else
                             <time>@comment.DateCreated.ToString("MMMM d, yyyy")</time>
                             @if (currentUserId == comment.UserId || isAdmin)
                             {
-                                <form method="post" action="/api/posts/@post.Id/comments/@comment.Id/delete" class="ms-auto">
+                                <form method="post" action="/api/posts/@post.Id/comments/@comment.Id/delete">
                                     <AntiforgeryToken />
                                     <button type="submit" class="post-comment-delete">Delete</button>
                                 </form>

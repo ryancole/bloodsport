@@ -6,27 +6,27 @@
 @if (TotalPages > 1)
 {
     <nav class="@NavClass">
-        <ul class="pagination pagination-sm mb-0">
-            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@PageUrl(CurrentPage - 1)">Previous</a>
+        <ul>
+            <li class="@(CurrentPage == 1 ? "disabled" : "")">
+                <a href="@PageUrl(CurrentPage - 1)">Previous</a>
             </li>
             @if (windowStart > 1)
             {
-                <li class="page-item disabled"><span class="page-link">…</span></li>
+                <li><span>…</span></li>
             }
             @for (var p = windowStart; p <= windowEnd; p++)
             {
                 var pageNum = p;
-                <li class="page-item @(CurrentPage == pageNum ? "active" : "")">
-                    <a class="page-link" href="@PageUrl(pageNum)">@pageNum</a>
+                <li class="@(CurrentPage == pageNum ? "active" : "")">
+                    <a href="@PageUrl(pageNum)">@pageNum</a>
                 </li>
             }
             @if (windowEnd < TotalPages)
             {
-                <li class="page-item disabled"><span class="page-link">…</span></li>
+                <li><span>…</span></li>
             }
-            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@PageUrl(CurrentPage + 1)">Next</a>
+            <li class="@(CurrentPage == TotalPages ? "disabled" : "")">
+                <a href="@PageUrl(CurrentPage + 1)">Next</a>
             </li>
         </ul>
     </nav>

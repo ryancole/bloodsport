@@ -8,7 +8,7 @@
 
 @if (notFound)
 {
-    <p class="text-muted">Week not found.</p>
+    <p>Week not found.</p>
 }
 else if (week is null)
 {
@@ -17,23 +17,23 @@ else if (week is null)
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav class="small"><a href="/seasons">Seasons</a> / <a href="/seasons/@week.Season.Id">@week.Season.Name</a> / @week.Name</nav>
+        <nav><a href="/seasons">Seasons</a> / <a href="/seasons/@week.Season.Id">@week.Season.Name</a> / @week.Name</nav>
     </SectionContent>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">@week.Name</h1>
-        <span class="text-muted">@week.DateStart.ToLocalTime().ToString("MMMM d") – @week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</span>
+    <div>
+        <h1>@week.Name</h1>
+        <span>@week.DateStart.ToLocalTime().ToString("MMMM d") – @week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</span>
     </div>
 
     <h2>Matchups</h2>
 
     @if (week.SeasonWeekMatchups.Count == 0)
     {
-        <p class="text-muted">No matchups scheduled for this week.</p>
+        <p>No matchups scheduled for this week.</p>
     }
     else
     {
-        <table class="table">
+        <table>
             <thead>
                 <tr>
                     <th>Matchup</th>
@@ -48,22 +48,22 @@ else
                     var result = matchup.SeasonWeekMatchupResult;
                     <tr>
                         <td><a href="/seasons/@week.Season.Id/weeks/@week.Id/matchups/@matchup.Id">@matchup.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamOneId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamOne.LogoUrl" />@matchup.TeamOne.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamTwoId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamTwo.LogoUrl" />@matchup.TeamTwo.Name</a></td>
+                        <td><a href="/teams/@matchup.TeamOneId"><TeamFlag LogoUrl="@matchup.TeamOne.LogoUrl" />@matchup.TeamOne.Name</a></td>
+                        <td><a href="/teams/@matchup.TeamTwoId"><TeamFlag LogoUrl="@matchup.TeamTwo.LogoUrl" />@matchup.TeamTwo.Name</a></td>
                         <td>
                             @if (result is not null)
                             {
                                 @if (result.DidNotPlay)
                                 {
-                                    <span class="badge text-bg-secondary me-1">Did Not Play</span>
+                                    <span class="cal-badge">Did Not Play</span>
                                 }
                                 else
                                 {
-                                    <span class="badge text-bg-success me-1">Final</span>
-                                    <span class="text-muted small">@result.WinnerTeam?.Name wins</span>
+                                    <span class="cal-badge cal-badge--success">Final</span>
+                                    <span>@result.WinnerTeam?.Name wins</span>
                                     @if (result.RosterMismatch)
                                     {
-                                        <span class="badge text-bg-warning ms-1" title="One or more players did not match the locked season roster">Roster Mismatch</span>
+                                        <span class="cal-badge cal-badge--warning" title="One or more players did not match the locked season roster">Roster Mismatch</span>
                                     }
                                 }
                             }

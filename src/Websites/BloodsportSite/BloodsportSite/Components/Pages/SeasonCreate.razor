@@ -10,31 +10,31 @@
 
 @if (error is not null)
 {
-    <div class="alert alert-danger">@error</div>
+    <div>@error</div>
 }
 
-<form method="post" action="/api/seasons/create" class="mt-3">
+<form method="post" action="/api/seasons/create">
     <AntiforgeryToken />
-    <div class="mb-3" style="max-width: 400px;">
-        <label class="form-label">Season Name</label>
-        <input type="text" name="name" class="form-control" placeholder="Season 1" required autofocus />
+    <div style="max-width: 400px;">
+        <label>Season Name</label>
+        <input type="text" name="name" placeholder="Season 1" required autofocus />
     </div>
-    <div class="mb-3" style="max-width: 400px;">
-        <label class="form-label">Season Length</label>
-        <select name="length" class="form-select">
+    <div style="max-width: 400px;">
+        <label>Season Length</label>
+        <select name="length">
             @for (int i = 3; i <= 8; i++)
             {
                 <option value="@i" selected="@(i == 6)">@i weeks</option>
             }
         </select>
     </div>
-    <div class="mb-3" style="max-width: 400px;">
-        <label class="form-label">Estimated Start Date <span class="text-muted">(optional)</span></label>
-        <input type="date" name="startDate" class="form-control" />
+    <div style="max-width: 400px;">
+        <label>Estimated Start Date <span>(optional)</span></label>
+        <input type="date" name="startDate" />
     </div>
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Create</button>
-        <a href="/seasons" class="btn btn-outline-secondary">Cancel</a>
+    <div>
+        <button type="submit">Create</button>
+        <a href="/seasons">Cancel</a>
     </div>
 </form>
 

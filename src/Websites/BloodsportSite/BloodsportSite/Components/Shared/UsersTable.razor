@@ -7,17 +7,17 @@
     var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
 }
 
-<div class="d-flex align-items-center justify-content-between mb-2">
-    <div class="d-flex align-items-center gap-3">
-        <form method="get" class="d-flex gap-2">
-            <input type="search" name="search" class="form-control w-auto" placeholder="Search by name…" />
-            <button type="submit" class="btn btn-secondary">Search</button>
+<div>
+    <div>
+        <form method="get">
+            <input type="search" name="search" placeholder="Search by name…" />
+            <button type="submit">Search</button>
         </form>
         @if (!string.IsNullOrWhiteSpace(Search))
         {
-            <span class="text-muted">
+            <span>
                 Filtering by &ldquo;@Search&rdquo;
-                <a href="/users" class="ms-1 text-decoration-none" title="Clear filter">&times;</a>
+                <a href="/users" title="Clear filter">&times;</a>
             </span>
         }
     </div>
@@ -26,11 +26,11 @@
 
 @if (!sorted.Any())
 {
-    <p class="text-center text-muted fs-5 py-4">No users found.</p>
+    <p>No users found.</p>
 }
 else
 {
-    <table class="table">
+    <table>
         <thead>
             <tr>
                 <th>Name</th>
@@ -49,17 +49,17 @@ else
                     .ToList();
 
                 <tr>
-                    <td><a href="/users/@user.Id" class="d-flex align-items-center gap-2"><UserFlag LogoUrl="@user.LogoUrl" />@user.DisplayName</a></td>
+                    <td><a href="/users/@user.Id"><UserFlag LogoUrl="@user.LogoUrl" />@user.DisplayName</a></td>
                     <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         @if (teams.Count == 0)
                         {
-                            <span class="text-muted">—</span>
+                            <span>—</span>
                         }
                         else
                         {
                             @for (var i = 0; i < teams.Count; i++)
                             {
-                                <a href="/teams/@teams[i].Id" class="d-inline-flex align-items-center gap-1"><TeamFlag LogoUrl="@teams[i].LogoUrl" />@teams[i].Name</a>@(i < teams.Count - 1 ? ", " : "")
+                                <a href="/teams/@teams[i].Id"><TeamFlag LogoUrl="@teams[i].LogoUrl" />@teams[i].Name</a>@(i < teams.Count - 1 ? ", " : "")
                             }
                         }
                     </td>

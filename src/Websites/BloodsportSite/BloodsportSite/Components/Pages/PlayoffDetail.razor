@@ -10,7 +10,7 @@
 
 @if (notFound)
 {
-    <p class="text-muted">Playoff not found.</p>
+    <p>Playoff not found.</p>
 }
 else if (playoff is null)
 {
@@ -19,26 +19,26 @@ else if (playoff is null)
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav class="small"><a href="/playoffs">Playoffs</a> / @playoff.Name</nav>
+        <nav><a href="/playoffs">Playoffs</a> / @playoff.Name</nav>
     </SectionContent>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">@playoff.Name</h1>
+    <div>
+        <h1>@playoff.Name</h1>
         <AuthorizeView Roles="Champions.Admin">
             <Authorized>
-                <div class="d-flex gap-2">
+                <div>
                     @if (playoff.PlayoffRounds.Count == 0)
                     {
                         <form method="post" action="/api/playoffs/@playoff.Id/build-bracket" data-enhance="false">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-primary">Build Bracket</button>
+                            <button type="submit">Build Bracket</button>
                         </form>
                     }
                     @if (playoff.Status == PlayoffStatus.Upcoming)
                     {
                         <form method="post" action="/api/playoffs/@playoff.Id/start" data-enhance="false">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-success">Start Playoff</button>
+                            <button type="submit">Start Playoff</button>
                         </form>
                     }
                 </div>
@@ -46,26 +46,26 @@ else
         </AuthorizeView>
     </div>
 
-    <dl class="row mb-4">
-        <dt class="col-sm-2">Season</dt>
-        <dd class="col-sm-10"><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></dd>
+    <dl>
+        <dt>Season</dt>
+        <dd><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></dd>
 
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10"><span class="badge @StatusBadgeClass(playoff.Status)">@playoff.Status</span></dd>
+        <dt>Status</dt>
+        <dd><span class="cal-badge @StatusBadgeClass(playoff.Status)">@playoff.Status</span></dd>
 
-        <dt class="col-sm-2">Region</dt>
-        <dd class="col-sm-10">@playoff.RiotRegion</dd>
+        <dt>Region</dt>
+        <dd>@playoff.RiotRegion</dd>
 
-        <dt class="col-sm-2">Teams</dt>
-        <dd class="col-sm-10">@playoff.PlayoffTeams.Count</dd>
+        <dt>Teams</dt>
+        <dd>@playoff.PlayoffTeams.Count</dd>
 
-        <dt class="col-sm-2">Created</dt>
-        <dd class="col-sm-10">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+        <dt>Created</dt>
+        <dd>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
     @if (grandFinalWinner is not null)
     {
-        <div class="alert alert-success d-flex align-items-center gap-2 mb-3" role="alert">
+        <div role="alert">
             <span style="font-size:1.4rem">🏆</span>
             <strong>@grandFinalWinner.Team?.Name</strong> wins the @playoff.Name!
         </div>
@@ -85,12 +85,12 @@ else
 
     @if (playoff.PlayoffRounds.Any(r => r.DateEnd == null))
     {
-        <div class="alert alert-warning" role="alert">
+        <div role="alert">
             This playoff has not started yet. Round end dates will be available once the playoff begins.
         </div>
     }
 
-    <ul class="nav nav-tabs mb-4">
+    <ul>
         <li class="nav-item">
             <a class="nav-link @(ActiveTab == "bracket" ? "active" : "")" href="/playoffs/@playoff.Id?tab=bracket">Bracket</a>
         </li>
@@ -179,9 +179,9 @@ else
 
     private static string StatusBadgeClass(PlayoffStatus status) => status switch
     {
-        PlayoffStatus.Upcoming => "bg-secondary",
-        PlayoffStatus.Active => "bg-success",
-        PlayoffStatus.Completed => "bg-dark",
-        _ => "bg-secondary"
+        PlayoffStatus.Upcoming => "cal-badge--warning",
+        PlayoffStatus.Active => "cal-badge--magenta",
+        PlayoffStatus.Completed => "",
+        _ => ""
     };
 }

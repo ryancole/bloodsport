@@ -1,34 +1,34 @@
 @using Bloodsport.Entity.Database
 
-<div class="d-flex justify-content-between align-items-start mt-4 mb-2">
-    <h2 class="mb-0">Riot Accounts</h2>
+<div>
+    <h2>Riot Accounts</h2>
     <form method="post" action="/api/riot/link">
         <AntiforgeryToken />
         @if (RiotError is not null)
         {
-            <div class="alert alert-danger py-1 px-2 small mb-2">@RiotError</div>
+            <div>@RiotError</div>
         }
-        <div class="d-flex gap-2 align-items-end">
+        <div>
             <div>
-                <label class="form-label small mb-1">Game Name</label>
-                <input type="text" name="gameName" class="form-control form-control-sm" placeholder="HideOnBush" required />
+                <label>Game Name</label>
+                <input type="text" name="gameName" placeholder="HideOnBush" required />
             </div>
             <div>
-                <label class="form-label small mb-1">Tag</label>
-                <input type="text" name="tagLine" class="form-control form-control-sm" placeholder="NA1" required />
+                <label>Tag</label>
+                <input type="text" name="tagLine" placeholder="NA1" required />
             </div>
-            <button type="submit" class="btn btn-sm btn-outline-secondary">Link Riot Account</button>
+            <button type="submit">Link Riot Account</button>
         </div>
     </form>
 </div>
 
 @if (Accounts.Count == 0)
 {
-    <p class="text-muted">No linked accounts.</p>
+    <p>No linked accounts.</p>
 }
 else
 {
-    <table class="table">
+    <table>
         <thead>
             <tr>
                 <th>Riot ID</th>
@@ -46,7 +46,7 @@ else
                         <form method="post" action="/api/riot/unlink">
                             <AntiforgeryToken />
                             <input type="hidden" name="riotAccountId" value="@account.Id" />
-                            <button type="submit" class="btn btn-link btn-sm text-danger p-0">Remove</button>
+                            <button type="submit">Remove</button>
                         </form>
                     </td>
                 </tr>

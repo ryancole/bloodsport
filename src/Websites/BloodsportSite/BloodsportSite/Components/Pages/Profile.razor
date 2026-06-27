@@ -12,17 +12,17 @@
 
 <PageTitle>Profile | BSAL</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center gap-3">
+<div>
+    <div>
         @if (user?.LogoUrl is not null)
         {
             <img src="@BlobSasService.GetSasUrl(user.LogoUrl)" alt="Profile logo" style="width: 72px; height: 72px; object-fit: contain;" />
         }
-        <h1 class="mb-0">My Profile</h1>
+        <h1>My Profile</h1>
     </div>
     <form method="post" action="/auth/logout">
         <AntiforgeryToken />
-        <button type="submit" class="btn btn-outline-danger btn-sm">Log out</button>
+        <button type="submit">Log out</button>
     </form>
 </div>
 
@@ -34,13 +34,13 @@ else
 {
     @if (pendingInvites.Count > 0)
     {
-        <div class="alert alert-info mb-4">
-            <h5 class="alert-heading">Team Invites</h5>
+        <div>
+            <h5>Team Invites</h5>
             @if (inviteAccepted)
             {
-                <div class="alert alert-success py-1 px-2 small mb-2">Invite accepted — you've joined the team!</div>
+                <div>Invite accepted — you've joined the team!</div>
             }
-            <table class="table table-sm mb-0">
+            <table>
                 <thead>
                     <tr>
                         <th>Team</th>
@@ -53,17 +53,17 @@ else
                     @foreach (var invite in pendingInvites)
                     {
                         <tr>
-                            <td><a href="/teams/@invite.TeamId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@invite.Team.LogoUrl" />@invite.Team.Name</a></td>
+                            <td><a href="/teams/@invite.TeamId"><TeamFlag LogoUrl="@invite.Team.LogoUrl" />@invite.Team.Name</a></td>
                             <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(invite.RiotAccount.GameName)-@Uri.EscapeDataString(invite.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@invite.RiotAccount.GameName#@invite.RiotAccount.TagLine</strong></a></td>
                             <td>@invite.DateCreated.ToLocalTime().ToString("MMM d, yyyy")</td>
-                            <td class="d-flex gap-2">
+                            <td>
                                 <form method="post" action="/api/invites/@invite.Id/accept">
                                     <AntiforgeryToken />
-                                    <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                    <button type="submit">Accept</button>
                                 </form>
                                 <form method="post" action="/api/invites/@invite.Id/decline">
                                     <AntiforgeryToken />
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Decline</button>
+                                    <button type="submit">Decline</button>
                                 </form>
                             </td>
                         </tr>
@@ -73,39 +73,39 @@ else
         </div>
     }
 
-    <dl class="row">
-        <dt class="col-sm-3">Display Name</dt>
-        <dd class="col-sm-9">
+    <dl>
+        <dt>Display Name</dt>
+        <dd>
             @if (displayNameError is not null)
             {
-                <div class="alert alert-danger py-1 px-2 small mb-2">@displayNameError</div>
+                <div>@displayNameError</div>
             }
-            <form method="post" action="/api/users/update-display-name" class="d-flex gap-2 align-items-center">
+            <form method="post" action="/api/users/update-display-name">
                 <AntiforgeryToken />
-                <input type="text" name="displayName" class="form-control form-control-sm" style="max-width: 240px;"
+                <input type="text" name="displayName" style="max-width: 240px;"
                        value="@user.DisplayName" required />
-                <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+                <button type="submit">Save</button>
             </form>
         </dd>
 
-        <dt class="col-sm-3">Logo</dt>
-        <dd class="col-sm-9">
+        <dt>Logo</dt>
+        <dd>
             @if (logoError is not null)
             {
-                <div class="alert alert-danger py-1 px-2 small mb-2">@logoError</div>
+                <div>@logoError</div>
             }
-            <form method="post" action="/api/users/update-logo" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
+            <form method="post" action="/api/users/update-logo" enctype="multipart/form-data">
                 <AntiforgeryToken />
-                <input type="file" name="logo" class="form-control form-control-sm" style="max-width: 240px;"
+                <input type="file" name="logo" style="max-width: 240px;"
                        accept="image/jpeg,image/png,image/gif,image/webp" required />
-                <button type="submit" class="btn btn-sm btn-outline-secondary">Upload</button>
+                <button type="submit">Upload</button>
                 <UserFlag LogoUrl="@user.LogoUrl" />
             </form>
-            <div class="form-text">PNG, JPG, GIF, or WebP. Max 5 MB.</div>
+            <div>PNG, JPG, GIF, or WebP. Max 5 MB.</div>
         </dd>
 
-        <dt class="col-sm-3">Member Since</dt>
-        <dd class="col-sm-9">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+        <dt>Member Since</dt>
+        <dd>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
 
     </dl>
 

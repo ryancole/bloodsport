@@ -27,7 +27,7 @@
     <div class="top-nav-auth">
         <AuthorizeView>
             <Authorized>
-                <a href="/profile" class="d-flex align-items-center gap-2"><UserFlag LogoUrl="@logoUrl" />@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)</a>
+                <a href="/profile"><UserFlag LogoUrl="@logoUrl" />@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)</a>
             </Authorized>
             <NotAuthorized>
                 <a href="/auth/login">Log in</a>

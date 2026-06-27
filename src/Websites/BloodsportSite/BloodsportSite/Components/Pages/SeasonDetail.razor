@@ -11,7 +11,7 @@
 
 @if (notFound)
 {
-    <p class="text-muted">Season not found.</p>
+    <p>Season not found.</p>
 }
 else if (season is null)
 {
@@ -20,34 +20,34 @@ else if (season is null)
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav class="small"><a href="/seasons">Seasons</a> / @season.Name</nav>
+        <nav><a href="/seasons">Seasons</a> / @season.Name</nav>
     </SectionContent>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">@season.Name</h1>
-        <div class="d-flex align-items-center gap-2">
+    <div>
+        <h1>@season.Name</h1>
+        <div>
             <AuthorizeView Roles="Champions.Admin">
                 <Authorized>
-                    <a href="/seasons/@season.Id/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a href="/seasons/@season.Id/edit">Edit</a>
                     @if (season.SeasonWeeks.Count == 0 && !season.RegistrationOpen && season.Status == SeasonStatus.PreSeason)
                     {
                         <form method="post" action="/api/seasons/@season.Id/build" style="display:inline">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-outline-primary">Build Season</button>
+                            <button type="submit">Build Season</button>
                         </form>
                     }
                     @if (season.SeasonWeeks.Count > 0 && !season.RegistrationOpen && season.Status == SeasonStatus.PreSeason)
                     {
                         <form method="post" action="/api/seasons/@season.Id/start" style="display:inline">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-success">Start Season</button>
+                            <button type="submit">Start Season</button>
                         </form>
                     }
                     @if (season.Status == SeasonStatus.Completed && season.Playoff is null)
                     {
                         <form method="post" action="/api/seasons/@season.Id/create-playoffs" style="display:inline">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-primary">Create Playoffs</button>
+                            <button type="submit">Create Playoffs</button>
                         </form>
                     }
                 </Authorized>
@@ -55,37 +55,37 @@ else
         </div>
     </div>
 
-    <dl class="row mb-4">
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10"><SeasonStatusBadge Status="season.Status" /></dd>
+    <dl>
+        <dt>Status</dt>
+        <dd><SeasonStatusBadge Status="season.Status" /></dd>
 
-        <dt class="col-sm-2">Registration</dt>
-        <dd class="col-sm-10">
+        <dt>Registration</dt>
+        <dd>
             <SeasonRegistrationBadge IsOpen="season.RegistrationOpen" />
         </dd>
 
-        <dt class="col-sm-2">Length</dt>
-        <dd class="col-sm-10">@season.Length weeks</dd>
+        <dt>Length</dt>
+        <dd>@season.Length weeks</dd>
 
-        <dt class="col-sm-2">Region</dt>
-        <dd class="col-sm-10">@season.RiotRegion</dd>
+        <dt>Region</dt>
+        <dd>@season.RiotRegion</dd>
 
-        <dt class="col-sm-2">Estimated Start</dt>
-        <dd class="col-sm-10">@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
+        <dt>Estimated Start</dt>
+        <dd>@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
 
-        <dt class="col-sm-2">Estimated End</dt>
-        <dd class="col-sm-10">@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
+        <dt>Estimated End</dt>
+        <dd>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
 
         @if (season.Playoff is not null)
         {
-            <dt class="col-sm-2">Playoff</dt>
-            <dd class="col-sm-10"><a href="/playoffs/@season.Playoff.Id">@season.Playoff.Name</a></dd>
+            <dt>Playoff</dt>
+            <dd><a href="/playoffs/@season.Playoff.Id">@season.Playoff.Name</a></dd>
         }
     </dl>
 
     @if (season.Status == SeasonStatus.PreSeason)
     {
-        <div class="alert alert-warning" role="alert">
+        <div role="alert">
             <strong>Roster Lock Warning:</strong> Once this season is started, all team rosters are locked and cannot be modified. Teams that are unable to field their roster will be recorded as a loss.
         </div>
     }
@@ -94,13 +94,13 @@ else
     {
         @if (season.RegistrationOpen)
         {
-            <div class="card mb-4" style="background-color: #2a2a2a; border-color: #3d3d3d; color: white;">
-                <div class="card-body">
-                    <h5 class="card-title" style="color: rgba(255,255,255,0.9);">Registration is Open</h5>
+            <div style="background-color: #2a2a2a; border-color: #3d3d3d; color: white;">
+                <div>
+                    <h5 style="color: rgba(255,255,255,0.9);">Registration is Open</h5>
 
                     @if (alreadyRegisteredTeams.Count > 0)
                     {
-                        <p class="card-text">
+                        <p>
                             @if (alreadyRegisteredTeams.Count == 1)
                             {
                                 <span><a href="/teams/@alreadyRegisteredTeams[0].Id"><strong>@alreadyRegisteredTeams[0].Name</strong></a> is registered for this season.</span>
@@ -122,33 +122,33 @@ else
 
                     @if (eligibleTeams.Count > 0)
                     {
-                        <p class="card-text" style="color: rgba(255,255,255,0.6);">Register one of your teams to compete in this season.</p>
+                        <p style="color: rgba(255,255,255,0.6);">Register one of your teams to compete in this season.</p>
                         <form method="post" action="/api/seasons/@season.Id/register">
                             <AntiforgeryToken />
-                            <div class="d-flex gap-2 align-items-center">
+                            <div>
                                 @if (eligibleTeams.Count == 1)
                                 {
                                     <input type="hidden" name="teamId" value="@eligibleTeams[0].Id" />
-                                    <button type="submit" class="btn btn-outline-light btn-sm">
+                                    <button type="submit">
                                         Register @eligibleTeams[0].Name
                                     </button>
                                 }
                                 else
                                 {
-                                    <select name="teamId" class="form-select form-select-sm" style="max-width: 250px; background-color: #3d3d3d; color: white; border-color: rgba(255,255,255,0.25);">
+                                    <select name="teamId" style="max-width: 250px; background-color: #3d3d3d; color: white; border-color: rgba(255,255,255,0.25);">
                                         @foreach (var team in eligibleTeams)
                                         {
                                             <option value="@team.Id">@team.Name</option>
                                         }
                                     </select>
-                                    <button type="submit" class="btn btn-outline-light btn-sm">Register</button>
+                                    <button type="submit">Register</button>
                                 }
                             </div>
                         </form>
                     }
                     else if (alreadyRegisteredTeams.Count == 0)
                     {
-                        <p class="card-text" style="color: rgba(255,255,255,0.6);">You don't have any teams eligible to register.</p>
+                        <p style="color: rgba(255,255,255,0.6);">You don't have any teams eligible to register.</p>
                     }
                 </div>
             </div>

@@ -1,14 +1,12 @@
-<div class="d-flex align-items-center gap-2 mt-1">
-    <div class="input-group" style="max-width: 340px;">
+<div>
+    <div style="max-width: 340px;">
         <input id="lobby-code-@_id"
                type="password"
-               class="form-control font-monospace fw-bold"
                value="@Code"
                readonly
                aria-label="Lobby code"
                onclick="this.select()" />
         <button type="button"
-                class="btn btn-outline-secondary"
                 onclick="(function(btn) {
                     var input = document.getElementById('lobby-code-@_id');
                     var shown = input.type === 'text';
@@ -16,14 +14,13 @@
                     btn.textContent = shown ? 'Show' : 'Hide';
                 })(this)">Show</button>
         <button type="button"
-                class="btn btn-outline-secondary"
                 onclick="(function(btn) {
                     navigator.clipboard.writeText(document.getElementById('lobby-code-@_id').value)
                         .then(() => { btn.textContent = '✓ Copied'; setTimeout(() => btn.textContent = 'Copy', 2000); });
                 })(this)">Copy</button>
     </div>
 </div>
-<div class="small text-success mt-1">&#10003; Lobby code ready</div>
+<div>&#10003; Lobby code ready</div>
 
 @code {
     [Parameter, EditorRequired] public string Code { get; set; } = "";
