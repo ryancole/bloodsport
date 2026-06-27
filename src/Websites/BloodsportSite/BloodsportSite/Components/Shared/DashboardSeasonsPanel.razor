@@ -38,64 +38,6 @@
     }
 </div>
 
-<style>
-    .dsp-list { padding: 8px 0 4px; }
-    .dsp-row {
-        display: grid;
-        grid-template-columns: 1fr auto auto auto;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 20px;
-        border-bottom: 1px solid var(--cal-border-faint);
-        transition: background var(--cal-dur-fast) var(--cal-ease);
-    }
-    .dsp-row:last-child { border-bottom: none; }
-    .dsp-row:hover { background: var(--cal-surface-3); }
-    .dsp-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--cal-text);
-        text-decoration: none;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        min-width: 0;
-        transition: color var(--cal-dur) var(--cal-ease);
-    }
-    .dsp-name:hover { color: var(--cal-cyan); }
-    .dsp-badges { display: flex; gap: 6px; flex-shrink: 0; }
-    .dsp-badge {
-        display: inline-flex;
-        align-items: center;
-        height: 20px;
-        padding: 0 8px;
-        border-radius: var(--cal-radius-pill);
-        font-family: var(--cal-font-mono);
-        font-weight: 600;
-        font-size: 10px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        white-space: nowrap;
-        background: var(--cal-surface-3);
-        color: var(--cal-text-muted);
-    }
-    .dsp-badge--active { background: var(--cal-cyan-ghost); color: var(--cal-cyan); }
-    .dsp-badge--preseason { background: rgba(255,176,32,0.12); color: #FFB020; }
-    .dsp-badge--reg { background: rgba(33,208,122,0.12); color: #21D07A; }
-    .dsp-date {
-        font-family: var(--cal-font-mono);
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        color: var(--cal-text-faint);
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-    .dsp-date-label {
-        text-transform: uppercase;
-        opacity: 0.6;
-        margin-right: 3px;
-    }
-</style>
 
 @code {
     [Parameter, EditorRequired] public List<Season> Seasons { get; set; } = [];

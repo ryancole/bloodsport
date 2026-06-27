@@ -165,13 +165,13 @@ else
                         <td>
                             @if (seasonResults.TryGetValue(reg.Season.Id, out var result))
                             {
-                                <span style="color:var(--cal-success);font-weight:700">@result.WinCount W</span>
-                                <span style="color:var(--cal-text-faint);margin:0 4px">/</span>
-                                <span style="color:var(--cal-danger);font-weight:700">@result.LoseCount L</span>
+                                <span>@result.WinCount W</span>
+                                <span style="margin:0 4px">/</span>
+                                <span>@result.LoseCount L</span>
                             }
                             else
                             {
-                                <span style="color:var(--cal-text-faint)">—</span>
+                                <span>—</span>
                             }
                         </td>
                         <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
