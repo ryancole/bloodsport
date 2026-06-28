@@ -17,8 +17,10 @@
                 var dateEnd = playoff.PlayoffRounds.Select(r => r.DateEnd).Where(d => d.HasValue).Max(d => d);
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
                     <a href="/playoffs/@playoff.Id" class="font-medium text-gray-900 no-underline hover:text-sky-600">@playoff.Name</a>
-                    <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium @PlayoffBadgeClass(playoff.Status)">
-                        <Icon Path="@PlayoffStatusIcon(playoff.Status)" />
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium @PlayoffBadgeClass(playoff.Status)">
+                        <span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-black @PlayoffIconCircleClass(playoff.Status)">
+                            <Icon Path="@PlayoffStatusIcon(playoff.Status)" />
+                        </span>
                         @playoff.Status
                     </span>
                     <span class="ml-auto text-xs text-gray-400">
@@ -51,5 +53,12 @@
         PlayoffStatus.Active    => StatusIcons.Bolt,
         PlayoffStatus.Completed => StatusIcons.Check,
         _                       => StatusIcons.Clock,
+    };
+
+    private static string PlayoffIconCircleClass(PlayoffStatus status) => status switch
+    {
+        PlayoffStatus.Active    => "bg-green-300",
+        PlayoffStatus.Completed => "bg-gray-300",
+        _                       => "bg-amber-300",
     };
 }

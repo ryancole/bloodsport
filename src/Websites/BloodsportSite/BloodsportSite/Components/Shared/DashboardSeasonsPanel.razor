@@ -17,14 +17,18 @@
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
                     <a href="/seasons/@season.Id" class="font-medium text-gray-900 no-underline hover:text-sky-600">@season.Name</a>
                     <div class="flex items-center gap-1">
-                        <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium @SeasonBadgeClass(season.Status)">
-                            <Icon Path="@SeasonStatusIcon(season.Status)" />
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium @SeasonBadgeClass(season.Status)">
+                            <span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-black @SeasonIconCircleClass(season.Status)">
+                                <Icon Path="@SeasonStatusIcon(season.Status)" />
+                            </span>
                             @season.Status
                         </span>
                         @if (season.RegistrationOpen)
                         {
-                            <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                                <Icon Path="@StatusIcons.Check" />
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                                <span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-black bg-green-300">
+                                    <Icon Path="@StatusIcons.Check" />
+                                </span>
                                 Reg. Open
                             </span>
                         }
@@ -59,5 +63,12 @@
         SeasonStatus.Active    => StatusIcons.Bolt,
         SeasonStatus.Completed => StatusIcons.Check,
         _                      => StatusIcons.Clock,
+    };
+
+    private static string SeasonIconCircleClass(SeasonStatus status) => status switch
+    {
+        SeasonStatus.Active    => "bg-green-300",
+        SeasonStatus.PreSeason => "bg-amber-300",
+        _                      => "bg-gray-300",
     };
 }
