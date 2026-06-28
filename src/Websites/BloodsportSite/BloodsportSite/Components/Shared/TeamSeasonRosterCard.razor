@@ -1,6 +1,13 @@
 @using Bloodsport.Entity.Database
 
 <div class="card">
+    @if (IsInaugural)
+    {
+        <span class="badge mb-2 gap-1 bg-amber-100 text-amber-700" title="Registered for the inaugural season">
+            <Icon Path="@StatusIcons.Star" />
+            Inaugural Season
+        </span>
+    }
     <h2 class="mb-3 text-lg font-semibold text-gray-900"><a href="/teams/@TeamId" class="link">@TeamName</a></h2>
     @if (AllowedSummonerNames.Count == 0)
     {
@@ -36,4 +43,5 @@
     [Parameter, EditorRequired] public ICollection<string> AllowedSummonerNames { get; set; } = [];
     [Parameter] public string BadgeClass { get; set; } = "bg-sky-100 text-sky-700";
     [Parameter] public Dictionary<string, long> UserIds { get; set; } = [];
+    [Parameter] public bool IsInaugural { get; set; }
 }

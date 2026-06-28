@@ -155,12 +155,18 @@ namespace BloodsportSite.Api
             if (alreadyRegistered)
                 return Results.Redirect($"/seasons/{id}?error=already_registered");
 
+            // The team is inaugural only if this is the first season it has ever
+            // registered for; having played in any prior season disqualifies it.
+            var hasPlayedPriorSeason = await db.SeasonRegistrations
+                .AnyAsync(r => r.TeamId == teamId && r.SeasonId != id);
+
             db.SeasonRegistrations.Add(new SeasonRegistration
             {
                 SeasonId = id,
                 Season = season,
                 TeamId = teamId,
                 Team = team,
+                InauguralRegistration = !hasPlayedPriorSeason,
             });
 
             await db.SaveChangesAsync();

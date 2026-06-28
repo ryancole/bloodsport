@@ -185,11 +185,11 @@ else
         </div>
     }
     <div class="grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
-        <TeamSeasonRosterCard TeamId="@matchup.TeamOne.Id" TeamName="@matchup.TeamOne.Name" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-sky-100 text-sky-700" UserIds="@rosterUserIds" />
+        <TeamSeasonRosterCard TeamId="@matchup.TeamOne.Id" TeamName="@matchup.TeamOne.Name" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-sky-100 text-sky-700" UserIds="@rosterUserIds" IsInaugural="@teamOneInaugural" />
 
         <div class="text-center text-sm font-bold text-gray-400">VS</div>
 
-        <TeamSeasonRosterCard TeamId="@matchup.TeamTwo.Id" TeamName="@matchup.TeamTwo.Name" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-red-100 text-red-700" UserIds="@rosterUserIds" />
+        <TeamSeasonRosterCard TeamId="@matchup.TeamTwo.Id" TeamName="@matchup.TeamTwo.Name" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-red-100 text-red-700" UserIds="@rosterUserIds" IsInaugural="@teamTwoInaugural" />
     </div>
 }
 
@@ -211,6 +211,8 @@ else
     private string? info;
     private ICollection<string> teamOneRoster = [];
     private ICollection<string> teamTwoRoster = [];
+    private bool teamOneInaugural;
+    private bool teamTwoInaugural;
     private Dictionary<string, long> rosterUserIds = [];
     private List<LobbyEvent> lobbyEvents = [];
     private Dictionary<string, string> puuidToSummonerName = [];
@@ -276,6 +278,15 @@ else
 
         teamOneRoster = ParseRoster(rosters.FirstOrDefault(r => r.TeamId == matchup.TeamOneId));
         teamTwoRoster = ParseRoster(rosters.FirstOrDefault(r => r.TeamId == matchup.TeamTwoId));
+
+        var inauguralTeamIds = await db.SeasonRegistrations
+            .Where(r => r.SeasonId == seasonId
+                        && (r.TeamId == matchup.TeamOneId || r.TeamId == matchup.TeamTwoId)
+                        && r.InauguralRegistration == true)
+            .Select(r => r.TeamId)
+            .ToListAsync();
+        teamOneInaugural = inauguralTeamIds.Contains(matchup.TeamOneId);
+        teamTwoInaugural = inauguralTeamIds.Contains(matchup.TeamTwoId);
 
         var allSummonerNames = teamOneRoster.Concat(teamTwoRoster).ToHashSet();
         var accounts = await db.RiotAccounts
