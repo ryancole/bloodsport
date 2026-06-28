@@ -15,6 +15,10 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
                 .IsUnique();
 
             builder
+                .Property(m => m.InauguralRegistration)
+                .HasDefaultValue(true);
+
+            builder
                 .Property(r => r.DateCreated)
                 .HasDefaultValueSql("GETUTCDATE()");
 

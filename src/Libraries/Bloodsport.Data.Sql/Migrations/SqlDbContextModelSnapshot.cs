@@ -397,8 +397,10 @@ namespace Bloodsport.Data.Sql.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<bool?>("InauguralRegistration")
-                        .HasColumnType("bit");
+                    b.Property<bool>("InauguralRegistration")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<long>("SeasonId")
                         .HasColumnType("bigint");

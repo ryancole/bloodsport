@@ -14,7 +14,8 @@ namespace Bloodsport.Data.Sql.Migrations
                 name: "InauguralRegistration",
                 table: "SeasonRegistrations",
                 type: "bit",
-                nullable: true);
+                nullable: false,
+                defaultValue: true);
         }
 
         /// <inheritdoc />

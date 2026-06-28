@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    [Migration("20260628063355_InauguralSeasonReg")]
+    [Migration("20260628064451_InauguralSeasonReg")]
     partial class InauguralSeasonReg
     {
         /// <inheritdoc />
@@ -400,8 +400,10 @@ namespace Bloodsport.Data.Sql.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<bool?>("InauguralRegistration")
-                        .HasColumnType("bit");
+                    b.Property<bool>("InauguralRegistration")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<long>("SeasonId")
                         .HasColumnType("bigint");
