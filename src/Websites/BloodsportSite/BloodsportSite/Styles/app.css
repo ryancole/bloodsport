@@ -40,7 +40,11 @@
     .doc          { @apply max-w-3xl text-gray-700; }
     .doc section  { @apply mb-8; }
     .doc h2       { @apply mt-8 mb-2 text-xl font-bold text-gray-900; }
-    .doc h3       { @apply mt-5 mb-1 text-base font-semibold text-gray-800; }
+    /* Indent subsections (and their paragraphs) under their parent section heading. */
+    .doc h3       { @apply mt-5 mb-1 pl-5 text-base font-semibold text-gray-800; }
+    .doc section p { @apply pl-5; }
     .doc p        { @apply mb-3 leading-relaxed; }
     .doc a        { @apply text-sky-600 no-underline hover:text-sky-700; }
+    /* Mirror the same hierarchy in the table of contents. */
+    .doc nav ul ul { @apply pl-5; }
 }
