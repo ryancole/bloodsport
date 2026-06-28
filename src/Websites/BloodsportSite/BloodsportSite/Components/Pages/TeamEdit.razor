@@ -40,7 +40,7 @@ else
             @if (team.LogoUrl is not null)
             {
                 <div class="mb-2">
-                    <img src="@BlobSasService.GetSasUrl(team.LogoUrl)" alt="Current team logo" class="max-h-20 max-w-[200px] object-contain" />
+                    <img src="@BlobSasService.GetSasUrl(team.LogoUrl)" alt="Current team logo" class="max-h-20 max-w-[200px] rounded-[2px] object-contain ring-1 ring-black/20" />
                 </div>
             }
             <input type="file" name="logo" accept="image/jpeg,image/png,image/gif,image/webp" class="block text-sm text-gray-600" />

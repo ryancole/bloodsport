@@ -29,7 +29,7 @@ else
         <div class="flex items-center gap-3">
             @if (team.LogoUrl is not null)
             {
-                <img src="@BlobSasService.GetSasUrl(team.LogoUrl)" alt="@team.Name logo" class="h-16 w-16 object-contain" />
+                <img src="@BlobSasService.GetSasUrl(team.LogoUrl)" alt="@team.Name logo" class="h-16 w-16 rounded-[2px] object-contain ring-1 ring-black/20" />
             }
             <h1 class="page-title">@team.Name</h1>
         </div>
