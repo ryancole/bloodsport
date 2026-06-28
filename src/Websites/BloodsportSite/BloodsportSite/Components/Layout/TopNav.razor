@@ -3,22 +3,22 @@
 @inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<header class="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-gray-200 bg-white px-6">
-    <a href="" class="flex items-center gap-2 text-base font-bold text-gray-900 no-underline hover:text-sky-600">
+<header class="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6">
+    <a href="" class="flex items-center gap-2 text-base font-bold text-white no-underline hover:text-sky-400">
         <img src="cal-logo.svg" alt="CAL" class="h-8 w-8" />
         Champions Amateur League
     </a>
 
-    <span class="mx-1 h-5 w-px bg-gray-200"></span>
+    <span class="mx-1 h-5 w-px bg-white/10"></span>
 
     <nav class="flex items-center gap-1">
         <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="news">News</NavLink>
         <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="format">Format</NavLink>
         <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="rules">Rules</NavLink>
-        <span class="mx-1 h-5 w-px bg-gray-200"></span>
+        <span class="mx-1 h-5 w-px bg-white/10"></span>
         <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="teams">Teams</NavLink>
         <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="users">Users</NavLink>
-        <span class="mx-1 h-5 w-px bg-gray-200"></span>
+        <span class="mx-1 h-5 w-px bg-white/10"></span>
         <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="seasons">Seasons</NavLink>
         <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="playoffs">Playoffs</NavLink>
     </nav>
@@ -30,12 +30,12 @@
     <div class="ml-auto flex items-center">
         <AuthorizeView>
             <Authorized>
-                <a href="/profile" class="flex items-center gap-2 text-sm text-gray-600 no-underline hover:text-gray-900">
-                    <UserFlag LogoUrl="@logoUrl" />@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)
+                <a href="/profile" class="flex items-center gap-2 text-sm text-gray-300 no-underline hover:text-white">
+                    <UserFlag LogoUrl="@logoUrl" OnDark="true" />@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)
                 </a>
             </Authorized>
             <NotAuthorized>
-                <a href="/auth/login" class="text-sm text-gray-600 no-underline hover:text-gray-900">Log in</a>
+                <a href="/auth/login" class="text-sm text-gray-300 no-underline hover:text-white">Log in</a>
             </NotAuthorized>
         </AuthorizeView>
     </div>
@@ -43,8 +43,8 @@
 
 @code {
     // Kept as consts so all nav links share one definition; Tailwind still scans these literals.
-    private const string LinkClass = "rounded px-3 py-1.5 text-sm font-medium text-gray-600 no-underline transition-colors hover:bg-gray-100 hover:text-gray-900";
-    private const string LinkActiveClass = "bg-sky-50 text-sky-700!";
+    private const string LinkClass = "rounded px-3 py-1.5 text-sm font-medium text-gray-300 no-underline transition-colors hover:bg-white/10 hover:text-white";
+    private const string LinkActiveClass = "bg-sky-500/15 text-sky-300!";
 
     private string? displayName;
     private string? logoUrl;

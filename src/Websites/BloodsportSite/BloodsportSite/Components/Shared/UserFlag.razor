@@ -3,7 +3,7 @@
 
 @if (flagUrl is not null)
 {
-    <img src="@flagUrl" width="28" height="18" class="flex-shrink-0 rounded-[2px] object-cover ring-1 ring-black/20" alt="" />
+    <img src="@flagUrl" width="28" height="18" class="flex-shrink-0 rounded-[2px] object-cover ring-1 @(OnDark ? "ring-white/25" : "ring-black/20")" alt="" />
 }
 else
 {
@@ -12,6 +12,9 @@ else
 
 @code {
     [Parameter, EditorRequired] public string? LogoUrl { get; set; }
+
+    /// <summary>Use a light ring instead of dark, for placement on dark surfaces like the top nav.</summary>
+    [Parameter] public bool OnDark { get; set; }
 
     private string? flagUrl => BlobSasService.GetSasUrl(LogoUrl?.Replace("/original.", "/flag."));
 }
