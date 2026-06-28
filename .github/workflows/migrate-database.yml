@@ -23,6 +23,13 @@ jobs:
       - name: Install EF Core tools
         run: dotnet tool install --global dotnet-ef --version 10.0.8
 
+      - name: Install Tailwind CSS CLI
+        shell: pwsh
+        run: |
+          $version = 'v4.3.1'
+          Invoke-WebRequest -Uri "https://github.com/tailwindlabs/tailwindcss/releases/download/$version/tailwindcss-windows-x64.exe" -OutFile tailwindcss.exe
+          "$pwd" | Out-File -FilePath $env:GITHUB_PATH -Append
+
       - name: Azure Login
         uses: azure/login@v2
         with:

@@ -20,6 +20,13 @@ jobs:
         with:
           dotnet-version: '10.x'
 
+      - name: Install Tailwind CSS CLI
+        shell: pwsh
+        run: |
+          $version = 'v4.3.1'
+          Invoke-WebRequest -Uri "https://github.com/tailwindlabs/tailwindcss/releases/download/$version/tailwindcss-windows-x64.exe" -OutFile tailwindcss.exe
+          "$pwd" | Out-File -FilePath $env:GITHUB_PATH -Append
+
       - name: Publish
         run: dotnet publish src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj --configuration Release --output ./publish
 
