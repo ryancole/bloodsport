@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Scan Razor markup for class names (server app + WASM client project). */
+@source "../Components/**/*.razor";
+@source "../Components/**/*.cshtml";
+@source "../../BloodsportSite.Client/**/*.razor";
