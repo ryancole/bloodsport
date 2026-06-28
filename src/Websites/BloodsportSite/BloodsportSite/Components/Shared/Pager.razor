@@ -5,30 +5,22 @@
 
 @if (TotalPages > 1)
 {
-    <nav class="@NavClass">
-        <ul class="pagination pagination-sm mb-0">
-            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@PageUrl(CurrentPage - 1)">Previous</a>
-            </li>
-            @if (windowStart > 1)
-            {
-                <li class="page-item disabled"><span class="page-link">…</span></li>
-            }
-            @for (var p = windowStart; p <= windowEnd; p++)
-            {
-                var pageNum = p;
-                <li class="page-item @(CurrentPage == pageNum ? "active" : "")">
-                    <a class="page-link" href="@PageUrl(pageNum)">@pageNum</a>
-                </li>
-            }
-            @if (windowEnd < TotalPages)
-            {
-                <li class="page-item disabled"><span class="page-link">…</span></li>
-            }
-            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@PageUrl(CurrentPage + 1)">Next</a>
-            </li>
-        </ul>
+    <nav class="flex flex-wrap items-center gap-1 @NavClass">
+        <a href="@PageUrl(CurrentPage - 1)" class="rounded border border-gray-200 px-3 py-1 text-sm text-gray-700 no-underline hover:bg-gray-100 @(CurrentPage == 1 ? "pointer-events-none opacity-40" : "")">Previous</a>
+        @if (windowStart > 1)
+        {
+            <span class="px-2 text-sm text-gray-400">…</span>
+        }
+        @for (var p = windowStart; p <= windowEnd; p++)
+        {
+            var pageNum = p;
+            <a href="@PageUrl(pageNum)" class="rounded border px-3 py-1 text-sm no-underline @(CurrentPage == pageNum ? "border-sky-600 bg-sky-600 text-white" : "border-gray-200 text-gray-700 hover:bg-gray-100")">@pageNum</a>
+        }
+        @if (windowEnd < TotalPages)
+        {
+            <span class="px-2 text-sm text-gray-400">…</span>
+        }
+        <a href="@PageUrl(CurrentPage + 1)" class="rounded border border-gray-200 px-3 py-1 text-sm text-gray-700 no-underline hover:bg-gray-100 @(CurrentPage == TotalPages ? "pointer-events-none opacity-40" : "")">Next</a>
     </nav>
 }
 

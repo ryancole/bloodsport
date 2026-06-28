@@ -1,32 +1,20 @@
 @using Bloodsport.Entity.Database
 
-<div class="modal fade" id="inviteMemberModal" tabindex="-1" aria-labelledby="inviteMemberModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="inviteMemberModalLabel">Invite Member</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post" action="/api/teams/@TeamId/invite">
-                <AntiforgeryToken />
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Game Name</label>
-                        <input type="text" name="gameName" class="form-control" placeholder="HideOnBush" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tag</label>
-                        <input type="text" name="tagLine" class="form-control" placeholder="NA1" required />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Send Invite</button>
-                </div>
-            </form>
+<details class="rounded-lg border border-gray-200 bg-white p-4">
+    <summary class="cursor-pointer font-medium text-gray-900">Invite Member</summary>
+    <form method="post" action="/api/teams/@TeamId/invite" class="mt-3 space-y-3">
+        <AntiforgeryToken />
+        <div>
+            <label class="label">Game Name</label>
+            <input type="text" name="gameName" placeholder="HideOnBush" required class="input w-64" />
         </div>
-    </div>
-</div>
+        <div>
+            <label class="label">Tag</label>
+            <input type="text" name="tagLine" placeholder="NA1" required class="input w-32" />
+        </div>
+        <button type="submit" class="btn btn-primary">Send Invite</button>
+    </form>
+</details>
 
 @code {
     [Parameter, EditorRequired] public long TeamId { get; set; }

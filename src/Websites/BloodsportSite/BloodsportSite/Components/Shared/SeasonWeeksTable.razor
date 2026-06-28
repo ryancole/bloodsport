@@ -1,39 +1,36 @@
 @using Bloodsport.Entity.Database
 
-<h2>Regular Season Weeks</h2>
+<h2 class="mb-3 text-lg font-semibold text-gray-900">Regular Season Weeks</h2>
 
 @if (Weeks.Count == 0)
 {
-    <p class="text-muted">No weeks scheduled yet.</p>
+    <p class="text-sm text-gray-500">No weeks scheduled yet.</p>
 }
 else
 {
-    <table class="table mb-4">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Start</th>
-                <th>End</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var week in Weeks.OrderBy(w => w.Index))
-            {
-                <tr>
-                    <td><a href="/seasons/@SeasonId/weeks/@week.Id">@week.Name</a></td>
-                    <td>@week.DateStart.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    <td>@week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    <td>
-                        @if (week.HasBeenEnded)
-                        {
-                            <span class="cal-badge">Closed</span>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Name</th><th>Start</th><th>End</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var week in Weeks.OrderBy(w => w.Index))
+                {
+                    <tr>
+                        <td><a href="/seasons/@SeasonId/weeks/@week.Id" class="link">@week.Name</a></td>
+                        <td>@week.DateStart.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        <td>@week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        <td>
+                            @if (week.HasBeenEnded)
+                            {
+                                <span class="badge bg-gray-100 text-gray-600">Closed</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

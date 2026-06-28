@@ -7,48 +7,46 @@
     var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
 }
 
-<div class="d-flex align-items-center justify-content-between mb-2">
-    <div class="d-flex align-items-center gap-3">
-        <form method="get" class="d-flex gap-2">
-            <input type="search" name="search" class="form-control w-auto" placeholder="Search by team name…" />
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-3">
+        <form method="get" class="flex items-center gap-2">
+            <input type="search" name="search" placeholder="Search by team name…" class="input w-64" />
             <button type="submit" class="btn btn-secondary">Search</button>
         </form>
         @if (!string.IsNullOrWhiteSpace(Search))
         {
-            <span class="text-muted">
+            <span class="text-sm text-gray-500">
                 Filtering by &ldquo;@Search&rdquo;
-                <a href="/teams" class="ms-1 text-decoration-none" title="Clear filter">&times;</a>
+                <a href="/teams" class="link" title="Clear filter">&times;</a>
             </span>
         }
     </div>
-    <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex" />
+    <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" />
 </div>
 
 @if (!sorted.Any())
 {
-    <p class="text-center text-muted fs-5 py-4">No teams found.</p>
+    <p class="text-sm text-gray-500">No teams found.</p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Manager</th>
-                <th>Created</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var team in pageItems)
-            {
-                <tr>
-                    <td><a href="/teams/@team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@team.LogoUrl" />@team.Name</a></td>
-                    <td><a href="/users/@team.Manager.Id" class="d-flex align-items-center gap-2"><UserFlag LogoUrl="@team.Manager.LogoUrl" />@team.Manager.DisplayName</a></td>
-                    <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Name</th><th>Manager</th><th>Created</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var team in pageItems)
+                {
+                    <tr>
+                        <td><a href="/teams/@team.Id" class="link inline-flex items-center gap-2"><TeamFlag LogoUrl="@team.LogoUrl" />@team.Name</a></td>
+                        <td><a href="/users/@team.Manager.Id" class="link inline-flex items-center gap-2"><UserFlag LogoUrl="@team.Manager.LogoUrl" />@team.Manager.DisplayName</a></td>
+                        <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

@@ -10,35 +10,35 @@
 
 @if (notFound)
 {
-    <p class="text-muted">Playoff not found.</p>
+    <p class="text-sm text-gray-500">Playoff not found.</p>
 }
 else if (playoff is null)
 {
-    <p><em>Loading...</em></p>
+    <p class="text-sm text-gray-500"><em>Loading...</em></p>
 }
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav class="small"><a href="/playoffs">Playoffs</a> / @playoff.Name</nav>
+        <nav><a href="/playoffs" class="link">Playoffs</a> / @playoff.Name</nav>
     </SectionContent>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">@playoff.Name</h1>
+    <div class="mb-6 flex items-center justify-between gap-4">
+        <h1 class="page-title">@playoff.Name</h1>
         <AuthorizeView Roles="Champions.Admin">
             <Authorized>
-                <div class="d-flex gap-2">
+                <div class="flex items-center gap-2">
                     @if (playoff.PlayoffRounds.Count == 0)
                     {
                         <form method="post" action="/api/playoffs/@playoff.Id/build-bracket" data-enhance="false">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-primary">Build Bracket</button>
+                            <button type="submit" class="btn btn-primary">Build Bracket</button>
                         </form>
                     }
                     @if (playoff.Status == PlayoffStatus.Upcoming)
                     {
                         <form method="post" action="/api/playoffs/@playoff.Id/start" data-enhance="false">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-sm btn-success">Start Playoff</button>
+                            <button type="submit" class="btn btn-primary">Start Playoff</button>
                         </form>
                     }
                 </div>
@@ -46,28 +46,28 @@ else
         </AuthorizeView>
     </div>
 
-    <dl class="row mb-4">
-        <dt class="col-sm-2">Season</dt>
-        <dd class="col-sm-10"><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></dd>
+    <dl class="mb-6 grid grid-cols-[140px_1fr] gap-y-2 text-sm">
+        <dt class="font-medium text-gray-500">Season</dt>
+        <dd><a href="/seasons/@playoff.SeasonId" class="link">@playoff.Season.Name</a></dd>
 
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10"><span class="badge @StatusBadgeClass(playoff.Status)">@playoff.Status</span></dd>
+        <dt class="font-medium text-gray-500">Status</dt>
+        <dd><span class="badge @StatusBadgeClass(playoff.Status)">@playoff.Status</span></dd>
 
-        <dt class="col-sm-2">Region</dt>
-        <dd class="col-sm-10">@playoff.RiotRegion</dd>
+        <dt class="font-medium text-gray-500">Region</dt>
+        <dd class="text-gray-700">@playoff.RiotRegion</dd>
 
-        <dt class="col-sm-2">Teams</dt>
-        <dd class="col-sm-10">@playoff.PlayoffTeams.Count</dd>
+        <dt class="font-medium text-gray-500">Teams</dt>
+        <dd class="text-gray-700">@playoff.PlayoffTeams.Count</dd>
 
-        <dt class="col-sm-2">Created</dt>
-        <dd class="col-sm-10">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+        <dt class="font-medium text-gray-500">Created</dt>
+        <dd class="text-gray-700">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
     @if (grandFinalWinner is not null)
     {
-        <div class="alert alert-success d-flex align-items-center gap-2 mb-3" role="alert">
-            <span style="font-size:1.4rem">🏆</span>
-            <strong>@grandFinalWinner.Team?.Name</strong> wins the @playoff.Name!
+        <div role="alert" class="alert alert-success mb-6 flex items-center gap-2">
+            <span class="text-2xl">🏆</span>
+            <span><strong>@grandFinalWinner.Team?.Name</strong> wins the @playoff.Name!</span>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
         <script>
@@ -85,19 +85,17 @@ else
 
     @if (playoff.PlayoffRounds.Any(r => r.DateEnd == null))
     {
-        <div class="alert alert-warning" role="alert">
+        <div role="alert" class="alert alert-info mb-6">
             This playoff has not started yet. Round end dates will be available once the playoff begins.
         </div>
     }
 
-    <ul class="nav nav-tabs mb-4">
-        <li class="nav-item">
-            <a class="nav-link @(ActiveTab == "bracket" ? "active" : "")" href="/playoffs/@playoff.Id?tab=bracket">Bracket</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link @(ActiveTab == "teams" ? "active" : "")" href="/playoffs/@playoff.Id?tab=teams">Teams</a>
-        </li>
-    </ul>
+    <div class="mb-6 border-b border-gray-200">
+        <nav class="flex gap-1">
+            <a href="/playoffs/@playoff.Id?tab=bracket" class="border-b-2 px-4 py-2 text-sm font-medium no-underline @(ActiveTab == "bracket" ? "border-sky-600 text-sky-700" : "border-transparent text-gray-500 hover:text-gray-800")">Bracket</a>
+            <a href="/playoffs/@playoff.Id?tab=teams" class="border-b-2 px-4 py-2 text-sm font-medium no-underline @(ActiveTab == "teams" ? "border-sky-600 text-sky-700" : "border-transparent text-gray-500 hover:text-gray-800")">Teams</a>
+        </nav>
+    </div>
 
     @if (ActiveTab == "teams")
     {
@@ -179,9 +177,9 @@ else
 
     private static string StatusBadgeClass(PlayoffStatus status) => status switch
     {
-        PlayoffStatus.Upcoming => "bg-secondary",
-        PlayoffStatus.Active => "bg-success",
-        PlayoffStatus.Completed => "bg-dark",
-        _ => "bg-secondary"
+        PlayoffStatus.Upcoming  => "bg-sky-100 text-sky-700",
+        PlayoffStatus.Active    => "bg-green-100 text-green-700",
+        PlayoffStatus.Completed => "bg-gray-100 text-gray-600",
+        _                       => "bg-gray-100 text-gray-600",
     };
 }

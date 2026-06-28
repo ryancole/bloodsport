@@ -8,70 +8,69 @@
 
 @if (notFound)
 {
-    <p class="text-muted">Week not found.</p>
+    <p class="text-sm text-gray-500">Week not found.</p>
 }
 else if (week is null)
 {
-    <p><em>Loading...</em></p>
+    <p class="text-sm text-gray-500"><em>Loading...</em></p>
 }
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav class="small"><a href="/seasons">Seasons</a> / <a href="/seasons/@week.Season.Id">@week.Season.Name</a> / @week.Name</nav>
+        <nav><a href="/seasons" class="link">Seasons</a> / <a href="/seasons/@week.Season.Id" class="link">@week.Season.Name</a> / @week.Name</nav>
     </SectionContent>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">@week.Name</h1>
-        <span class="text-muted">@week.DateStart.ToLocalTime().ToString("MMMM d") – @week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</span>
+    <div class="mb-6 flex flex-wrap items-baseline gap-3">
+        <h1 class="page-title">@week.Name</h1>
+        <span class="text-sm text-gray-500">@week.DateStart.ToLocalTime().ToString("MMMM d") – @week.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</span>
     </div>
 
-    <h2>Matchups</h2>
+    <h2 class="mb-3 text-lg font-semibold text-gray-900">Matchups</h2>
 
     @if (week.SeasonWeekMatchups.Count == 0)
     {
-        <p class="text-muted">No matchups scheduled for this week.</p>
+        <p class="text-sm text-gray-500">No matchups scheduled for this week.</p>
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Matchup</th>
-                    <th>Team One</th>
-                    <th>Team Two</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var matchup in week.SeasonWeekMatchups.OrderByDescending(m => m.SeasonWeekMatchupResult != null))
-                {
-                    var result = matchup.SeasonWeekMatchupResult;
-                    <tr>
-                        <td><a href="/seasons/@week.Season.Id/weeks/@week.Id/matchups/@matchup.Id">@matchup.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamOneId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamOne.LogoUrl" />@matchup.TeamOne.Name</a></td>
-                        <td><a href="/teams/@matchup.TeamTwoId" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamTwo.LogoUrl" />@matchup.TeamTwo.Name</a></td>
-                        <td>
-                            @if (result is not null)
-                            {
-                                @if (result.DidNotPlay)
+        <div class="overflow-x-auto">
+            <table class="tbl">
+                <thead>
+                    <tr><th>Matchup</th><th>Team One</th><th>Team Two</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var matchup in week.SeasonWeekMatchups.OrderByDescending(m => m.SeasonWeekMatchupResult != null))
+                    {
+                        var result = matchup.SeasonWeekMatchupResult;
+                        <tr>
+                            <td><a href="/seasons/@week.Season.Id/weeks/@week.Id/matchups/@matchup.Id" class="link">@matchup.Name</a></td>
+                            <td><a href="/teams/@matchup.TeamOneId" class="link inline-flex items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamOne.LogoUrl" />@matchup.TeamOne.Name</a></td>
+                            <td><a href="/teams/@matchup.TeamTwoId" class="link inline-flex items-center gap-2"><TeamFlag LogoUrl="@matchup.TeamTwo.LogoUrl" />@matchup.TeamTwo.Name</a></td>
+                            <td>
+                                @if (result is not null)
                                 {
-                                    <span class="badge text-bg-secondary me-1">Did Not Play</span>
-                                }
-                                else
-                                {
-                                    <span class="badge text-bg-success me-1">Final</span>
-                                    <span class="text-muted small">@result.WinnerTeam?.Name wins</span>
-                                    @if (result.RosterMismatch)
+                                    @if (result.DidNotPlay)
                                     {
-                                        <span class="badge text-bg-warning ms-1" title="One or more players did not match the locked season roster">Roster Mismatch</span>
+                                        <span class="badge bg-gray-100 text-gray-600">Did Not Play</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center gap-2">
+                                            <span class="badge bg-green-100 text-green-700">Final</span>
+                                            <span class="text-gray-600">@result.WinnerTeam?.Name wins</span>
+                                            @if (result.RosterMismatch)
+                                            {
+                                                <span class="badge bg-amber-100 text-amber-700" title="One or more players did not match the locked season roster">Roster Mismatch</span>
+                                            }
+                                        </span>
                                     }
                                 }
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 }
 

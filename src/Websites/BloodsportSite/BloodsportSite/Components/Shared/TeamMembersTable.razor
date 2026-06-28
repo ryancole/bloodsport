@@ -2,29 +2,27 @@
 
 @if (Memberships.Count == 0)
 {
-    <p class="text-muted">No members yet.</p>
+    <p class="text-sm text-gray-500">No members yet.</p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Riot ID</th>
-                <th>User</th>
-                <th>Joined</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var membership in Memberships)
-            {
-                <tr>
-                    <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
-                    <td><a href="/users/@membership.RiotAccount.User.Id" class="d-flex align-items-center gap-2"><UserFlag LogoUrl="@membership.RiotAccount.User.LogoUrl" />@membership.RiotAccount.User.DisplayName</a></td>
-                    <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Riot ID</th><th>User</th><th>Joined</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var membership in Memberships)
+                {
+                    <tr>
+                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
+                        <td><a href="/users/@membership.RiotAccount.User.Id" class="link inline-flex items-center gap-2"><UserFlag LogoUrl="@membership.RiotAccount.User.LogoUrl" />@membership.RiotAccount.User.DisplayName</a></td>
+                        <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

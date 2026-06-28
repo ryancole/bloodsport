@@ -7,39 +7,39 @@
 
 <PageTitle>News | BSAL</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="mb-0">News</h1>
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="page-title">News</h1>
     <AuthorizeView Roles="Champions.Admin">
         <Authorized>
-            <a href="/news/create" class="btn btn-sm btn-primary">Create Post</a>
+            <a href="/news/create" class="btn btn-primary">Create Post</a>
         </Authorized>
     </AuthorizeView>
 </div>
 
 @if (posts is null)
 {
-    <p><em>Loading...</em></p>
+    <p class="text-sm text-gray-500"><em>Loading...</em></p>
 }
 else if (posts.Count == 0)
 {
-    <p class="text-muted">No posts yet.</p>
+    <p class="text-sm text-gray-500">No posts yet.</p>
 }
 else
 {
-    <div class="news-list">
+    <div class="mx-auto max-w-3xl divide-y divide-gray-100">
         @foreach (var post in posts)
         {
-            <article class="news-item">
-                <a href="/news/@post.Id" class="news-item-title">@post.Title</a>
-                <div class="news-item-meta">
+            <article class="py-6 first:pt-0">
+                <a href="/news/@post.Id" class="text-xl font-semibold text-gray-900 no-underline hover:text-sky-600">@post.Title</a>
+                <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                     <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
-                    <span class="news-item-meta-sep">·</span>
-                    <a href="/users/@post.User.Id">@post.User.DisplayName</a>
-                    <span class="news-item-meta-sep">·</span>
-                    <a href="/news/@post.Id#comments">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
+                    <span>·</span>
+                    <a href="/users/@post.User.Id" class="link">@post.User.DisplayName</a>
+                    <span>·</span>
+                    <a href="/news/@post.Id#comments" class="link">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
                 </div>
-                <p class="news-item-excerpt">@Excerpt(post.Markdown)</p>
-                <a href="/news/@post.Id" class="news-item-read-more">Read more →</a>
+                <p class="mt-2 text-gray-600">@Excerpt(post.Markdown)</p>
+                <a href="/news/@post.Id" class="mt-2 inline-block text-sm font-medium text-sky-600 no-underline hover:text-sky-700">Read more →</a>
             </article>
         }
     </div>
@@ -60,7 +60,6 @@ else
 
     private static string Excerpt(string markdown, int maxLength = 200)
     {
-        // Strip common Markdown syntax for a clean plain-text preview
         var text = System.Text.RegularExpressions.Regex.Replace(markdown, @"[#*_~`>\[\]!]|(\[.*?\]\(.*?\))", " ");
         text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ").Trim();
         return text.Length <= maxLength ? text : text[..maxLength].TrimEnd() + "…";

@@ -1,41 +1,39 @@
 @using Bloodsport.Entity.Database
 
-<div class="card h-100 border-0 bg-body-secondary">
-    <div class="card-body p-4">
-        <h2 class="fw-bold mb-3"><a href="/teams/@TeamId" class="text-decoration-none text-body">@TeamName</a></h2>
-        @if (AllowedSummonerNames.Count == 0)
-        {
-            <p class="text-muted small mb-0">No roster on file for this season.</p>
-        }
-        else
-        {
-            <ul class="list-unstyled mb-0">
-                @foreach (var name in AllowedSummonerNames)
-                {
-                    var parts = name.Split('#', 2);
-                    var uggHref = $"https://u.gg/lol/profile/na1/{Uri.EscapeDataString(parts[0])}-{(parts.Length > 1 ? Uri.EscapeDataString(parts[1]) : "")}/overview";
-                    <li class="d-flex align-items-center gap-2 py-2 border-bottom border-secondary-subtle">
-                        <span class="badge rounded-pill px-2 py-1 small @BadgeClass">&#9670;</span>
-                        <span class="fw-medium me-auto">@parts[0]@if (parts.Length > 1){<span class="text-muted fw-normal">#@parts[1]</span>}</span>
-                        <div class="d-flex gap-2 small">
-                            @if (UserIds.TryGetValue(name, out var userId))
-                            {
-                                <a href="/users/@userId" class="text-decoration-none">Profile</a>
-                                <span class="text-muted">·</span>
-                            }
-                            <a href="@uggHref" target="_blank" rel="noopener noreferrer" class="text-decoration-none">u.gg</a>
-                        </div>
-                    </li>
-                }
-            </ul>
-        }
-    </div>
+<div class="card">
+    <h2 class="mb-3 text-lg font-semibold text-gray-900"><a href="/teams/@TeamId" class="link">@TeamName</a></h2>
+    @if (AllowedSummonerNames.Count == 0)
+    {
+        <p class="text-sm text-gray-500">No roster on file for this season.</p>
+    }
+    else
+    {
+        <ul class="space-y-2">
+            @foreach (var name in AllowedSummonerNames)
+            {
+                var parts = name.Split('#', 2);
+                var uggHref = $"https://u.gg/lol/profile/na1/{Uri.EscapeDataString(parts[0])}-{(parts.Length > 1 ? Uri.EscapeDataString(parts[1]) : "")}/overview";
+                <li class="flex items-center gap-2">
+                    <span class="badge @BadgeClass">&#9670;</span>
+                    <span class="font-medium text-gray-900">@parts[0]@if (parts.Length > 1){<span class="text-gray-400">#@parts[1]</span>}</span>
+                    <div class="ml-auto flex items-center gap-2 text-sm">
+                        @if (UserIds.TryGetValue(name, out var userId))
+                        {
+                            <a href="/users/@userId" class="link">Profile</a>
+                            <span class="text-gray-300">·</span>
+                        }
+                        <a href="@uggHref" target="_blank" rel="noopener noreferrer" class="link">u.gg</a>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
 </div>
 
 @code {
     [Parameter, EditorRequired] public long TeamId { get; set; }
     [Parameter, EditorRequired] public string TeamName { get; set; } = "";
     [Parameter, EditorRequired] public ICollection<string> AllowedSummonerNames { get; set; } = [];
-    [Parameter] public string BadgeClass { get; set; } = "bg-primary-subtle text-primary-emphasis";
+    [Parameter] public string BadgeClass { get; set; } = "bg-sky-100 text-sky-700";
     [Parameter] public Dictionary<string, long> UserIds { get; set; } = [];
 }

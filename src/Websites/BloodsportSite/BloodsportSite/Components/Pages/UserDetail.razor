@@ -8,83 +8,79 @@
 
 @if (notFound)
 {
-    <p class="text-muted">User not found.</p>
+    <p class="text-sm text-gray-500">User not found.</p>
 }
 else if (user is null)
 {
-    <p><em>Loading...</em></p>
+    <p class="text-sm text-gray-500"><em>Loading...</em></p>
 }
 else
 {
-    <div class="d-flex align-items-center gap-3 mb-4">
+    <div class="mb-6 flex items-center gap-3">
         @if (user.LogoUrl is not null)
         {
-            <img src="@BlobSasService.GetSasUrl(user.LogoUrl)" alt="@user.DisplayName logo" style="width: 72px; height: 72px; object-fit: contain;" />
+            <img src="@BlobSasService.GetSasUrl(user.LogoUrl)" alt="@user.DisplayName logo" class="h-16 w-16 object-contain" />
         }
-        <h1 class="mb-0">@user.DisplayName</h1>
+        <h1 class="page-title">@user.DisplayName</h1>
     </div>
 
-    <dl class="row mb-4">
-        <dt class="col-sm-3">Member Since</dt>
-        <dd class="col-sm-9">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+    <dl class="mb-8 grid grid-cols-[120px_1fr] gap-y-2 text-sm">
+        <dt class="font-medium text-gray-500">Member Since</dt>
+        <dd class="text-gray-700">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
-    <h2>Riot Accounts</h2>
+    <h2 class="mb-3 text-lg font-semibold text-gray-900">Riot Accounts</h2>
 
     @if (user.RiotAccounts.Count == 0)
     {
-        <p class="text-muted mb-4">No linked Riot accounts.</p>
+        <p class="text-sm text-gray-500">No linked Riot accounts.</p>
     }
     else
     {
-        <table class="table table-sm mb-4">
-            <thead>
-                <tr>
-                    <th>Riot ID</th>
-                    <th>Linked</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var account in user.RiotAccounts.OrderBy(a => a.GameName))
-                {
-                    <tr>
-                        <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(account.GameName)-@Uri.EscapeDataString(account.TagLine)/overview" target="_blank" rel="noopener noreferrer"><strong>@account.GameName#@account.TagLine</strong></a></td>
-                        <td>@account.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="tbl">
+                <thead>
+                    <tr><th>Riot ID</th><th>Linked</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var account in user.RiotAccounts.OrderBy(a => a.GameName))
+                    {
+                        <tr>
+                            <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(account.GameName)-@Uri.EscapeDataString(account.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link"><strong>@account.GameName#@account.TagLine</strong></a></td>
+                            <td>@account.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 
-    <h2>Teams</h2>
+    <h2 class="mb-3 mt-8 text-lg font-semibold text-gray-900">Teams</h2>
 
     @if (teamRows.Count == 0)
     {
-        <p class="text-muted">No teams.</p>
+        <p class="text-sm text-gray-500">No teams.</p>
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Team</th>
-                    <th>Role</th>
-                    <th>Members</th>
-                    <th>Created</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var row in teamRows)
-                {
-                    <tr>
-                        <td><a href="/teams/@row.Team.Id" class="d-flex align-items-center gap-2"><TeamFlag LogoUrl="@row.Team.LogoUrl" />@row.Team.Name</a></td>
-                        <td>@row.Role</td>
-                        <td>@row.Team.TeamMemberships.Count</td>
-                        <td>@row.Team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="tbl">
+                <thead>
+                    <tr><th>Team</th><th>Role</th><th>Members</th><th>Created</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in teamRows)
+                    {
+                        <tr>
+                            <td><a href="/teams/@row.Team.Id" class="link inline-flex items-center gap-2"><TeamFlag LogoUrl="@row.Team.LogoUrl" />@row.Team.Name</a></td>
+                            <td>@row.Role</td>
+                            <td>@row.Team.TeamMemberships.Count</td>
+                            <td>@row.Team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 }
 
