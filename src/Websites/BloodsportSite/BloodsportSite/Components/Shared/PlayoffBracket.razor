@@ -34,17 +34,17 @@
 
 @if (!orderedRounds.Any())
 {
-    <p>Bracket has not been built yet.</p>
+    <p class="text-sm text-gray-500">Bracket has not been built yet.</p>
 }
 else
 {
-    <div class="bracket-canvas-wrapper">
-        <div class="bracket-toolbar">
-            <button class="bracket-btn" type="button" onclick="window._bc?.zoomIn?.('@canvasId')" title="Zoom in">+</button>
-            <button class="bracket-btn" type="button" onclick="window._bc?.fit?.('@canvasId')"    title="Fit to view">Fit</button>
-            <button class="bracket-btn" type="button" onclick="window._bc?.zoomOut?.('@canvasId')" title="Zoom out">−</button>
+    <div class="relative h-[520px] overflow-hidden rounded-lg border border-gray-200 bg-white">
+        <div class="absolute right-2 top-2 z-10 flex gap-1">
+            <button class="flex h-8 w-8 items-center justify-center rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-100" type="button" onclick="window._bc?.zoomIn?.('@canvasId')" title="Zoom in">+</button>
+            <button class="flex h-8 items-center justify-center rounded border border-gray-200 bg-white px-2 text-gray-700 hover:bg-gray-100" type="button" onclick="window._bc?.fit?.('@canvasId')" title="Fit to view">Fit</button>
+            <button class="flex h-8 w-8 items-center justify-center rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-100" type="button" onclick="window._bc?.zoomOut?.('@canvasId')" title="Zoom out">−</button>
         </div>
-        <canvas id="@canvasId" data-bracket="@dataJson"></canvas>
+        <canvas id="@canvasId" data-bracket="@dataJson" class="h-full w-full"></canvas>
     </div>
 }
 

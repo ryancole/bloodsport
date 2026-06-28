@@ -7,67 +7,65 @@
     var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
 }
 
-<div>
-    <div>
-        <form method="get">
-            <input type="search" name="search" placeholder="Search by name…" />
-            <button type="submit">Search</button>
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-3">
+        <form method="get" class="flex items-center gap-2">
+            <input type="search" name="search" placeholder="Search by name…" class="input w-64" />
+            <button type="submit" class="btn btn-secondary">Search</button>
         </form>
         @if (!string.IsNullOrWhiteSpace(Search))
         {
-            <span>
+            <span class="text-sm text-gray-500">
                 Filtering by &ldquo;@Search&rdquo;
-                <a href="/users" title="Clear filter">&times;</a>
+                <a href="/users" class="link" title="Clear filter">&times;</a>
             </span>
         }
     </div>
-    <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" NavClass="d-flex" />
+    <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" />
 </div>
 
 @if (!sorted.Any())
 {
-    <p>No users found.</p>
+    <p class="text-sm text-gray-500">No users found.</p>
 }
 else
 {
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Teams</th>
-                <th>Member Since</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in pageItems)
-            {
-                var teams = user.RiotAccounts
-                    .SelectMany(a => a.TeamMemberships)
-                    .Select(m => m.Team)
-                    .DistinctBy(t => t.Id)
-                    .OrderBy(t => t.Name)
-                    .ToList();
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Name</th><th>Teams</th><th>Member Since</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var user in pageItems)
+                {
+                    var teams = user.RiotAccounts
+                        .SelectMany(a => a.TeamMemberships)
+                        .Select(m => m.Team)
+                        .DistinctBy(t => t.Id)
+                        .OrderBy(t => t.Name)
+                        .ToList();
 
-                <tr>
-                    <td><a href="/users/@user.Id"><UserFlag LogoUrl="@user.LogoUrl" />@user.DisplayName</a></td>
-                    <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        @if (teams.Count == 0)
-                        {
-                            <span>—</span>
-                        }
-                        else
-                        {
-                            @for (var i = 0; i < teams.Count; i++)
+                    <tr>
+                        <td><a href="/users/@user.Id" class="link inline-flex items-center gap-2"><UserFlag LogoUrl="@user.LogoUrl" />@user.DisplayName</a></td>
+                        <td class="max-w-[260px] truncate">
+                            @if (teams.Count == 0)
                             {
-                                <a href="/teams/@teams[i].Id"><TeamFlag LogoUrl="@teams[i].LogoUrl" />@teams[i].Name</a>@(i < teams.Count - 1 ? ", " : "")
+                                <span class="text-gray-400">—</span>
                             }
-                        }
-                    </td>
-                    <td>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                            else
+                            {
+                                @for (var i = 0; i < teams.Count; i++)
+                                {
+                                    <a href="/teams/@teams[i].Id" class="link inline-flex items-center gap-1"><TeamFlag LogoUrl="@teams[i].LogoUrl" />@teams[i].Name</a>@(i < teams.Count - 1 ? ", " : "")
+                                }
+                            }
+                        </td>
+                        <td>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

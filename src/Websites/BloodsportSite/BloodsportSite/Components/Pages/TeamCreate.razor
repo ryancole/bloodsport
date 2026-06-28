@@ -6,22 +6,22 @@
 
 <PageTitle>Create Team | BSAL</PageTitle>
 
-<h1>Create Team</h1>
+<h1 class="page-title mb-6">Create Team</h1>
 
 @if (error is not null)
 {
-    <div>@error</div>
+    <div class="alert alert-danger mb-4 max-w-md">@error</div>
 }
 
-<form method="post" action="/api/teams/create">
+<form method="post" action="/api/teams/create" class="max-w-md space-y-4">
     <AntiforgeryToken />
-    <div style="max-width: 400px;">
-        <label>Team Name</label>
-        <input type="text" name="name" required autofocus />
-    </div>
     <div>
-        <button type="submit">Create</button>
-        <a href="/teams">Cancel</a>
+        <label class="label">Team Name</label>
+        <input type="text" name="name" required autofocus class="input" />
+    </div>
+    <div class="flex items-center gap-3">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <a href="/teams" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 

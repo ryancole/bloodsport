@@ -6,35 +6,35 @@
 
 <PageTitle>Create Season | BSAL</PageTitle>
 
-<h1>Create Season</h1>
+<h1 class="page-title mb-6">Create Season</h1>
 
 @if (error is not null)
 {
-    <div>@error</div>
+    <div class="alert alert-danger mb-4 max-w-md">@error</div>
 }
 
-<form method="post" action="/api/seasons/create">
+<form method="post" action="/api/seasons/create" class="max-w-md space-y-4">
     <AntiforgeryToken />
-    <div style="max-width: 400px;">
-        <label>Season Name</label>
-        <input type="text" name="name" placeholder="Season 1" required autofocus />
+    <div>
+        <label class="label">Season Name</label>
+        <input type="text" name="name" placeholder="Season 1" required autofocus class="input" />
     </div>
-    <div style="max-width: 400px;">
-        <label>Season Length</label>
-        <select name="length">
+    <div>
+        <label class="label">Season Length</label>
+        <select name="length" class="input">
             @for (int i = 3; i <= 8; i++)
             {
                 <option value="@i" selected="@(i == 6)">@i weeks</option>
             }
         </select>
     </div>
-    <div style="max-width: 400px;">
-        <label>Estimated Start Date <span>(optional)</span></label>
-        <input type="date" name="startDate" />
-    </div>
     <div>
-        <button type="submit">Create</button>
-        <a href="/seasons">Cancel</a>
+        <label class="label">Estimated Start Date <span class="font-normal text-gray-400">(optional)</span></label>
+        <input type="date" name="startDate" class="input" />
+    </div>
+    <div class="flex items-center gap-3">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <a href="/seasons" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 

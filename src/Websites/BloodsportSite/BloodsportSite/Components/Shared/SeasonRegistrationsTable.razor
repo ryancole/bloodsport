@@ -7,36 +7,34 @@
     var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
 }
 
-<div>
-    <h2>Registered Teams</h2>
+<div class="mb-3 flex items-center justify-between">
+    <h2 class="text-lg font-semibold text-gray-900">Registered Teams</h2>
     <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" />
 </div>
 
 @if (Registrations.Count == 0)
 {
-    <p>No teams registered yet.</p>
+    <p class="text-sm text-gray-500">No teams registered yet.</p>
 }
 else
 {
-    <table>
-        <thead>
-            <tr>
-                <th>Team</th>
-                <th>Manager</th>
-                <th>Registered</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var reg in pageItems)
-            {
-                <tr>
-                    <td><a href="/teams/@reg.Team.Id"><TeamFlag LogoUrl="@reg.Team.LogoUrl" />@reg.Team.Name</a></td>
-                    <td><a href="/users/@reg.Team.Manager.Id"><UserFlag LogoUrl="@reg.Team.Manager.LogoUrl" />@reg.Team.Manager.DisplayName</a></td>
-                    <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Team</th><th>Manager</th><th>Registered</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var reg in pageItems)
+                {
+                    <tr>
+                        <td><a href="/teams/@reg.Team.Id" class="link inline-flex items-center gap-2"><TeamFlag LogoUrl="@reg.Team.LogoUrl" />@reg.Team.Name</a></td>
+                        <td><a href="/users/@reg.Team.Manager.Id" class="link inline-flex items-center gap-2"><UserFlag LogoUrl="@reg.Team.Manager.LogoUrl" />@reg.Team.Manager.DisplayName</a></td>
+                        <td>@reg.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

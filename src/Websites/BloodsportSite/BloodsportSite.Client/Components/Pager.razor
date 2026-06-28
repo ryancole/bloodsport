@@ -5,30 +5,22 @@
 
 @if (TotalPages > 1)
 {
-    <nav>
-        <ul class="pagination pagination-sm mb-0">
-            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
-                <button class="page-link" @onclick="() => OnPageChanged.InvokeAsync(CurrentPage - 1)">Previous</button>
-            </li>
-            @if (windowStart > 1)
-            {
-                <li class="page-item disabled"><span class="page-link">…</span></li>
-            }
-            @for (var p = windowStart; p <= windowEnd; p++)
-            {
-                var pageNum = p;
-                <li class="page-item @(CurrentPage == pageNum ? "active" : "")">
-                    <button class="page-link" @onclick="() => OnPageChanged.InvokeAsync(pageNum)">@pageNum</button>
-                </li>
-            }
-            @if (windowEnd < TotalPages)
-            {
-                <li class="page-item disabled"><span class="page-link">…</span></li>
-            }
-            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
-                <button class="page-link" @onclick="() => OnPageChanged.InvokeAsync(CurrentPage + 1)">Next</button>
-            </li>
-        </ul>
+    <nav class="flex flex-wrap items-center gap-1">
+        <button type="button" @onclick="() => OnPageChanged.InvokeAsync(CurrentPage - 1)" disabled="@(CurrentPage == 1)" class="rounded border border-gray-200 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-40">Previous</button>
+        @if (windowStart > 1)
+        {
+            <span class="px-2 text-sm text-gray-400">…</span>
+        }
+        @for (var p = windowStart; p <= windowEnd; p++)
+        {
+            var pageNum = p;
+            <button type="button" @onclick="() => OnPageChanged.InvokeAsync(pageNum)" class="rounded border px-3 py-1 text-sm @(CurrentPage == pageNum ? "border-sky-600 bg-sky-600 text-white" : "border-gray-200 text-gray-700 hover:bg-gray-100")">@pageNum</button>
+        }
+        @if (windowEnd < TotalPages)
+        {
+            <span class="px-2 text-sm text-gray-400">…</span>
+        }
+        <button type="button" @onclick="() => OnPageChanged.InvokeAsync(CurrentPage + 1)" disabled="@(CurrentPage == TotalPages)" class="rounded border border-gray-200 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-40">Next</button>
     </nav>
 }
 

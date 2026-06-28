@@ -4,25 +4,25 @@
 {
     @if (result.DidNotPlay)
     {
-        <div>
-            <div>
-                <div>Match Result</div>
-                <div>Recorded @result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</div>
+        <div class="card">
+            <div class="mb-3 flex items-center justify-between">
+                <div class="eyebrow">Match Result</div>
+                <div class="text-xs text-gray-400">Recorded @result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</div>
             </div>
-            <div>
-                <span>&#10060;</span>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">&#10060;</span>
                 @if (result.WinnerTeamId is not null)
                 {
                     <div>
-                        <div>Forfeit</div>
-                        <div>A team manually forfeited. <a href="/teams/@result.WinnerTeamId">@result.WinnerTeam?.Name</a> has been awarded the win.</div>
+                        <div class="font-semibold text-gray-900">Forfeit</div>
+                        <div class="text-sm text-gray-600">A team manually forfeited. <a href="/teams/@result.WinnerTeamId" class="link">@result.WinnerTeam?.Name</a> has been awarded the win.</div>
                     </div>
                 }
                 else
                 {
                     <div>
-                        <div>Did Not Play</div>
-                        <div>This match was not played before the week ended.</div>
+                        <div class="font-semibold text-gray-900">Did Not Play</div>
+                        <div class="text-sm text-gray-600">This match was not played before the week ended.</div>
                     </div>
                 }
             </div>
@@ -30,23 +30,23 @@
     }
     else
     {
-        <div>
-            <div>
-                <div>Match Result</div>
-                <div>Recorded @result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</div>
+        <div class="card">
+            <div class="mb-3 flex items-center justify-between">
+                <div class="eyebrow">Match Result</div>
+                <div class="text-xs text-gray-400">Recorded @result.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</div>
             </div>
-            <div>
-                <span>&#127942;</span>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">&#127942;</span>
                 <div>
-                    <div>
-                        <a href="/teams/@result.WinnerTeamId">@result.WinnerTeam?.Name</a>
+                    <div class="font-semibold text-gray-900">
+                        <a href="/teams/@result.WinnerTeamId" class="link">@result.WinnerTeam?.Name</a>
                     </div>
-                    <div>Winner</div>
+                    <div class="text-sm text-gray-500">Winner</div>
                 </div>
             </div>
             @if (result.RosterMismatch)
             {
-                <div>
+                <div class="alert alert-warning mt-3">
                     <strong>Roster Mismatch Detected:</strong> One or more players in this match did not match the locked season roster for their team. This result may be subject to review.
                 </div>
             }

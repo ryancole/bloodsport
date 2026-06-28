@@ -14,84 +14,82 @@
 
 @if (notFound)
 {
-    <p>Post not found.</p>
+    <p class="text-sm text-gray-500">Post not found.</p>
 }
 else if (post is null)
 {
-    <p><em>Loading...</em></p>
+    <p class="text-sm text-gray-500"><em>Loading...</em></p>
 }
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav><a href="/news">News</a> / @post.Title</nav>
+        <nav><a href="/news" class="link">News</a> / @post.Title</nav>
     </SectionContent>
 
-    <div>
+    <div class="mb-6 flex items-start justify-between gap-4">
         <div>
-            <h1>@post.Title</h1>
-            <div class="news-item-meta">
+            <h1 class="page-title">@post.Title</h1>
+            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                 <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
-                <span class="news-item-meta-sep">·</span>
-                <a href="/users/@post.User.Id">@post.User.DisplayName</a>
+                <span>·</span>
+                <a href="/users/@post.User.Id" class="link">@post.User.DisplayName</a>
             </div>
         </div>
         <AuthorizeView Roles="Champions.Admin">
             <Authorized>
-                <a href="/news/@post.Id/edit">Edit</a>
+                <a href="/news/@post.Id/edit" class="btn btn-secondary">Edit</a>
             </Authorized>
         </AuthorizeView>
     </div>
 
-    <div class="post-content">
+    <div class="doc">
         @renderedHtml
     </div>
 
-    <section class="post-comments" id="comments">
-        <h2>@(comments.Count == 1 ? "1 Comment" : $"{comments.Count} Comments")</h2>
+    <section id="comments" class="mt-10 max-w-3xl border-t border-gray-200 pt-6">
+        <h2 class="mb-4 text-lg font-semibold text-gray-900">@(comments.Count == 1 ? "1 Comment" : $"{comments.Count} Comments")</h2>
 
         @if (commentError is not null)
         {
-            <div>@commentError</div>
+            <div class="alert alert-danger mb-4">@commentError</div>
         }
 
         <AuthorizeView>
             <Authorized>
-                <form method="post" action="/api/posts/@post.Id/comments">
+                <form method="post" action="/api/posts/@post.Id/comments" class="mb-6 space-y-2">
                     <AntiforgeryToken />
-                    <div>
-                        <textarea name="body" rows="3" placeholder="Write a comment..." required></textarea>
-                    </div>
-                    <button type="submit">Post Comment</button>
+                    <textarea name="body" rows="3" placeholder="Write a comment..." required class="input"></textarea>
+                    <button type="submit" class="btn btn-primary">Post Comment</button>
                 </form>
             </Authorized>
             <NotAuthorized>
-                <p><a href="/auth/login">Log in</a> to leave a comment.</p>
+                <p class="mb-6 text-sm text-gray-500"><a href="/auth/login" class="link">Log in</a> to leave a comment.</p>
             </NotAuthorized>
         </AuthorizeView>
 
         @if (comments.Count == 0)
         {
-            <p>No comments yet. Be the first!</p>
+            <p class="text-sm text-gray-500">No comments yet. Be the first!</p>
         }
         else
         {
-            <div>
+            <div class="divide-y divide-gray-100">
                 @foreach (var comment in comments)
                 {
-                    <div class="post-comment">
-                        <div class="post-comment-meta">
-                            <a href="/users/@comment.User.Id">@comment.User.DisplayName</a>
-                            <span class="news-item-meta-sep">·</span>
+                    <div class="py-4">
+                        <div class="mb-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                            <a href="/users/@comment.User.Id" class="link">@comment.User.DisplayName</a>
+                            <span>·</span>
                             <time>@comment.DateCreated.ToString("MMMM d, yyyy")</time>
                             @if (currentUserId == comment.UserId || isAdmin)
                             {
                                 <form method="post" action="/api/posts/@post.Id/comments/@comment.Id/delete">
                                     <AntiforgeryToken />
-                                    <button type="submit" class="post-comment-delete">Delete</button>
+                                    <button type="submit" class="text-xs text-gray-400 hover:text-red-600">Delete</button>
                                 </form>
                             }
                         </div>
-                        <p class="post-comment-body">@comment.Body</p>
+                        <p class="text-gray-700">@comment.Body</p>
                     </div>
                 }
             </div>

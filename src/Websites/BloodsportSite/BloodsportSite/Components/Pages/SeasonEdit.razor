@@ -10,21 +10,21 @@
 
 @if (notFound)
 {
-    <p>Season not found.</p>
+    <p class="text-sm text-gray-500">Season not found.</p>
 }
 else if (season is null)
 {
-    <p><em>Loading...</em></p>
+    <p class="text-sm text-gray-500"><em>Loading...</em></p>
 }
 else
 {
-    <h1>Edit — @season.Name</h1>
+    <h1 class="page-title mb-6">Edit — @season.Name</h1>
 
-    <form method="post" action="/api/seasons/@season.Id/edit">
+    <form method="post" action="/api/seasons/@season.Id/edit" class="max-w-md space-y-4">
         <AntiforgeryToken />
-        <div style="max-width: 400px;">
-            <label>Status</label>
-            <select name="status">
+        <div>
+            <label class="label">Status</label>
+            <select name="status" class="input">
                 @foreach (var value in Enum.GetValues<SeasonStatus>())
                 {
                     if (value == season.Status)
@@ -38,23 +38,19 @@ else
                 }
             </select>
         </div>
-        <div>
-            <div>
-                <input type="checkbox" name="registrationOpen" value="true"
-                       id="registrationOpen" checked="@season.RegistrationOpen" />
-                <label for="registrationOpen">
-                    Registration open
-                </label>
-            </div>
+        <div class="flex items-center gap-2">
+            <input type="checkbox" name="registrationOpen" value="true"
+                   id="registrationOpen" checked="@season.RegistrationOpen" class="h-4 w-4 rounded border-gray-300" />
+            <label for="registrationOpen" class="text-sm text-gray-700">Registration open</label>
         </div>
-        <div style="max-width: 400px;">
-            <label>Estimated Start Date <span>(optional)</span></label>
-            <input type="date" name="startDate"
+        <div>
+            <label class="label">Estimated Start Date <span class="font-normal text-gray-400">(optional)</span></label>
+            <input type="date" name="startDate" class="input"
                    value="@(season.EstimatedDateStart?.ToString("yyyy-MM-dd"))" />
         </div>
-        <div>
-            <button type="submit">Save</button>
-            <a href="/seasons/@season.Id">Cancel</a>
+        <div class="flex items-center gap-3">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="/seasons/@season.Id" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 }

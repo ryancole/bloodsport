@@ -2,35 +2,30 @@
 
 @if (Playoffs.Count == 0)
 {
-    <p>No playoffs yet.</p>
+    <p class="text-sm text-gray-500">No playoffs yet.</p>
 }
 else
 {
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Region</th>
-                <th>Season</th>
-                <th>Status</th>
-                <th>Teams</th>
-                <th>Created</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var playoff in Playoffs)
-            {
-                <tr>
-                    <td><a href="/playoffs/@playoff.Id">@playoff.Name</a></td>
-                    <td>@playoff.RiotRegion</td>
-                    <td><a href="/seasons/@playoff.SeasonId">@playoff.Season.Name</a></td>
-                    <td><PlayoffStatusBadge Status="playoff.Status" /></td>
-                    <td>@playoff.PlayoffTeams.Count</td>
-                    <td>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Name</th><th>Region</th><th>Season</th><th>Status</th><th>Teams</th><th>Created</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var playoff in Playoffs)
+                {
+                    <tr>
+                        <td><a href="/playoffs/@playoff.Id" class="link">@playoff.Name</a></td>
+                        <td>@playoff.RiotRegion</td>
+                        <td><a href="/seasons/@playoff.SeasonId" class="link">@playoff.Season.Name</a></td>
+                        <td><PlayoffStatusBadge Status="playoff.Status" /></td>
+                        <td>@playoff.PlayoffTeams.Count</td>
+                        <td>@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

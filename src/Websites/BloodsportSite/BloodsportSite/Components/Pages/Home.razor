@@ -8,111 +8,108 @@
 
 @if (seasons is null)
 {
-    <div class="db-loading">
-        <span class="db-loading-text">Loading...</span>
+    <div class="flex items-center justify-center py-16">
+        <span class="text-sm text-gray-500">Loading...</span>
     </div>
 }
 else
 {
-    <!-- stat row -->
-    <div class="db-stat-row">
-        <div class="db-stat-card">
-            <div class="db-stat-keyline"></div>
-            <span class="db-stat-num">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
-            <span class="db-stat-label">Active seasons</span>
-        </div>
-        <div class="db-stat-card">
-            <div class="db-stat-keyline"></div>
-            <span class="db-stat-num">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
-            <span class="db-stat-label">Active playoffs</span>
-        </div>
-        <div class="db-stat-card">
-            <div class="db-stat-keyline"></div>
-            <span class="db-stat-num">@resultsThisWeek</span>
-            <span class="db-stat-label">Results this week</span>
-        </div>
-    </div>
-
-    <!-- seasons + playoffs panels -->
-    <div class="db-panels">
-        <DashboardSeasonsPanel Seasons="seasons" />
-        <DashboardPlayoffsPanel Playoffs="activePlayoffs" />
-    </div>
-
-    <!-- news -->
-    @if (recentPosts.Count > 0)
-    {
-        <div class="db-card db-news mb">
-            <div class="db-card-keyline"></div>
-            <div class="db-card-head">
-                <span class="db-eyebrow">Latest news</span>
-                <a href="/news" class="db-see-all">All news →</a>
+    <div class="space-y-6">
+        <!-- stat row -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <span class="block text-3xl font-bold text-gray-900">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
+                <span class="text-sm text-gray-500">Active seasons</span>
             </div>
-            <div class="db-news-list">
-                @foreach (var post in recentPosts)
-                {
-                    <div class="db-news-item">
-                        <div class="db-news-meta">
-                            <span class="db-news-author">@post.User.DisplayName</span>
-                            <span class="db-sep">·</span>
-                            <span>@post.DateCreated.ToString("MMM d, yyyy")</span>
-                            <span class="db-sep">·</span>
-                            <a href="/news/@post.Id#comments" class="db-news-comments">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
+            <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <span class="block text-3xl font-bold text-gray-900">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
+                <span class="text-sm text-gray-500">Active playoffs</span>
+            </div>
+            <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <span class="block text-3xl font-bold text-gray-900">@resultsThisWeek</span>
+                <span class="text-sm text-gray-500">Results this week</span>
+            </div>
+        </div>
+
+        <!-- seasons + playoffs panels -->
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <DashboardSeasonsPanel Seasons="seasons" />
+            <DashboardPlayoffsPanel Playoffs="activePlayoffs" />
+        </div>
+
+        <!-- news -->
+        @if (recentPosts.Count > 0)
+        {
+            <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="mb-4 flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Latest news</span>
+                    <a href="/news" class="text-sm text-sky-600 no-underline hover:text-sky-700">All news →</a>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    @foreach (var post in recentPosts)
+                    {
+                        <div class="py-3 first:pt-0 last:pb-0">
+                            <div class="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                                <span>@post.User.DisplayName</span>
+                                <span>·</span>
+                                <span>@post.DateCreated.ToString("MMM d, yyyy")</span>
+                                <span>·</span>
+                                <a href="/news/@post.Id#comments" class="text-sky-600 no-underline hover:text-sky-700">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
+                            </div>
+                            <a href="/news/@post.Id" class="mt-1 block text-lg font-semibold text-gray-900 no-underline hover:text-sky-600">@post.Title</a>
+                            <p class="mt-1 text-sm text-gray-600">@Excerpt(post.Markdown)</p>
                         </div>
-                        <a href="/news/@post.Id" class="db-news-title">@post.Title</a>
-                        <p class="db-news-excerpt">@Excerpt(post.Markdown)</p>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-        </div>
-    }
-
-    <!-- activity feed -->
-    <div class="db-card db-activity">
-        <div class="db-card-keyline"></div>
-        <div class="db-card-head">
-            <span class="db-eyebrow">Recent activity</span>
-        </div>
-        @if (activityFeed.Count == 0)
-        {
-            <p class="db-empty">No results yet.</p>
         }
-        else
-        {
-            <div class="db-feed">
-                @foreach (var item in activityFeed)
-                {
-                    <div class="db-feed-row">
-                        <span class="db-feed-badge @(item.IsPlayoff ? "db-feed-badge--playoff" : "db-feed-badge--regular")">
-                            @(item.IsPlayoff ? "Playoff" : "Regular")
-                        </span>
-                        <div class="db-feed-winner">
-                            @if (item.WinnerName is not null)
+
+        <!-- activity feed -->
+        <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+            <div class="mb-4">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Recent activity</span>
+            </div>
+            @if (activityFeed.Count == 0)
+            {
+                <p class="text-sm text-gray-500">No results yet.</p>
+            }
+            else
+            {
+                <div class="divide-y divide-gray-100">
+                    @foreach (var item in activityFeed)
+                    {
+                        <div class="flex flex-wrap items-center gap-3 py-2 text-sm">
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium @(item.IsPlayoff ? "bg-purple-100 text-purple-700" : "bg-sky-100 text-sky-700")">
+                                @(item.IsPlayoff ? "Playoff" : "Regular")
+                            </span>
+                            <div class="min-w-0">
+                                @if (item.WinnerName is not null)
+                                {
+                                    <a href="@item.WinnerUrl" class="inline-flex items-center gap-2 font-medium text-gray-900 no-underline hover:text-sky-600">
+                                        <TeamFlag LogoUrl="@item.WinnerLogoUrl" />
+                                        @item.WinnerName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-gray-400">—</span>
+                                }
+                            </div>
+                            <a href="@item.MatchupUrl" class="font-medium text-gray-900 no-underline hover:text-sky-600">@item.MatchupName</a>
+                            @if (item.ContextUrl is not null)
                             {
-                                <a href="@item.WinnerUrl" class="db-feed-winner-link">
-                                    <TeamFlag LogoUrl="@item.WinnerLogoUrl" />
-                                    @item.WinnerName
-                                </a>
+                                <a href="@item.ContextUrl" class="text-gray-500 no-underline hover:text-sky-600">@item.Context</a>
                             }
                             else
                             {
-                                <span class="db-feed-no-result">—</span>
+                                <span class="text-gray-500">@item.Context</span>
                             }
+                            <span class="ml-auto text-xs text-gray-400" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
                         </div>
-                        <a href="@item.MatchupUrl" class="db-feed-matchup">@item.MatchupName</a>
-                        @if (item.ContextUrl is not null)
-                        {
-                            <a href="@item.ContextUrl" class="db-feed-context">@item.Context</a>
-                        }
-                        else
-                        {
-                            <span class="db-feed-context">@item.Context</span>
-                        }
-                        <span class="db-feed-time" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
-                    </div>
-                }
-            </div>
-        }
+                    }
+                </div>
+            }
+        </div>
     </div>
 }
 

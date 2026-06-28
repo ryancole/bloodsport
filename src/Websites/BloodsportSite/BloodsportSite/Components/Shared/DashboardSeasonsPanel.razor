@@ -1,35 +1,34 @@
 @using Bloodsport.Entity.Database
 
-<div class="db-card dsp">
-    <div class="db-card-keyline"></div>
-    <div class="db-card-head">
-        <span class="db-eyebrow">Recent seasons</span>
-        <a href="/seasons" class="db-see-all">All →</a>
+<div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+    <div class="mb-4 flex items-center justify-between">
+        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Recent seasons</span>
+        <a href="/seasons" class="text-sm text-sky-600 no-underline hover:text-sky-700">All →</a>
     </div>
     @if (Seasons.Count == 0)
     {
-        <p class="db-empty">No seasons yet.</p>
+        <p class="text-sm text-gray-500">No seasons yet.</p>
     }
     else
     {
-        <div class="dsp-list">
+        <div class="divide-y divide-gray-100">
             @foreach (var season in Seasons)
             {
-                <div class="dsp-row">
-                    <a href="/seasons/@season.Id" class="dsp-name">@season.Name</a>
-                    <div class="dsp-badges">
-                        <span class="dsp-badge @SeasonBadgeClass(season.Status)">@season.Status</span>
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
+                    <a href="/seasons/@season.Id" class="font-medium text-gray-900 no-underline hover:text-sky-600">@season.Name</a>
+                    <div class="flex items-center gap-1">
+                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium @SeasonBadgeClass(season.Status)">@season.Status</span>
                         @if (season.RegistrationOpen)
                         {
-                            <span class="dsp-badge dsp-badge--reg">Reg. Open</span>
+                            <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Reg. Open</span>
                         }
                     </div>
-                    <span class="dsp-date">
-                        <span class="dsp-date-label">starts</span>
+                    <span class="ml-auto text-xs text-gray-400">
+                        <span class="uppercase tracking-wide">starts</span>
                         @(season.EstimatedDateStart.HasValue ? season.EstimatedDateStart.Value.ToLocalTime().ToString("MMM d, yyyy") : "TBD")
                     </span>
-                    <span class="dsp-date">
-                        <span class="dsp-date-label">ends</span>
+                    <span class="text-xs text-gray-400">
+                        <span class="uppercase tracking-wide">ends</span>
                         @(season.EstimatedDateEnd.HasValue ? season.EstimatedDateEnd.Value.ToLocalTime().ToString("MMM d, yyyy") : "TBD")
                     </span>
                 </div>
@@ -44,8 +43,8 @@
 
     private static string SeasonBadgeClass(SeasonStatus status) => status switch
     {
-        SeasonStatus.Active    => "dsp-badge--active",
-        SeasonStatus.PreSeason => "dsp-badge--preseason",
-        _                      => "",
+        SeasonStatus.Active    => "bg-green-100 text-green-700",
+        SeasonStatus.PreSeason => "bg-amber-100 text-amber-700",
+        _                      => "bg-gray-100 text-gray-600",
     };
 }

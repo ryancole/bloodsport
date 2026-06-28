@@ -12,117 +12,117 @@
 
 @if (notFound)
 {
-    <p>Matchup not found.</p>
+    <p class="text-sm text-gray-500">Matchup not found.</p>
 }
 else if (matchup is null)
 {
-    <p><em>Loading...</em></p>
+    <p class="text-sm text-gray-500"><em>Loading...</em></p>
 }
 else
 {
     <SectionContent SectionName="breadcrumbs">
-        <nav><a href="/seasons">Seasons</a> / <a href="/seasons/@matchup.SeasonWeek.Season.Id">@matchup.SeasonWeek.Season.Name</a> / <a href="/seasons/@matchup.SeasonWeek.Season.Id/weeks/@matchup.SeasonWeek.Id">@matchup.SeasonWeek.Name</a> / @matchup.TeamOne.Name vs @matchup.TeamTwo.Name</nav>
+        <nav><a href="/seasons" class="link">Seasons</a> / <a href="/seasons/@matchup.SeasonWeek.Season.Id" class="link">@matchup.SeasonWeek.Season.Name</a> / <a href="/seasons/@matchup.SeasonWeek.Season.Id/weeks/@matchup.SeasonWeek.Id" class="link">@matchup.SeasonWeek.Name</a> / @matchup.TeamOne.Name vs @matchup.TeamTwo.Name</nav>
     </SectionContent>
 
-    <h1>@matchup.TeamOne.Name vs @matchup.TeamTwo.Name</h1>
-    <p>@matchup.SeasonWeek.Name &mdash; @matchup.SeasonWeek.Season.Name</p>
-    <p>@matchup.SeasonWeek.DateStart.ToLocalTime().ToString("MMMM d, yyyy") – @matchup.SeasonWeek.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</p>
+    <h1 class="page-title">@matchup.TeamOne.Name vs @matchup.TeamTwo.Name</h1>
+    <p class="mt-1 text-gray-600">@matchup.SeasonWeek.Name &mdash; @matchup.SeasonWeek.Season.Name</p>
+    <p class="mb-6 text-sm text-gray-400">@matchup.SeasonWeek.DateStart.ToLocalTime().ToString("MMMM d, yyyy") – @matchup.SeasonWeek.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</p>
 
     @* Tournament Lobby *@
     @if (!matchup.SeasonWeek.HasBeenEnded)
     {
-    <div>
-        <div>
-            <div>
-                <div>Tournament Lobby</div>
-                @if (matchup.TournamentCode is not null)
-                {
-                    @if (isMember || isManager)
+        <div class="card mb-6 space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div class="space-y-1">
+                    <div class="eyebrow">Tournament Lobby</div>
+                    @if (matchup.TournamentCode is not null)
                     {
-                        <LobbyCodeDisplay Code="@matchup.TournamentCode" />
+                        @if (isMember || isManager)
+                        {
+                            <LobbyCodeDisplay Code="@matchup.TournamentCode" />
+                        }
+                        else
+                        {
+                            <div class="font-mono text-gray-400">••••••••••••</div>
+                            <div class="text-xs text-gray-400">Join a competing team to reveal this code</div>
+                        }
                     }
                     else
                     {
-                        <div>••••••••••••</div>
-                        <div>Join a competing team to reveal this code</div>
+                        <div class="text-sm text-gray-500">No code yet</div>
+                        @if (isManager)
+                        {
+                            <div class="text-xs text-gray-400">Generate one below to create the custom lobby</div>
+                        }
+                        else
+                        {
+                            <div class="text-xs text-gray-400">A team manager must generate the lobby code</div>
+                        }
                     }
-                }
-                else
-                {
-                    <div>No code yet</div>
-                    @if (isManager)
+                </div>
+                <div class="space-y-2">
+                    @if (isManager && matchup.TournamentCode is null)
                     {
-                        <div>Generate one below to create the custom lobby</div>
+                        @if (matchup.SeasonWeek.HasBeenEnded)
+                        {
+                            <div class="text-xs text-gray-400">This week has ended — lobby codes can no longer be generated.</div>
+                        }
+                        else
+                        {
+                            <form method="post" action="/api/matchups/@matchup.Id/tournament-code">
+                                <AntiforgeryToken />
+                                <button type="submit" class="btn btn-primary">Generate Lobby Code</button>
+                            </form>
+                        }
                     }
-                    else
+                    @if (isManager && matchup.TournamentCode is not null)
                     {
-                        <div>A team manager must generate the lobby code</div>
+                        <div class="space-y-1">
+                            <form method="post" action="/api/matchups/@matchup.Id/fetch-lobby-events">
+                                <AntiforgeryToken />
+                                <button type="submit" class="btn btn-secondary">Fetch Lobby Events</button>
+                            </form>
+                            <div class="text-xs text-gray-400">Use this if there is a dispute about who participated in the lobby.</div>
+                        </div>
                     }
-                }
+                </div>
             </div>
-            <div>
-                @if (isManager && matchup.TournamentCode is null)
-                {
-                    @if (matchup.SeasonWeek.HasBeenEnded)
-                    {
-                        <div>This week has ended — lobby codes can no longer be generated.</div>
-                    }
-                    else
-                    {
-                        <form method="post" action="/api/matchups/@matchup.Id/tournament-code">
-                            <AntiforgeryToken />
-                            <button type="submit">Generate Lobby Code</button>
-                        </form>
-                    }
-                }
-                @if (isManager && matchup.TournamentCode is not null)
-                {
-                    <div>
-                        <form method="post" action="/api/matchups/@matchup.Id/fetch-lobby-events">
-                            <AntiforgeryToken />
-                            <button type="submit">Fetch Lobby Events</button>
-                        </form>
-                        <div>Use this if there is a dispute about who participated in the lobby.</div>
-                    </div>
-                }
-            </div>
+            @if (error == "tournament_not_configured")
+            {
+                <div class="alert alert-danger">This season has not been configured with a Riot tournament ID. An admin must set it up before lobby codes can be generated.</div>
+            }
+            else if (error == "riot_api_error")
+            {
+                <div class="alert alert-danger">Failed to generate a lobby code from the Riot API. Please try again.</div>
+            }
+            else if (error == "week_ended")
+            {
+                <div class="alert alert-warning">This week has ended — lobby codes can no longer be generated.</div>
+            }
+            else if (info == "lobby_events_requested")
+            {
+                <div class="alert alert-info">Lobby events have been requested and will be fetched shortly.</div>
+            }
         </div>
-        @if (error == "tournament_not_configured")
-        {
-            <div>This season has not been configured with a Riot tournament ID. An admin must set it up before lobby codes can be generated.</div>
-        }
-        else if (error == "riot_api_error")
-        {
-            <div>Failed to generate a lobby code from the Riot API. Please try again.</div>
-        }
-        else if (error == "week_ended")
-        {
-            <div>This week has ended — lobby codes can no longer be generated.</div>
-        }
-        else if (info == "lobby_events_requested")
-        {
-            <div>Lobby events have been requested and will be fetched shortly.</div>
-        }
-    </div>
     }
 
     @* Forfeit *@
     @if (isManager && result is null && !matchup.SeasonWeek.HasBeenEnded)
     {
-        <div>
-            <div>
+        <div class="card mb-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <div>Forfeit</div>
-                    <div>Forfeit this matchup on behalf of your team. This cannot be undone.</div>
+                    <div class="font-semibold text-gray-900">Forfeit</div>
+                    <div class="text-sm text-gray-500">Forfeit this matchup on behalf of your team. This cannot be undone.</div>
                 </div>
                 <form method="post" action="/api/matchups/@matchup.Id/forfeit" onsubmit="return confirm('Are you sure you want to forfeit this matchup? This cannot be undone.');">
                     <AntiforgeryToken />
-                    <button type="submit">Forfeit Matchup</button>
+                    <button type="submit" class="btn btn-danger">Forfeit Matchup</button>
                 </form>
             </div>
             @if (error == "result_exists")
             {
-                <div>A result already exists for this matchup.</div>
+                <div class="alert alert-danger mt-3">A result already exists for this matchup.</div>
             }
         </div>
     }
@@ -130,70 +130,66 @@ else
     @* Result *@
     @if (info == "forfeit_recorded")
     {
-        <div>Forfeit recorded. Your opponent has been awarded the win.</div>
+        <div class="alert alert-success mb-6">Forfeit recorded. Your opponent has been awarded the win.</div>
     }
     @if (result is not null)
     {
-        <MatchupResultCard Result="result" />
+        <div class="mb-6">
+            <MatchupResultCard Result="result" />
+        </div>
     }
     else if (matchup.TournamentCode is not null && !matchup.SeasonWeek.HasBeenEnded)
     {
-        <MatchupPendingResultAlert />
+        <div class="mb-6">
+            <MatchupPendingResultAlert />
+        </div>
     }
 
     @* Lobby Events *@
     @if (isManager && lobbyEvents.Count > 0)
     {
-        <div>
-            <div>Lobby Events (@lobbyEvents.Count)</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Event</th>
-                        <th>Player</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var evt in lobbyEvents)
-                    {
-                        var displayName = evt.Puuid is not null && puuidToSummonerName.TryGetValue(evt.Puuid, out var name)
-                            ? name
-                            : (evt.Puuid?[..8] ?? "unknown") + "…";
-                        var time = long.TryParse(evt.Timestamp, out var ms)
-                            ? DateTimeOffset.FromUnixTimeMilliseconds(ms).LocalDateTime.ToString("MMM d, h:mm:ss tt")
-                            : evt.Timestamp;
-                        <tr>
-                            <td>@time</td>
-                            <td>@evt.EventType</td>
-                            <td>@displayName</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="mb-6">
+            <h2 class="mb-3 text-lg font-semibold text-gray-900">Lobby Events (@lobbyEvents.Count)</h2>
+            <div class="overflow-x-auto">
+                <table class="tbl">
+                    <thead>
+                        <tr><th>Time</th><th>Event</th><th>Player</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var evt in lobbyEvents)
+                        {
+                            var displayName = evt.Puuid is not null && puuidToSummonerName.TryGetValue(evt.Puuid, out var name)
+                                ? name
+                                : (evt.Puuid?[..8] ?? "unknown") + "…";
+                            var time = long.TryParse(evt.Timestamp, out var ms)
+                                ? DateTimeOffset.FromUnixTimeMilliseconds(ms).LocalDateTime.ToString("MMM d, h:mm:ss tt")
+                                : evt.Timestamp;
+                            <tr>
+                                <td>@time</td>
+                                <td>@evt.EventType</td>
+                                <td>@displayName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
 
     @* Teams *@
     @if (result is null)
     {
-        <div>
+        <div class="alert alert-info mb-4">
             <strong>Locked-in rosters enforced.</strong>
             Only Riot IDs on each team's locked-in roster are permitted in the tournament lobby. Players not on the roster below will be blocked from joining.
         </div>
     }
-    <div>
-        <div>
-            <TeamSeasonRosterCard TeamId="@matchup.TeamOne.Id" TeamName="@matchup.TeamOne.Name" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-primary-subtle text-primary-emphasis" UserIds="@rosterUserIds" />
-        </div>
+    <div class="grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
+        <TeamSeasonRosterCard TeamId="@matchup.TeamOne.Id" TeamName="@matchup.TeamOne.Name" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-sky-100 text-sky-700" UserIds="@rosterUserIds" />
 
-        <div>
-            <div>VS</div>
-        </div>
+        <div class="text-center text-sm font-bold text-gray-400">VS</div>
 
-        <div>
-            <TeamSeasonRosterCard TeamId="@matchup.TeamTwo.Id" TeamName="@matchup.TeamTwo.Name" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-danger-subtle text-danger-emphasis" UserIds="@rosterUserIds" />
-        </div>
+        <TeamSeasonRosterCard TeamId="@matchup.TeamTwo.Id" TeamName="@matchup.TeamTwo.Name" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-red-100 text-red-700" UserIds="@rosterUserIds" />
     </div>
 }
 

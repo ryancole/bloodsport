@@ -16,18 +16,18 @@ else
     var page = currentPage < 1 ? 1 : currentPage;
     var pageItems = filtered.Skip((page - 1) * PageSize).Take(PageSize).ToList();
 
-    <div class="d-flex align-items-center justify-content-between mb-2">
-        <div class="d-flex align-items-center gap-3">
-            <div class="d-flex gap-2">
-                <input type="search" class="form-control w-auto" placeholder="Search by name…"
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+                <input type="search" class="input w-64" placeholder="Search by name…"
                        @bind="searchInput" @bind:event="oninput" @onkeydown="HandleSearchKey" />
                 <button class="btn btn-secondary" @onclick="ApplySearch">Search</button>
             </div>
             @if (!string.IsNullOrWhiteSpace(search))
             {
-                <span class="text-muted">
+                <span class="text-sm text-gray-500">
                     Filtering by &ldquo;@search&rdquo;
-                    <button class="btn btn-link btn-sm p-0 ms-1 text-decoration-none" @onclick="ClearSearch">&times;</button>
+                    <button class="link cursor-pointer" @onclick="ClearSearch">&times;</button>
                 </span>
             }
         </div>
@@ -36,50 +36,40 @@ else
 
     @if (!filtered.Any())
     {
-        <p class="text-center text-muted fs-5 py-4">No users found.</p>
+        <p class="py-4 text-center text-gray-500">No users found.</p>
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Teams</th>
-                    <th>Member Since</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var user in pageItems)
-                {
-                    <tr>
-                        <td>
-                            <a href="/users/@user.Id" class="d-flex align-items-center gap-2">
-                                <UserFlag FlagUrl="@user.FlagUrl" />
-                                @user.DisplayName
-                            </a>
-                        </td>
-                        <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            @if (user.Teams.Count == 0)
-                            {
-                                <span class="text-muted">—</span>
-                            }
-                            else
-                            {
-                                @for (var i = 0; i < user.Teams.Count; i++)
+        <div class="overflow-x-auto">
+            <table class="tbl">
+                <thead>
+                    <tr><th>Name</th><th>Teams</th><th>Member Since</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in pageItems)
+                    {
+                        <tr>
+                            <td><a href="/users/@user.Id" class="link inline-flex items-center gap-2"><UserFlag FlagUrl="@user.FlagUrl" />@user.DisplayName</a></td>
+                            <td class="max-w-[260px] truncate">
+                                @if (user.Teams.Count == 0)
                                 {
-                                    var team = user.Teams[i];
-                                    <a href="/teams/@team.Id" class="d-inline-flex align-items-center gap-1">
-                                        <TeamFlag FlagUrl="@team.FlagUrl" />
-                                        @team.Name
-                                    </a>@(i < user.Teams.Count - 1 ? ", " : "")
+                                    <span class="text-gray-400">—</span>
                                 }
-                            }
-                        </td>
-                        <td>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                                else
+                                {
+                                    @for (var i = 0; i < user.Teams.Count; i++)
+                                    {
+                                        var team = user.Teams[i];
+                                        <a href="/teams/@team.Id" class="link inline-flex items-center gap-1"><TeamFlag FlagUrl="@team.FlagUrl" />@team.Name</a>@(i < user.Teams.Count - 1 ? ", " : "")
+                                    }
+                                }
+                            </td>
+                            <td>@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 }
 

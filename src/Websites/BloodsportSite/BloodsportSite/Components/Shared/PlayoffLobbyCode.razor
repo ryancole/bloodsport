@@ -1,68 +1,68 @@
 @using Bloodsport.Entity.Database
 
-<div>
-    <div>
-        <div>
-            <div>Tournament Lobby</div>
+<div class="card space-y-3">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="space-y-1">
+            <div class="eyebrow">Tournament Lobby</div>
             @if (TournamentCode is not null)
             {
                 <LobbyCodeDisplay Code="@TournamentCode" />
             }
             else
             {
-                <div>No code yet</div>
+                <div class="text-sm text-gray-500">No code yet</div>
                 @if (IsManager)
                 {
                     @if (RoundEnded)
                     {
-                        <div>This round has ended — lobby codes can no longer be generated</div>
+                        <div class="text-xs text-gray-400">This round has ended — lobby codes can no longer be generated</div>
                     }
                     else
                     {
-                        <div>Generate one below to create the custom lobby</div>
+                        <div class="text-xs text-gray-400">Generate one below to create the custom lobby</div>
                     }
                 }
                 else
                 {
-                    <div>A team manager must generate the lobby code</div>
+                    <div class="text-xs text-gray-400">A team manager must generate the lobby code</div>
                 }
             }
         </div>
-        <div>
+        <div class="space-y-2">
             @if (IsManager && TournamentCode is null && !RoundEnded)
             {
                 <form method="post" action="/api/playoff-matchups/@MatchupId/tournament-code">
                     <AntiforgeryToken />
-                    <button type="submit">Generate Lobby Code</button>
+                    <button type="submit" class="btn btn-primary">Generate Lobby Code</button>
                 </form>
             }
             @if (IsManager && TournamentCode is not null)
             {
-                <div>
+                <div class="space-y-1">
                     <form method="post" action="/api/playoff-matchups/@MatchupId/fetch-lobby-events">
                         <AntiforgeryToken />
-                        <button type="submit">Fetch Lobby Events</button>
+                        <button type="submit" class="btn btn-secondary">Fetch Lobby Events</button>
                     </form>
-                    <div>Use this if there is a dispute about who participated in the lobby.</div>
+                    <div class="text-xs text-gray-400">Use this if there is a dispute about who participated in the lobby.</div>
                 </div>
             }
         </div>
     </div>
     @if (Error == "tournament_not_configured")
     {
-        <div>This playoff has not been configured with a Riot tournament ID. An admin must set it up before lobby codes can be generated.</div>
+        <div class="alert alert-danger">This playoff has not been configured with a Riot tournament ID. An admin must set it up before lobby codes can be generated.</div>
     }
     else if (Error == "riot_api_error")
     {
-        <div>Failed to generate a lobby code from the Riot API. Please try again.</div>
+        <div class="alert alert-danger">Failed to generate a lobby code from the Riot API. Please try again.</div>
     }
     else if (Error == "round_ended")
     {
-        <div>This round has ended — lobby codes can no longer be generated.</div>
+        <div class="alert alert-warning">This round has ended — lobby codes can no longer be generated.</div>
     }
     else if (Info == "lobby_events_requested")
     {
-        <div>Lobby events have been requested and will be fetched shortly.</div>
+        <div class="alert alert-info">Lobby events have been requested and will be fetched shortly.</div>
     }
 </div>
 

@@ -7,34 +7,33 @@
     var pageItems = sorted.Skip((page - 1) * PageSize).Take(PageSize);
 }
 
-<div>
-    <h2>Teams</h2>
+<div class="mb-3 flex items-center justify-between">
+    <h2 class="text-lg font-semibold text-gray-900">Teams</h2>
     <Pager CurrentPage="page" TotalPages="totalPages" PageUrl="PageUrl" />
 </div>
 
 @if (Teams.Count == 0)
 {
-    <p>No teams yet.</p>
+    <p class="text-sm text-gray-500">No teams yet.</p>
 }
 else
 {
-    <table>
-        <thead>
-            <tr>
-                <th>Seed</th>
-                <th>Team</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var pt in pageItems)
-            {
-                <tr>
-                    <td>@pt.Seed</td>
-                    <td><a href="/teams/@pt.TeamId"><TeamFlag LogoUrl="@pt.Team.LogoUrl" />@pt.Team.Name</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Seed</th><th>Team</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var pt in pageItems)
+                {
+                    <tr>
+                        <td>@pt.Seed</td>
+                        <td><a href="/teams/@pt.TeamId" class="link inline-flex items-center gap-2"><TeamFlag LogoUrl="@pt.Team.LogoUrl" />@pt.Team.Name</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

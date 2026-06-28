@@ -2,39 +2,35 @@
 
 @if (Seasons.Count == 0)
 {
-    <p>No seasons yet.</p>
+    <p class="text-sm text-gray-500">No seasons yet.</p>
 }
 else
 {
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Region</th>
-                <th>Status</th>
-                <th>End</th>
-                <th>Length</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var season in Seasons)
-            {
-                <tr>
-                    <td>
-                        <a href="/seasons/@season.Id">@season.Name</a>
-                        @if (season.RegistrationOpen)
-                        {
-                            <span class="cal-badge cal-badge--success">Reg. Open</span>
-                        }
-                    </td>
-                    <td>@season.RiotRegion</td>
-                    <td><span class="cal-badge @StatusBadgeClass(season.Status)">@season.Status</span></td>
-                    <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
-                    <td>@season.Length weeks</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
+                <tr><th>Name</th><th>Region</th><th>Status</th><th>End</th><th>Length</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var season in Seasons)
+                {
+                    <tr>
+                        <td>
+                            <a href="/seasons/@season.Id" class="link">@season.Name</a>
+                            @if (season.RegistrationOpen)
+                            {
+                                <span class="badge bg-green-100 text-green-700">Reg. Open</span>
+                            }
+                        </td>
+                        <td>@season.RiotRegion</td>
+                        <td><span class="badge @StatusBadgeClass(season.Status)">@season.Status</span></td>
+                        <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
+                        <td>@season.Length weeks</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {
@@ -42,10 +38,10 @@ else
 
     private static string StatusBadgeClass(SeasonStatus status) => status switch
     {
-        SeasonStatus.Active    => "cal-badge--cyan",
-        SeasonStatus.PreSeason => "cal-badge--warning",
-        SeasonStatus.Upcoming  => "cal-badge--warning",
-        SeasonStatus.Completed => "",
-        _                      => "",
+        SeasonStatus.Active    => "bg-green-100 text-green-700",
+        SeasonStatus.Upcoming  => "bg-sky-100 text-sky-700",
+        SeasonStatus.PreSeason => "bg-amber-100 text-amber-700",
+        SeasonStatus.Completed => "bg-gray-100 text-gray-600",
+        _                      => "bg-gray-100 text-gray-600",
     };
 }
