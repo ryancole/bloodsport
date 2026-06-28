@@ -1,0 +1,9 @@
+@* Renders a Heroicons (20/solid) glyph from its SVG path data. See StatusIcons.cs. *@
+<svg class="@Class" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="@Path" />
+</svg>
+
+@code {
+    [Parameter, EditorRequired] public string Path { get; set; } = "";
+    [Parameter] public string Class { get; set; } = "h-3 w-3";
+}

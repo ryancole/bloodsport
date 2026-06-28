@@ -80,9 +80,7 @@ else
                     {
                         <div class="flex flex-wrap items-center gap-3 py-2 text-sm">
                             <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium @(item.IsPlayoff ? "bg-purple-100 text-purple-700" : "bg-sky-100 text-sky-700")">
-                                <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)" />
-                                </svg>
+                                <Icon Path="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)" />
                                 @(item.IsPlayoff ? "Playoff" : "Regular")
                             </span>
                             <div class="min-w-0">
