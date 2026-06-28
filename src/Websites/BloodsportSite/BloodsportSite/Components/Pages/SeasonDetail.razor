@@ -60,7 +60,10 @@ else
         <dd><SeasonStatusBadge Status="season.Status" /></dd>
 
         <dt class="font-medium text-gray-500">Registration</dt>
-        <dd><SeasonRegistrationBadge IsOpen="season.RegistrationOpen" /></dd>
+        <dd>
+            <Pill Color="@(season.RegistrationOpen ? PillColor.Green : PillColor.Red)"
+                  IconPath="@(season.RegistrationOpen ? StatusIcons.LockOpen : StatusIcons.LockClosed)">@(season.RegistrationOpen ? "Open" : "Closed")</Pill>
+        </dd>
 
         <dt class="font-medium text-gray-500">Length</dt>
         <dd class="text-gray-700">@season.Length weeks</dd>
