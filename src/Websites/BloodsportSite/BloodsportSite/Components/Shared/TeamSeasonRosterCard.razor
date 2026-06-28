@@ -3,10 +3,7 @@
 <div class="card">
     @if (IsInaugural)
     {
-        <span class="badge mb-2 gap-1 bg-amber-100 text-amber-700" title="Registered for the inaugural season">
-            <Icon Path="@StatusIcons.Star" />
-            Inaugural Season
-        </span>
+        <Pill Color="PillColor.Amber" IconPath="@StatusIcons.Star" IconCircle="false" Class="mb-2" Title="Registered for the inaugural season">Inaugural Season</Pill>
     }
     <h2 class="mb-3 text-lg font-semibold text-gray-900"><a href="/teams/@TeamId" class="link">@TeamName</a></h2>
     @if (AllowedSummonerNames.Count == 0)
@@ -21,7 +18,7 @@
                 var parts = name.Split('#', 2);
                 var uggHref = $"https://u.gg/lol/profile/na1/{Uri.EscapeDataString(parts[0])}-{(parts.Length > 1 ? Uri.EscapeDataString(parts[1]) : "")}/overview";
                 <li class="flex items-center gap-2">
-                    <span class="badge @BadgeClass">&#9670;</span>
+                    <Pill Color="@DiamondColor">&#9670;</Pill>
                     <span class="font-medium text-gray-900">@parts[0]@if (parts.Length > 1){<span class="text-gray-400">#@parts[1]</span>}</span>
                     <div class="ml-auto flex items-center gap-2 text-sm">
                         @if (UserIds.TryGetValue(name, out var userId))
@@ -41,7 +38,7 @@
     [Parameter, EditorRequired] public long TeamId { get; set; }
     [Parameter, EditorRequired] public string TeamName { get; set; } = "";
     [Parameter, EditorRequired] public ICollection<string> AllowedSummonerNames { get; set; } = [];
-    [Parameter] public string BadgeClass { get; set; } = "bg-sky-100 text-sky-700";
+    [Parameter] public PillColor DiamondColor { get; set; } = PillColor.Sky;
     [Parameter] public Dictionary<string, long> UserIds { get; set; } = [];
     [Parameter] public bool IsInaugural { get; set; }
 }

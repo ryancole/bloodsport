@@ -1,16 +1,23 @@
 @using Bloodsport.Entity.Database
 
-<span class="badge @BadgeClass">@Status</span>
+<Pill Color="@BadgeColor" IconPath="@StatusIcon">@Status</Pill>
 
 @code {
     [Parameter] public SeasonStatus Status { get; set; }
 
-    private string BadgeClass => Status switch
+    private PillColor BadgeColor => Status switch
     {
-        SeasonStatus.Active    => "bg-green-100 text-green-700",
-        SeasonStatus.Upcoming  => "bg-sky-100 text-sky-700",
-        SeasonStatus.PreSeason => "bg-amber-100 text-amber-700",
-        SeasonStatus.Completed => "bg-gray-100 text-gray-600",
-        _                      => "bg-gray-100 text-gray-600",
+        SeasonStatus.Active    => PillColor.Green,
+        SeasonStatus.Upcoming  => PillColor.Sky,
+        SeasonStatus.PreSeason => PillColor.Amber,
+        SeasonStatus.Completed => PillColor.Gray,
+        _                      => PillColor.Gray,
+    };
+
+    private string StatusIcon => Status switch
+    {
+        SeasonStatus.Active    => StatusIcons.Bolt,
+        SeasonStatus.Completed => StatusIcons.Check,
+        _                      => StatusIcons.Clock,
     };
 }

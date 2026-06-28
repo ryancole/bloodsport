@@ -17,20 +17,10 @@
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
                     <a href="/seasons/@season.Id" class="font-medium text-gray-900 no-underline hover:text-sky-600">@season.Name</a>
                     <div class="flex items-center gap-1">
-                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium @SeasonBadgeClass(season.Status)">
-                            <span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-black @SeasonIconCircleClass(season.Status)">
-                                <Icon Path="@SeasonStatusIcon(season.Status)" />
-                            </span>
-                            @season.Status
-                        </span>
+                        <SeasonStatusBadge Status="season.Status" />
                         @if (season.RegistrationOpen)
                         {
-                            <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                                <span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-black bg-green-300">
-                                    <Icon Path="@StatusIcons.Check" />
-                                </span>
-                                Reg. Open
-                            </span>
+                            <Pill Color="PillColor.Green" IconPath="@StatusIcons.Check">Reg. Open</Pill>
                         }
                     </div>
                     <span class="ml-auto text-xs text-gray-400">
@@ -50,25 +40,4 @@
 
 @code {
     [Parameter, EditorRequired] public List<Season> Seasons { get; set; } = [];
-
-    private static string SeasonBadgeClass(SeasonStatus status) => status switch
-    {
-        SeasonStatus.Active    => "bg-green-100 text-green-700",
-        SeasonStatus.PreSeason => "bg-amber-100 text-amber-700",
-        _                      => "bg-gray-100 text-gray-600",
-    };
-
-    private static string SeasonStatusIcon(SeasonStatus status) => status switch
-    {
-        SeasonStatus.Active    => StatusIcons.Bolt,
-        SeasonStatus.Completed => StatusIcons.Check,
-        _                      => StatusIcons.Clock,
-    };
-
-    private static string SeasonIconCircleClass(SeasonStatus status) => status switch
-    {
-        SeasonStatus.Active    => "bg-green-300",
-        SeasonStatus.PreSeason => "bg-amber-300",
-        _                      => "bg-gray-300",
-    };
 }

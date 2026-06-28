@@ -19,11 +19,11 @@ else
                             <a href="/seasons/@season.Id" class="link">@season.Name</a>
                             @if (season.RegistrationOpen)
                             {
-                                <span class="badge bg-green-100 text-green-700">Reg. Open</span>
+                                <Pill Color="PillColor.Green">Reg. Open</Pill>
                             }
                         </td>
                         <td>@season.RiotRegion</td>
-                        <td><span class="badge @StatusBadgeClass(season.Status)">@season.Status</span></td>
+                        <td><SeasonStatusBadge Status="season.Status" /></td>
                         <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
                         <td>@season.Length weeks</td>
                     </tr>
@@ -35,13 +35,4 @@ else
 
 @code {
     [Parameter, EditorRequired] public List<Season> Seasons { get; set; } = [];
-
-    private static string StatusBadgeClass(SeasonStatus status) => status switch
-    {
-        SeasonStatus.Active    => "bg-green-100 text-green-700",
-        SeasonStatus.Upcoming  => "bg-sky-100 text-sky-700",
-        SeasonStatus.PreSeason => "bg-amber-100 text-amber-700",
-        SeasonStatus.Completed => "bg-gray-100 text-gray-600",
-        _                      => "bg-gray-100 text-gray-600",
-    };
 }

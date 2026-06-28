@@ -51,7 +51,7 @@ else
         <dd><a href="/seasons/@playoff.SeasonId" class="link">@playoff.Season.Name</a></dd>
 
         <dt class="font-medium text-gray-500">Status</dt>
-        <dd><span class="badge @StatusBadgeClass(playoff.Status)">@playoff.Status</span></dd>
+        <dd><PlayoffStatusBadge Status="playoff.Status" /></dd>
 
         <dt class="font-medium text-gray-500">Region</dt>
         <dd class="text-gray-700">@playoff.RiotRegion</dd>
@@ -174,12 +174,4 @@ else
             }
         }
     }
-
-    private static string StatusBadgeClass(PlayoffStatus status) => status switch
-    {
-        PlayoffStatus.Upcoming  => "bg-sky-100 text-sky-700",
-        PlayoffStatus.Active    => "bg-green-100 text-green-700",
-        PlayoffStatus.Completed => "bg-gray-100 text-gray-600",
-        _                       => "bg-gray-100 text-gray-600",
-    };
 }

@@ -51,16 +51,16 @@ else
                                 {
                                     @if (result.DidNotPlay)
                                     {
-                                        <span class="badge bg-gray-100 text-gray-600">Did Not Play</span>
+                                        <Pill Color="PillColor.Gray">Did Not Play</Pill>
                                     }
                                     else
                                     {
                                         <span class="inline-flex items-center gap-2">
-                                            <span class="badge bg-green-100 text-green-700">Final</span>
+                                            <Pill Color="PillColor.Green">Final</Pill>
                                             <span class="text-gray-600">@result.WinnerTeam?.Name wins</span>
                                             @if (result.RosterMismatch)
                                             {
-                                                <span class="badge bg-amber-100 text-amber-700" title="One or more players did not match the locked season roster">Roster Mismatch</span>
+                                                <Pill Color="PillColor.Amber" Title="One or more players did not match the locked season roster">Roster Mismatch</Pill>
                                             }
                                         </span>
                                     }

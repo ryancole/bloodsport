@@ -121,11 +121,11 @@ else
         </div>
     }
     <div class="grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
-        <TeamSeasonRosterCard TeamId="@(matchup.TeamOne?.TeamId ?? 0)" TeamName="@teamOneName" AllowedSummonerNames="@teamOneRoster" BadgeClass="bg-sky-100 text-sky-700" UserIds="@rosterUserIds" />
+        <TeamSeasonRosterCard TeamId="@(matchup.TeamOne?.TeamId ?? 0)" TeamName="@teamOneName" AllowedSummonerNames="@teamOneRoster" DiamondColor="PillColor.Sky" UserIds="@rosterUserIds" />
 
         <div class="text-center text-sm font-bold text-gray-400">VS</div>
 
-        <TeamSeasonRosterCard TeamId="@(matchup.TeamTwo?.TeamId ?? 0)" TeamName="@teamTwoName" AllowedSummonerNames="@teamTwoRoster" BadgeClass="bg-red-100 text-red-700" UserIds="@rosterUserIds" />
+        <TeamSeasonRosterCard TeamId="@(matchup.TeamTwo?.TeamId ?? 0)" TeamName="@teamTwoName" AllowedSummonerNames="@teamTwoRoster" DiamondColor="PillColor.Red" UserIds="@rosterUserIds" />
     </div>
 }
 

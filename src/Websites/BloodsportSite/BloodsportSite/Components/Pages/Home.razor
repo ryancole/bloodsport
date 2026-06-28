@@ -79,12 +79,7 @@ else
                     @foreach (var item in activityFeed)
                     {
                         <div class="flex flex-wrap items-center gap-3 py-2 text-sm">
-                            <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium @(item.IsPlayoff ? "bg-purple-100 text-purple-700" : "bg-sky-100 text-sky-700")">
-                                <span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-black @(item.IsPlayoff ? "bg-purple-300" : "bg-sky-300")">
-                                    <Icon Path="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)" />
-                                </span>
-                                @(item.IsPlayoff ? "Playoff" : "Regular")
-                            </span>
+                            <Pill Color="@(item.IsPlayoff ? PillColor.Purple : PillColor.Sky)" IconPath="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)">@(item.IsPlayoff ? "Playoff" : "Regular")</Pill>
                             <div class="min-w-0">
                                 @if (item.WinnerName is not null)
                                 {
