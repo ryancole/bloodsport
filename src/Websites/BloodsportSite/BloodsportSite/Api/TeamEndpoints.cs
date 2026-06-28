@@ -25,15 +25,35 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> ListAsync(
             IDbContextFactory<SqlDbContext> dbFactory,
-            BlobSasService blobSasService)
+            BlobSasService blobSasService,
+            int page = 1,
+            int pageSize = 20,
+            string? search = null)
         {
+            pageSize = Math.Clamp(pageSize, 1, 100);
+
             await using var db = await dbFactory.CreateDbContextAsync();
-            var teams = await db.Teams
+
+            var query = db.Teams.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                query = query.Where(t => t.Name.Contains(search));
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            page = totalPages == 0 ? 1 : Math.Clamp(page, 1, totalPages);
+
+            var teams = await query
                 .Include(t => t.Manager)
                 .OrderBy(t => t.Name)
+                .ThenBy(t => t.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            var result = teams.Select(t => new
+            var items = teams.Select(t => new
             {
                 t.Id,
                 t.Name,
@@ -44,7 +64,14 @@ namespace BloodsportSite.Api
                 ManagerFlagUrl = blobSasService.GetSasUrl(t.Manager.LogoUrl?.Replace("/original.", "/flag.")),
             });
 
-            return Results.Ok(result);
+            return Results.Ok(new
+            {
+                items,
+                totalCount,
+                page,
+                pageSize,
+                totalPages,
+            });
         }
 
         private static async Task<IResult> CreateAsync(

@@ -2,20 +2,12 @@
 @using BloodsportSite.Client.Models
 @inject HttpClient Http
 
-@if (teams is null)
+@if (result is null)
 {
     <LoadingSpinner />
 }
 else
 {
-    var filtered = string.IsNullOrWhiteSpace(search)
-        ? teams
-        : teams.Where(t => t.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-
-    var totalPages = (int)Math.Ceiling(filtered.Count / (double)PageSize);
-    var page = currentPage < 1 ? 1 : currentPage;
-    var pageItems = filtered.Skip((page - 1) * PageSize).Take(PageSize).ToList();
-
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-2">
@@ -31,10 +23,10 @@ else
                 </span>
             }
         </div>
-        <Pager CurrentPage="page" TotalPages="totalPages" OnPageChanged="GoToPage" />
+        <Pager CurrentPage="result.Page" TotalPages="result.TotalPages" OnPageChanged="GoToPage" />
     </div>
 
-    @if (!filtered.Any())
+    @if (result.Items.Count == 0)
     {
         <p class="py-4 text-center text-gray-500">No teams found.</p>
     }
@@ -46,7 +38,7 @@ else
                     <tr><th>Name</th><th>Manager</th><th>Created</th></tr>
                 </thead>
                 <tbody>
-                    @foreach (var team in pageItems)
+                    @foreach (var team in result.Items)
                     {
                         <tr>
                             <td><a href="/teams/@team.Id" class="link inline-flex items-center gap-2"><TeamFlag FlagUrl="@team.FlagUrl" />@team.Name</a></td>
@@ -63,7 +55,7 @@ else
 @code {
     private const int PageSize = 20;
 
-    private List<TeamListItem>? teams;
+    private PagedResult<TeamListItem>? result;
     private string? search;
     private string searchInput = "";
     private int currentPage = 1;
@@ -72,30 +64,48 @@ else
     {
         if (OperatingSystem.IsBrowser())
         {
-            teams = await Http.GetFromJsonAsync<List<TeamListItem>>("/api/teams");
+            await LoadAsync();
         }
     }
 
-    private void ApplySearch()
+    private async Task LoadAsync()
+    {
+        var url = $"/api/teams?page={currentPage}&pageSize={PageSize}";
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            url += $"&search={Uri.EscapeDataString(search)}";
+        }
+
+        result = await Http.GetFromJsonAsync<PagedResult<TeamListItem>>(url);
+        if (result is not null)
+        {
+            currentPage = result.Page;
+        }
+    }
+
+    private async Task ApplySearch()
     {
         search = string.IsNullOrWhiteSpace(searchInput) ? null : searchInput.Trim();
         currentPage = 1;
+        await LoadAsync();
     }
 
-    private void ClearSearch()
+    private async Task ClearSearch()
     {
         search = null;
         searchInput = "";
         currentPage = 1;
+        await LoadAsync();
     }
 
-    private void HandleSearchKey(KeyboardEventArgs e)
+    private async Task HandleSearchKey(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter") ApplySearch();
+        if (e.Key == "Enter") await ApplySearch();
     }
 
-    private void GoToPage(int page)
+    private async Task GoToPage(int page)
     {
         currentPage = page;
+        await LoadAsync();
     }
 }

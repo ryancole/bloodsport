@@ -22,17 +22,37 @@ namespace BloodsportSite.Api
 
         private static async Task<IResult> ListAsync(
             IDbContextFactory<SqlDbContext> dbFactory,
-            BlobSasService blobSasService)
+            BlobSasService blobSasService,
+            int page = 1,
+            int pageSize = 20,
+            string? search = null)
         {
+            pageSize = Math.Clamp(pageSize, 1, 100);
+
             await using var db = await dbFactory.CreateDbContextAsync();
-            var users = await db.Users
+
+            var query = db.Users.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                query = query.Where(u => u.DisplayName.Contains(search));
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            page = totalPages == 0 ? 1 : Math.Clamp(page, 1, totalPages);
+
+            var users = await query
+                .OrderBy(u => u.DisplayName)
+                .ThenBy(u => u.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Include(u => u.RiotAccounts)
                     .ThenInclude(a => a.TeamMemberships)
                         .ThenInclude(m => m.Team)
-                .OrderBy(u => u.DisplayName)
                 .ToListAsync();
 
-            var result = users.Select(u => new
+            var items = users.Select(u => new
             {
                 u.Id,
                 u.DisplayName,
@@ -51,7 +71,14 @@ namespace BloodsportSite.Api
                     }),
             });
 
-            return Results.Ok(result);
+            return Results.Ok(new
+            {
+                items,
+                totalCount,
+                page,
+                pageSize,
+                totalPages,
+            });
         }
 
         private static async Task<IResult> UpdateDisplayNameAsync(
