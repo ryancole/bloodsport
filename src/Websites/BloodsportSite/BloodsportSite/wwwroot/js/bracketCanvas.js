@@ -18,6 +18,8 @@ const C_TEXT    = '#212529';
 const C_TBD     = '#adb5bd';
 const C_HEADER  = '#6c757d';
 const C_MY_TEAM = '#0d6efd';
+const C_HOVER    = '#f59e0b';
+const C_HOVER_BG = 'rgba(245,158,11,0.15)';
 
 const instances = new Map();
 
@@ -46,6 +48,8 @@ export function init(canvasId, data) {
         lastMX: 0,
         lastMY: 0,
         hitBoxes: [],
+        rowBoxes: [],
+        hoverTeamId: null,
         images: new Map()
     };
 
@@ -175,6 +179,7 @@ function draw(s) {
     ctx.scale(s.zoom, s.zoom);
 
     s.hitBoxes = [];
+    s.rowBoxes = [];
     drawRoundHeaders(ctx, layout);
     drawConnectors(ctx, layout);
     for (const round of layout.rounds) {
@@ -246,13 +251,29 @@ function drawCard(ctx, m, s) {
     ctx.strokeStyle = C_LINE;
     ctx.stroke();
 
-    drawTeamRow(ctx, m.teamOne, cardX, cardY,        m.teamOneWinner, s.images);
-    drawTeamRow(ctx, m.teamTwo, cardX, cardY + ROW_H, m.teamTwoWinner, s.images);
+    const oneHover = m.teamOne != null && m.teamOne.teamId === s.hoverTeamId;
+    const twoHover = m.teamTwo != null && m.teamTwo.teamId === s.hoverTeamId;
+
+    drawTeamRow(ctx, m.teamOne, cardX, cardY,        m.teamOneWinner, s.images, oneHover);
+    drawTeamRow(ctx, m.teamTwo, cardX, cardY + ROW_H, m.teamTwoWinner, s.images, twoHover);
+
+    if (oneHover) strokeRowHighlight(ctx, cardX, cardY);
+    if (twoHover) strokeRowHighlight(ctx, cardX, cardY + ROW_H);
+
+    // Per-team row boxes for hover detection (layout coordinates)
+    if (m.teamOne) s.rowBoxes.push({ x: cardX, y: cardY,         w: CARD_W, h: ROW_H, teamId: m.teamOne.teamId });
+    if (m.teamTwo) s.rowBoxes.push({ x: cardX, y: cardY + ROW_H, w: CARD_W, h: ROW_H, teamId: m.teamTwo.teamId });
 
     s.hitBoxes.push({
         x: cardX, y: cardY, w: CARD_W, h: CARD_H,
         url: `/playoffs/${s.data.playoffId}/matchups/${m.id}`
     });
+}
+
+function strokeRowHighlight(ctx, x, y) {
+    ctx.strokeStyle = C_HOVER;
+    ctx.lineWidth   = 2;
+    ctx.strokeRect(x + 1.5, y + 1.5, CARD_W - 3, ROW_H - 2);
 }
 
 const LOGO_W = 28;
@@ -261,7 +282,7 @@ const SEED_AREA = 18; // width reserved for seed number
 const LOGO_X_OFF = 6 + SEED_AREA + 3; // left pad + seed area + gap
 const NAME_X_OFF = LOGO_X_OFF + LOGO_W + 4;
 
-function drawTeamRow(ctx, team, x, y, winner, images) {
+function drawTeamRow(ctx, team, x, y, winner, images, highlight) {
     ctx.save();
     ctx.beginPath();
     ctx.rect(x + 1, y + 1, CARD_W - 2, ROW_H - 1);
@@ -269,6 +290,11 @@ function drawTeamRow(ctx, team, x, y, winner, images) {
 
     if (winner) {
         ctx.fillStyle = C_WIN_BG;
+        ctx.fillRect(x + 1, y + 1, CARD_W - 2, ROW_H - 1);
+    }
+
+    if (highlight) {
+        ctx.fillStyle = C_HOVER_BG;
         ctx.fillRect(x + 1, y + 1, CARD_W - 2, ROW_H - 1);
     }
 
@@ -355,6 +381,13 @@ function hitTest(s, mx, my) {
     return s.hitBoxes.find(hb => lx >= hb.x && lx <= hb.x + hb.w && ly >= hb.y && ly <= hb.y + hb.h);
 }
 
+function teamAt(s, mx, my) {
+    const lx = (mx - s.panX) / s.zoom;
+    const ly = (my - s.panY) / s.zoom;
+    const rb = s.rowBoxes.find(rb => lx >= rb.x && lx <= rb.x + rb.w && ly >= rb.y && ly <= rb.y + rb.h);
+    return rb ? rb.teamId : null;
+}
+
 function attachEvents(s) {
     const { canvas } = s;
 
@@ -376,8 +409,16 @@ function attachEvents(s) {
     s._mmove = e => {
         if (!s.isPanning) {
             const r   = canvas.getBoundingClientRect();
-            const hit = hitTest(s, e.clientX - r.left, e.clientY - r.top);
+            const mx  = e.clientX - r.left;
+            const my  = e.clientY - r.top;
+            const hit = hitTest(s, mx, my);
             canvas.style.cursor = hit ? 'pointer' : 'grab';
+
+            const tid = teamAt(s, mx, my);
+            if (tid !== s.hoverTeamId) {
+                s.hoverTeamId = tid;
+                draw(s);
+            }
             return;
         }
         const dx = e.clientX - s.lastMX;
@@ -404,6 +445,10 @@ function attachEvents(s) {
     s._mleave = () => {
         s.isPanning = false;
         canvas.style.cursor = 'grab';
+        if (s.hoverTeamId !== null) {
+            s.hoverTeamId = null;
+            draw(s);
+        }
     };
 
     // Touch pan

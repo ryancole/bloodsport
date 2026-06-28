@@ -20,8 +20,8 @@
                 matchups = r.PlayoffMatchups.OrderBy(m => m.MatchNumber).Select(m => new
                 {
                     id            = m.Id,
-                    teamOne       = m.TeamOne != null ? (object)new { seed = m.TeamOne.Seed, name = m.TeamOne.Team?.Name ?? "Unknown", logoUrl = m.TeamOne.Team?.LogoUrl?.Replace("/original.", "/flag."), myTeam = MyTeamIds.Contains(m.TeamOne.TeamId) } : null,
-                    teamTwo       = m.TeamTwo != null ? (object)new { seed = m.TeamTwo.Seed, name = m.TeamTwo.Team?.Name ?? "Unknown", logoUrl = m.TeamTwo.Team?.LogoUrl?.Replace("/original.", "/flag."), myTeam = MyTeamIds.Contains(m.TeamTwo.TeamId) } : null,
+                    teamOne       = m.TeamOne != null ? (object)new { teamId = m.TeamOne.TeamId, seed = m.TeamOne.Seed, name = m.TeamOne.Team?.Name ?? "Unknown", logoUrl = m.TeamOne.Team?.LogoUrl?.Replace("/original.", "/flag."), myTeam = MyTeamIds.Contains(m.TeamOne.TeamId) } : null,
+                    teamTwo       = m.TeamTwo != null ? (object)new { teamId = m.TeamTwo.TeamId, seed = m.TeamTwo.Seed, name = m.TeamTwo.Team?.Name ?? "Unknown", logoUrl = m.TeamTwo.Team?.LogoUrl?.Replace("/original.", "/flag."), myTeam = MyTeamIds.Contains(m.TeamTwo.TeamId) } : null,
                     teamOneWinner = m.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == m.TeamOneId),
                     teamTwoWinner = m.PlayoffRoundMatchupResults.Any(r => r.WinningTeamId == m.TeamTwoId)
                 }).ToList()
