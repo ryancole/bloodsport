@@ -12,6 +12,8 @@ namespace Bloodsport.Entity.Database
 
         public long SeasonId { get; set; }
 
+        public bool? InauguralRegistration { get; set; }
+
         public DateTime DateCreated { get; private set; }
 
         #endregion
