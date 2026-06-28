@@ -17,10 +17,20 @@
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
                     <a href="/seasons/@season.Id" class="font-medium text-gray-900 no-underline hover:text-sky-600">@season.Name</a>
                     <div class="flex items-center gap-1">
-                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium @SeasonBadgeClass(season.Status)">@season.Status</span>
+                        <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium @SeasonBadgeClass(season.Status)">
+                            <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="@SeasonStatusIcon(season.Status)" />
+                            </svg>
+                            @season.Status
+                        </span>
                         @if (season.RegistrationOpen)
                         {
-                            <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Reg. Open</span>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                                <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="@StatusIcons.Check" />
+                                </svg>
+                                Reg. Open
+                            </span>
                         }
                     </div>
                     <span class="ml-auto text-xs text-gray-400">
@@ -46,5 +56,12 @@
         SeasonStatus.Active    => "bg-green-100 text-green-700",
         SeasonStatus.PreSeason => "bg-amber-100 text-amber-700",
         _                      => "bg-gray-100 text-gray-600",
+    };
+
+    private static string SeasonStatusIcon(SeasonStatus status) => status switch
+    {
+        SeasonStatus.Active    => StatusIcons.Bolt,
+        SeasonStatus.Completed => StatusIcons.Check,
+        _                      => StatusIcons.Clock,
     };
 }

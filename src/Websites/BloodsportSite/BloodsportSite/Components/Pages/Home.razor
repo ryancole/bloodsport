@@ -79,7 +79,10 @@ else
                     @foreach (var item in activityFeed)
                     {
                         <div class="flex flex-wrap items-center gap-3 py-2 text-sm">
-                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium @(item.IsPlayoff ? "bg-purple-100 text-purple-700" : "bg-sky-100 text-sky-700")">
+                            <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium @(item.IsPlayoff ? "bg-purple-100 text-purple-700" : "bg-sky-100 text-sky-700")">
+                                <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)" />
+                                </svg>
                                 @(item.IsPlayoff ? "Playoff" : "Regular")
                             </span>
                             <div class="min-w-0">
@@ -98,13 +101,13 @@ else
                             <a href="@item.MatchupUrl" class="font-medium text-gray-900 no-underline hover:text-sky-600">@item.MatchupName</a>
                             @if (item.ContextUrl is not null)
                             {
-                                <a href="@item.ContextUrl" class="text-gray-500 no-underline hover:text-sky-600">@item.Context</a>
+                                <a href="@item.ContextUrl" class="ml-auto text-gray-500 no-underline hover:text-sky-600">@item.Context</a>
                             }
                             else
                             {
-                                <span class="text-gray-500">@item.Context</span>
+                                <span class="ml-auto text-gray-500">@item.Context</span>
                             }
-                            <span class="ml-auto text-xs text-gray-400" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
+                            <span class="text-xs text-gray-400" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
                         </div>
                     }
                 </div>
@@ -120,6 +123,10 @@ else
     private List<ActivityItem> activityFeed = [];
     private List<Post> recentPosts = [];
     private int resultsThisWeek;
+
+    // Heroicons (20/solid): star, calendar-days
+    private const string PlayoffIcon = "M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z";
+    private const string RegularIcon = "M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z";
 
     private record ActivityItem(
         bool IsPlayoff,
