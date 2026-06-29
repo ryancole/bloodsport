@@ -9,5 +9,4 @@ public enum PillColor
     Amber,
     Sky,
     Red,
-    Purple,
 }

@@ -21,9 +21,9 @@ else
                 <span class="block text-3xl font-bold text-sky-900">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
                 <span class="text-sm font-medium text-sky-700">Active seasons</span>
             </div>
-            <div class="w-44 rounded-xl bg-purple-50 p-5 text-center sm:w-44">
-                <span class="block text-3xl font-bold text-purple-900">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
-                <span class="text-sm font-medium text-purple-700">Active playoffs</span>
+            <div class="w-44 rounded-xl bg-amber-50 p-5 text-center sm:w-44">
+                <span class="block text-3xl font-bold text-amber-900">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
+                <span class="text-sm font-medium text-amber-700">Active playoffs</span>
             </div>
             <div class="w-44 rounded-xl bg-emerald-50 p-5 text-center sm:w-44">
                 <span class="block text-3xl font-bold text-emerald-900">@resultsThisWeek</span>
@@ -79,7 +79,7 @@ else
                     @foreach (var item in activityFeed)
                     {
                         <div class="flex flex-wrap items-center gap-3 py-2 text-sm">
-                            <Pill Color="@(item.IsPlayoff ? PillColor.Purple : PillColor.Sky)" IconPath="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)">@(item.IsPlayoff ? "Playoff" : "Regular")</Pill>
+                            <Pill Color="@(item.IsPlayoff ? PillColor.Amber : PillColor.Sky)" IconPath="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)">@(item.IsPlayoff ? "Playoff" : "Regular")</Pill>
                             <div class="min-w-0">
                                 @if (item.WinnerName is not null)
                                 {
