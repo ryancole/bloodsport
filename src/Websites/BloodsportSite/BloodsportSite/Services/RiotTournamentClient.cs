@@ -24,7 +24,8 @@ namespace BloodsportSite.Services
         public async Task<string> CreateTournamentCodeAsync(
             long tournamentId,
             SeasonMatchupParameters? parameters = null,
-            string[]? allowedParticipants = null)
+            string[]? allowedParticipants = null,
+            string? metadata = null)
         {
             // Riot PUUIDs must be lowercase — normalize in case seeded/stored data is uppercase
             var normalizedParticipants = allowedParticipants?.Select(p => p.ToLowerInvariant()).ToArray();
@@ -34,7 +35,6 @@ namespace BloodsportSite.Services
             var mapType = parameters?.MapType ?? "SUMMONERS_RIFT";
             var spectatorType = parameters?.SpectatorType ?? "ALL";
             var enoughPlayers = parameters?.EnoughPlayers ?? false;
-            var metadata = parameters?.Metadata;
 
             string[] codes;
 

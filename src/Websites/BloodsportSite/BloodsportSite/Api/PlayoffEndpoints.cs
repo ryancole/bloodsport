@@ -142,12 +142,23 @@ namespace BloodsportSite.Api
 
             var logger = loggerFactory.CreateLogger("PlayoffEndpoints");
 
+            var metadata = JsonSerializer.Serialize(new
+            {
+                matchupType = "PlayoffRoundMatchup",
+                matchupId = matchup.Id,
+                playoffId = playoff.Id,
+                playoffRoundId = matchup.PlayoffRoundId,
+                teamOneId,
+                teamTwoId,
+            });
+
             try
             {
                 matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(
                     playoff.RiotTournamentId.Value,
                     parameters: playoff.Season.MatchupParameters,
-                    allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null);
+                    allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null,
+                    metadata: metadata);
                 await db.SaveChangesAsync();
             }
             catch (Exception ex)

@@ -20,8 +20,6 @@ namespace Bloodsport.Entity.Database
 
         public bool EnoughPlayers { get; set; }
 
-        public string? Metadata { get; set; }
-
         public DateTime DateCreated { get; set; }
 
         #endregion
