@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bloodsport.Data.Sql.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    [Migration("20260629062120_SeasonMatchupParameters")]
+    [Migration("20260629065426_SeasonMatchupParameters")]
     partial class SeasonMatchupParameters
     {
         /// <inheritdoc />
@@ -399,9 +399,6 @@ namespace Bloodsport.Data.Sql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<bool>("EnoughPlayers")
-                        .HasColumnType("bit");
 
                     b.Property<string>("MapType")
                         .IsRequired()

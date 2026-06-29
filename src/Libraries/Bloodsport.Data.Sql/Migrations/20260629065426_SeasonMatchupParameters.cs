@@ -22,7 +22,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     PickType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MapType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SpectatorType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EnoughPlayers = table.Column<bool>(type: "bit", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
                 constraints: table =>

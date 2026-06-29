@@ -397,9 +397,6 @@ namespace Bloodsport.Data.Sql.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<bool>("EnoughPlayers")
-                        .HasColumnType("bit");
-
                     b.Property<string>("MapType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
