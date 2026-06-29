@@ -41,19 +41,31 @@ else
         </div>
         <div>
             <label class="label">Riot Region</label>
-            <select name="riotRegion" class="input">
-                @foreach (var value in Enum.GetValues<TournamentRegion>())
-                {
-                    if (value.ToString() == season.RiotRegion)
+            <div class="flex items-center gap-2">
+                <span class="shrink-0">
+                    @foreach (var value in Enum.GetValues<TournamentRegion>())
                     {
-                        <option value="@value" selected>@value</option>
+                        <span class="region-flag-opt @(value.ToString() == season.RiotRegion ? "" : "hidden")"
+                              data-region="@value">
+                            <RegionFlag Region="@value.ToString()" Class="h-4 w-6" />
+                        </span>
                     }
-                    else
+                </span>
+                <select name="riotRegion" class="input"
+                        onchange="document.querySelectorAll('.region-flag-opt').forEach(e => e.classList.toggle('hidden', e.dataset.region !== this.value))">
+                    @foreach (var value in Enum.GetValues<TournamentRegion>())
                     {
-                        <option value="@value">@value</option>
+                        if (value.ToString() == season.RiotRegion)
+                        {
+                            <option value="@value" selected>@value</option>
+                        }
+                        else
+                        {
+                            <option value="@value">@value</option>
+                        }
                     }
-                }
-            </select>
+                </select>
+            </div>
         </div>
         <div class="flex items-center gap-2">
             <input type="checkbox" name="registrationOpen" value="true"

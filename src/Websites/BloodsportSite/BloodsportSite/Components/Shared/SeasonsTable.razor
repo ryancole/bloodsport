@@ -22,7 +22,12 @@ else
                                 <Pill Color="PillColor.Green">Reg. Open</Pill>
                             }
                         </td>
-                        <td>@season.RiotRegion</td>
+                        <td>
+                            <span class="inline-flex items-center gap-1.5">
+                                <RegionFlag Region="@season.RiotRegion" Class="h-4 w-6" />
+                                @season.RiotRegion
+                            </span>
+                        </td>
                         <td><SeasonStatusBadge Status="season.Status" /></td>
                         <td>@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMM d, yyyy") ?? "TBD")</td>
                         <td>@season.Length weeks</td>

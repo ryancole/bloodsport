@@ -69,7 +69,12 @@ else
         <dd class="text-gray-700">@season.Length weeks</dd>
 
         <dt class="font-medium text-gray-500">Region</dt>
-        <dd class="text-gray-700">@season.RiotRegion</dd>
+        <dd class="text-gray-700">
+            <span class="inline-flex items-center gap-1.5">
+                <RegionFlag Region="@season.RiotRegion" Class="h-4 w-6" />
+                @season.RiotRegion
+            </span>
+        </dd>
 
         <dt class="font-medium text-gray-500">Estimated Start</dt>
         <dd class="text-gray-700">@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>

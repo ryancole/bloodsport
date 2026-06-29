@@ -1,0 +1,117 @@
+@* Inline-SVG flag for a Riot/LoL server region. Regions map to the
+   Camille TournamentRegion enum names (BR, EUNE, EUW, JP, LAN, LAS, NA,
+   OCE, TR, PBE). National flags are used where a region maps to a single
+   country; the rest use a consistent custom design. *@
+
+<svg viewBox="0 0 24 16" width="24" height="16" class="@Class"
+     style="border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;box-shadow:0 0 0 1px rgba(0,0,0,.15)"
+     role="img" aria-label="@Region region">
+    <title>@Region</title>
+    @((MarkupString)Flag(Region))
+</svg>
+
+@code {
+    [Parameter] public string? Region { get; set; }
+
+    /// Extra CSS classes for sizing, e.g. "h-4 w-6".
+    [Parameter] public string? Class { get; set; }
+
+    private static string Flag(string? region) => (region ?? "").ToUpperInvariant() switch
+    {
+        // Brazil
+        "BR" => """
+            <rect width="24" height="16" fill="#009C3B"/>
+            <path d="M12 2 22 8 12 14 2 8Z" fill="#FFDF00"/>
+            <circle cx="12" cy="8" r="3.1" fill="#002776"/>
+            """,
+
+        // Japan
+        "JP" => """
+            <rect width="24" height="16" fill="#fff"/>
+            <circle cx="12" cy="8" r="4.2" fill="#BC002D"/>
+            """,
+
+        // Turkey
+        "TR" => """
+            <rect width="24" height="16" fill="#E30A17"/>
+            <circle cx="10" cy="8" r="3.5" fill="#fff"/>
+            <circle cx="11.1" cy="8" r="2.8" fill="#E30A17"/>
+            <polygon points="15,6 15.47,7.35 16.9,7.38 15.76,8.25 16.18,9.62 15,8.8 13.82,9.62 14.24,8.25 13.1,7.38 14.53,7.35" fill="#fff"/>
+            """,
+
+        // Europe West — EU flag (ring of stars, simplified to dots)
+        "EUW" => """
+            <rect width="24" height="16" fill="#003399"/>
+            <g fill="#FFCC00">
+              <circle cx="12" cy="3.2" r="0.6"/><circle cx="14.4" cy="3.84" r="0.6"/>
+              <circle cx="16.16" cy="5.6" r="0.6"/><circle cx="16.8" cy="8" r="0.6"/>
+              <circle cx="16.16" cy="10.4" r="0.6"/><circle cx="14.4" cy="12.16" r="0.6"/>
+              <circle cx="12" cy="12.8" r="0.6"/><circle cx="9.6" cy="12.16" r="0.6"/>
+              <circle cx="7.84" cy="10.4" r="0.6"/><circle cx="7.2" cy="8" r="0.6"/>
+              <circle cx="7.84" cy="5.6" r="0.6"/><circle cx="9.6" cy="3.84" r="0.6"/>
+            </g>
+            """,
+
+        // Europe Nordic & East — Nordic cross
+        "EUNE" => """
+            <rect width="24" height="16" fill="#0b3d91"/>
+            <rect x="7" width="3" height="16" fill="#f2c14e"/>
+            <rect y="6.5" width="24" height="3" fill="#f2c14e"/>
+            """,
+
+        // North America — stars & stripes
+        "NA" => """
+            <rect width="24" height="16" fill="#B22234"/>
+            <g fill="#fff">
+              <rect y="2.667" width="24" height="2.667"/>
+              <rect y="8" width="24" height="2.667"/>
+              <rect y="13.333" width="24" height="2.667"/>
+            </g>
+            <rect width="10" height="8.6" fill="#3C3B6E"/>
+            <polygon points="5,2.1 5.52,3.585 7.09,3.618 5.836,4.575 6.298,6.082 5,5.18 3.702,6.082 4.164,4.575 2.91,3.618 4.483,3.585" fill="#fff"/>
+            """,
+
+        // Latin America North — Mexico-inspired tricolor
+        "LAN" => """
+            <rect width="8" height="16" fill="#006847"/>
+            <rect x="8" width="8" height="16" fill="#fff"/>
+            <rect x="16" width="8" height="16" fill="#CE1126"/>
+            <circle cx="12" cy="8" r="1.7" fill="#9b6b2f"/>
+            """,
+
+        // Latin America South — Argentina-inspired
+        "LAS" => """
+            <rect width="24" height="16" fill="#74ACDF"/>
+            <rect y="5.333" width="24" height="5.333" fill="#fff"/>
+            <circle cx="12" cy="8" r="1.7" fill="#F6B40E"/>
+            """,
+
+        // Oceania — ocean blue with Southern Cross
+        "OCE" => """
+            <rect width="24" height="16" fill="#00308F"/>
+            <g fill="#fff">
+              <circle cx="16" cy="3.6" r="0.8"/>
+              <circle cx="19" cy="8" r="0.8"/>
+              <circle cx="16" cy="12.4" r="0.8"/>
+              <circle cx="13" cy="8" r="0.8"/>
+              <circle cx="16.5" cy="8" r="0.55"/>
+            </g>
+            """,
+
+        // Public Beta Environment — test realm, caution stripes
+        "PBE" => """
+            <rect width="24" height="16" fill="#334155"/>
+            <g fill="#f59e0b">
+              <path d="M-12 16 L-9 16 L7 0 L4 0 Z"/>
+              <path d="M-4 16 L-1 16 L15 0 L12 0 Z"/>
+              <path d="M4 16 L7 16 L23 0 L20 0 Z"/>
+            </g>
+            """,
+
+        // Unknown region — neutral placeholder
+        _ => """
+            <rect width="24" height="16" fill="#e5e7eb"/>
+            <path d="M0 0 L24 16 M24 0 L0 16" stroke="#9ca3af" stroke-width="1"/>
+            """,
+    };
+}
