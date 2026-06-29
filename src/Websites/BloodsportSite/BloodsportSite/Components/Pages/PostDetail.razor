@@ -32,7 +32,7 @@ else
             <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                 <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
                 <span>·</span>
-                <a href="/users/@post.User.Id" class="link">@post.User.DisplayName</a>
+                <a href="/users/@post.User.Id" class="link inline-flex items-center gap-1.5"><UserFlag LogoUrl="@post.User.LogoUrl" />@post.User.DisplayName</a>
             </div>
         </div>
         <AuthorizeView Roles="Champions.Admin">
@@ -47,7 +47,7 @@ else
     </div>
 
     <section id="comments" class="mt-10 max-w-3xl border-t border-gray-200 pt-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900">@(comments.Count == 1 ? "1 Comment" : $"{comments.Count} Comments")</h2>
+        <h2 class="mb-4 section-title">@(comments.Count == 1 ? "1 Comment" : $"{comments.Count} Comments")</h2>
 
         @if (commentError is not null)
         {
@@ -78,7 +78,7 @@ else
                 {
                     <div class="py-4">
                         <div class="mb-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                            <a href="/users/@comment.User.Id" class="link">@comment.User.DisplayName</a>
+                            <a href="/users/@comment.User.Id" class="link inline-flex items-center gap-1.5"><UserFlag LogoUrl="@comment.User.LogoUrl" />@comment.User.DisplayName</a>
                             <span>·</span>
                             <time>@comment.DateCreated.ToString("MMMM d, yyyy")</time>
                             @if (currentUserId == comment.UserId || isAdmin)

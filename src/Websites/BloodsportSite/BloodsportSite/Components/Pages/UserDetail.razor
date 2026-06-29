@@ -29,7 +29,7 @@ else
         <dd class="text-gray-700">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
-    <h2 class="mb-3 text-lg font-semibold text-gray-900">Riot Accounts</h2>
+    <h2 class="mb-3 section-title">Riot Accounts</h2>
 
     @if (user.RiotAccounts.Count == 0)
     {
@@ -55,7 +55,7 @@ else
         </div>
     }
 
-    <h2 class="mb-3 mt-8 text-lg font-semibold text-gray-900">Teams</h2>
+    <h2 class="mb-3 mt-8 section-title">Teams</h2>
 
     @if (teamRows.Count == 0)
     {

@@ -90,12 +90,12 @@ else
         </div>
     }
 
-    <h2 class="mb-2 mt-8 text-lg font-semibold text-gray-900">Members</h2>
+    <h2 class="mb-2 mt-8 section-title">Members</h2>
     <p class="mb-3 text-sm text-gray-500">Teams are limited to 7 members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of players on this roster.</p>
 
     <TeamMembersTable Memberships="@team.TeamMemberships" />
 
-    <h2 class="mb-3 mt-8 text-lg font-semibold text-gray-900">Matchups</h2>
+    <h2 class="mb-3 mt-8 section-title">Matchups</h2>
 
     @if (matchups.Count == 0)
     {
@@ -125,7 +125,7 @@ else
         </div>
     }
 
-    <h2 class="mb-3 mt-8 text-lg font-semibold text-gray-900">Seasons</h2>
+    <h2 class="mb-3 mt-8 section-title">Seasons</h2>
 
     @if (team.SeasonRegistrations.Count == 0)
     {
@@ -189,7 +189,7 @@ else
         </div>
     }
 
-    <h2 class="mb-3 mt-8 text-lg font-semibold text-gray-900">Playoffs</h2>
+    <h2 class="mb-3 mt-8 section-title">Playoffs</h2>
 
     @if (playoffEntries.Count == 0)
     {

@@ -34,7 +34,7 @@ else
                 <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                     <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
                     <span>·</span>
-                    <a href="/users/@post.User.Id" class="link">@post.User.DisplayName</a>
+                    <a href="/users/@post.User.Id" class="link inline-flex items-center gap-1.5"><UserFlag LogoUrl="@post.User.LogoUrl" />@post.User.DisplayName</a>
                     <span>·</span>
                     <a href="/news/@post.Id#comments" class="link">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
                 </div>

@@ -1,7 +1,7 @@
 @using Bloodsport.Entity.Database
 
 <div class="mb-4">
-    <h2 class="mb-3 text-lg font-semibold text-gray-900">Riot Accounts</h2>
+    <h2 class="mb-3 section-title">Riot Accounts</h2>
     <form method="post" action="/api/riot/link" class="space-y-3">
         <AntiforgeryToken />
         @if (RiotError is not null)
