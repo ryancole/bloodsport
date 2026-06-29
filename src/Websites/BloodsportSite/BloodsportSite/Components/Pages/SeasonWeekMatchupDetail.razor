@@ -28,6 +28,23 @@ else
     <p class="mt-1 text-gray-600">@matchup.SeasonWeek.Name &mdash; @matchup.SeasonWeek.Season.Name</p>
     <p class="mb-6 text-sm text-gray-400">@matchup.SeasonWeek.DateStart.ToLocalTime().ToString("MMMM d, yyyy") – @matchup.SeasonWeek.DateEnd.ToLocalTime().ToString("MMMM d, yyyy")</p>
 
+    @if (matchup.SeasonWeek.Season.MatchupParameters is { } mp)
+    {
+        <dl class="mb-6 grid grid-cols-[140px_1fr] sm:grid-cols-[140px_1fr_140px_1fr] gap-x-8 gap-y-2 text-sm">
+            <dt class="font-medium text-gray-500">Team Size</dt>
+            <dd class="text-gray-700">@(mp.TeamSize)v@(mp.TeamSize)</dd>
+
+            <dt class="font-medium text-gray-500">Pick Type</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.PickType)</dd>
+
+            <dt class="font-medium text-gray-500">Map</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.MapType)</dd>
+
+            <dt class="font-medium text-gray-500">Spectators</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.SpectatorType)</dd>
+        </dl>
+    }
+
     @* Tournament Lobby *@
     @if (!matchup.SeasonWeek.HasBeenEnded)
     {
@@ -105,8 +122,6 @@ else
             }
         </div>
     }
-
-    <MatchupSettingsCard Parameters="matchup.SeasonWeek.Season.MatchupParameters" CssClass="mb-6" />
 
     @* Forfeit *@
     @if (isManager && result is null && !matchup.SeasonWeek.HasBeenEnded)

@@ -63,6 +63,8 @@ else
         <dd class="text-gray-700">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
+    <MatchupSettingsCard Parameters="playoff.Season.MatchupParameters" CssClass="mb-6 max-w-md" />
+
     @if (grandFinalWinner is not null)
     {
         <div role="alert" class="alert alert-success mb-6 flex items-center gap-2">
@@ -131,6 +133,7 @@ else
 
         playoff = await db.Playoffs
             .Include(p => p.Season)
+                .ThenInclude(s => s.MatchupParameters)
             .Include(p => p.PlayoffTeams)
                 .ThenInclude(pt => pt.Team)
             .Include(p => p.PlayoffRounds)

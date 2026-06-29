@@ -55,7 +55,7 @@ else
         </AuthorizeView>
     </div>
 
-    <dl class="mb-6 grid grid-cols-[140px_1fr] gap-y-2 text-sm">
+    <dl class="mb-6 grid grid-cols-[140px_1fr] sm:grid-cols-[140px_1fr_140px_1fr] gap-x-8 gap-y-2 text-sm">
         <dt class="font-medium text-gray-500">Status</dt>
         <dd><SeasonStatusBadge Status="season.Status" /></dd>
 
@@ -71,6 +71,21 @@ else
         <dt class="font-medium text-gray-500">Region</dt>
         <dd class="text-gray-700">@season.RiotRegion</dd>
 
+        @if (season.MatchupParameters is { } mp)
+        {
+            <dt class="font-medium text-gray-500">Team Size</dt>
+            <dd class="text-gray-700">@(mp.TeamSize)v@(mp.TeamSize)</dd>
+
+            <dt class="font-medium text-gray-500">Pick Type</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.PickType)</dd>
+
+            <dt class="font-medium text-gray-500">Map</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.MapType)</dd>
+
+            <dt class="font-medium text-gray-500">Spectators</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.SpectatorType)</dd>
+        }
+
         <dt class="font-medium text-gray-500">Estimated Start</dt>
         <dd class="text-gray-700">@(season.EstimatedDateStart?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
 
@@ -83,8 +98,6 @@ else
             <dd><a href="/playoffs/@season.Playoff.Id" class="link">@season.Playoff.Name</a></dd>
         }
     </dl>
-
-    <MatchupSettingsCard Parameters="season.MatchupParameters" CssClass="mb-6 max-w-md" />
 
     @if (season.Status == SeasonStatus.PreSeason)
     {
