@@ -54,12 +54,7 @@ else
         <dd><PlayoffStatusBadge Status="playoff.Status" /></dd>
 
         <dt class="font-medium text-gray-500">Region</dt>
-        <dd class="text-gray-700">
-            <span class="inline-flex items-center gap-1.5">
-                <RegionFlag Region="@playoff.RiotRegion" Class="h-4 w-6" />
-                @playoff.RiotRegion
-            </span>
-        </dd>
+        <dd class="text-gray-700">@playoff.RiotRegion</dd>
 
         <dt class="font-medium text-gray-500">Teams</dt>
         <dd class="text-gray-700">@playoff.PlayoffTeams.Count</dd>

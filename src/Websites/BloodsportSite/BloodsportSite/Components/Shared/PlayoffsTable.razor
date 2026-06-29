@@ -16,12 +16,7 @@ else
                 {
                     <tr>
                         <td><a href="/playoffs/@playoff.Id" class="link">@playoff.Name</a></td>
-                        <td>
-                            <span class="inline-flex items-center gap-1.5">
-                                <RegionFlag Region="@playoff.RiotRegion" Class="h-4 w-6" />
-                                @playoff.RiotRegion
-                            </span>
-                        </td>
+                        <td>@playoff.RiotRegion</td>
                         <td><a href="/seasons/@playoff.SeasonId" class="link">@playoff.Season.Name</a></td>
                         <td><PlayoffStatusBadge Status="playoff.Status" /></td>
                         <td>@playoff.PlayoffTeams.Count</td>
