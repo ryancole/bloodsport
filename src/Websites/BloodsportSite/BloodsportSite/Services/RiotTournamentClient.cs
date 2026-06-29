@@ -34,7 +34,6 @@ namespace BloodsportSite.Services
             var pickType = parameters?.PickType ?? "TOURNAMENT_DRAFT";
             var mapType = parameters?.MapType ?? "SUMMONERS_RIFT";
             var spectatorType = parameters?.SpectatorType ?? "ALL";
-            var enoughPlayers = parameters?.EnoughPlayers ?? false;
 
             string[] codes;
 
@@ -47,7 +46,7 @@ namespace BloodsportSite.Services
                         PickType = pickType,
                         MapType = mapType,
                         SpectatorType = spectatorType,
-                        EnoughPlayers = enoughPlayers,
+                        EnoughPlayers = false,
                         Metadata = metadata,
                         AllowedParticipants = normalizedParticipants,
                     },
@@ -62,7 +61,7 @@ namespace BloodsportSite.Services
                         PickType = pickType,
                         MapType = mapType,
                         SpectatorType = spectatorType,
-                        EnoughPlayers = enoughPlayers,
+                        EnoughPlayers = false,
                         Metadata = metadata,
                         AllowedParticipants = normalizedParticipants,
                     },

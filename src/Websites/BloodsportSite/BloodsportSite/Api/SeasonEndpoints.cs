@@ -98,7 +98,6 @@ namespace BloodsportSite.Api
                 PickType = NormalizePickType(form.PickType),
                 MapType = NormalizeMapType(form.MapType),
                 SpectatorType = NormalizeSpectatorType(form.SpectatorType),
-                EnoughPlayers = form.EnoughPlayers ?? false,
             });
             await db.SaveChangesAsync();
 
@@ -142,7 +141,6 @@ namespace BloodsportSite.Api
             parameters.PickType = NormalizePickType(form.PickType);
             parameters.MapType = NormalizeMapType(form.MapType);
             parameters.SpectatorType = NormalizeSpectatorType(form.SpectatorType);
-            parameters.EnoughPlayers = form.EnoughPlayers ?? false;
 
             await db.SaveChangesAsync();
 

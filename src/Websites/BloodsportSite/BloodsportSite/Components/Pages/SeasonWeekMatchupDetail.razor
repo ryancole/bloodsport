@@ -106,6 +106,8 @@ else
         </div>
     }
 
+    <MatchupSettingsCard Parameters="matchup.SeasonWeek.Season.MatchupParameters" CssClass="mb-6" />
+
     @* Forfeit *@
     @if (isManager && result is null && !matchup.SeasonWeek.HasBeenEnded)
     {
@@ -234,6 +236,7 @@ else
             .Include(m => m.TeamTwo)
             .Include(m => m.SeasonWeek)
                 .ThenInclude(w => w.Season)
+                    .ThenInclude(s => s.MatchupParameters)
             .FirstOrDefaultAsync(m => m.Id == MatchupId && m.SeasonWeekId == WeekId);
 
         result = await db.SeasonWeekMatchupResults

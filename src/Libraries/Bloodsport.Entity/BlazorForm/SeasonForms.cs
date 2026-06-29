@@ -17,8 +17,6 @@ namespace Bloodsport.Entity.BlazorForm
         public string? MapType { get; set; }
 
         public string? SpectatorType { get; set; }
-
-        public bool? EnoughPlayers { get; set; }
     }
 
     public class SeasonEditForm
@@ -38,8 +36,6 @@ namespace Bloodsport.Entity.BlazorForm
         public string? MapType { get; set; }
 
         public string? SpectatorType { get; set; }
-
-        public bool? EnoughPlayers { get; set; }
     }
 
     public class SeasonRegistrationForm

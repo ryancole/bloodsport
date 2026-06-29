@@ -84,6 +84,8 @@ else
         }
     </dl>
 
+    <MatchupSettingsCard Parameters="season.MatchupParameters" CssClass="mb-6 max-w-md" />
+
     @if (season.Status == SeasonStatus.PreSeason)
     {
         <div role="alert" class="alert alert-warning mb-6">
@@ -189,6 +191,7 @@ else
         season = await db.Seasons
             .Include(s => s.SeasonWeeks)
             .Include(s => s.Playoff)
+            .Include(s => s.MatchupParameters)
             .Include(s => s.SeasonRegistrations)
                 .ThenInclude(r => r.Team)
                     .ThenInclude(t => t.Manager)

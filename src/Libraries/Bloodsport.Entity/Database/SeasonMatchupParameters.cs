@@ -29,8 +29,6 @@ namespace Bloodsport.Entity.Database
 
         public string SpectatorType { get; set; } = "ALL";
 
-        public bool EnoughPlayers { get; set; }
-
         public DateTime DateCreated { get; set; }
 
         #endregion
