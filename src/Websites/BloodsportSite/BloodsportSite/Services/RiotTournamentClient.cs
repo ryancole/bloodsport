@@ -1,3 +1,4 @@
+using Bloodsport.Entity.Database;
 using Bloodsport.Entity.RiotApi;
 using Camille.Enums;
 using Camille.RiotGames;
@@ -20,10 +21,20 @@ namespace BloodsportSite.Services
         private RegionalRoute Route =>
             Enum.Parse<RegionalRoute>(_config["RiotApi:RegionalRoute"] ?? "AMERICAS", ignoreCase: true);
 
-        public async Task<string> CreateTournamentCodeAsync(long tournamentId, string[]? allowedParticipants = null, int teamSize = 5)
+        public async Task<string> CreateTournamentCodeAsync(
+            long tournamentId,
+            SeasonMatchupParameters? parameters = null,
+            string[]? allowedParticipants = null)
         {
             // Riot PUUIDs must be lowercase — normalize in case seeded/stored data is uppercase
             var normalizedParticipants = allowedParticipants?.Select(p => p.ToLowerInvariant()).ToArray();
+
+            var teamSize = parameters?.TeamSize ?? 5;
+            var pickType = parameters?.PickType ?? "TOURNAMENT_DRAFT";
+            var mapType = parameters?.MapType ?? "SUMMONERS_RIFT";
+            var spectatorType = parameters?.SpectatorType ?? "ALL";
+            var enoughPlayers = parameters?.EnoughPlayers ?? false;
+            var metadata = parameters?.Metadata;
 
             string[] codes;
 
@@ -33,10 +44,11 @@ namespace BloodsportSite.Services
                     new StubNs.TournamentCodeParametersV5
                     {
                         TeamSize = teamSize,
-                        PickType = "TOURNAMENT_DRAFT",
-                        MapType = "SUMMONERS_RIFT",
-                        SpectatorType = "ALL",
-                        EnoughPlayers = false,
+                        PickType = pickType,
+                        MapType = mapType,
+                        SpectatorType = spectatorType,
+                        EnoughPlayers = enoughPlayers,
+                        Metadata = metadata,
                         AllowedParticipants = normalizedParticipants,
                     },
                     tournamentId, count: 1);
@@ -47,10 +59,11 @@ namespace BloodsportSite.Services
                     new TournNs.TournamentCodeParametersV5
                     {
                         TeamSize = teamSize,
-                        PickType = "TOURNAMENT_DRAFT",
-                        MapType = "SUMMONERS_RIFT",
-                        SpectatorType = "ALL",
-                        EnoughPlayers = false,
+                        PickType = pickType,
+                        MapType = mapType,
+                        SpectatorType = spectatorType,
+                        EnoughPlayers = enoughPlayers,
+                        Metadata = metadata,
                         AllowedParticipants = normalizedParticipants,
                     },
                     tournamentId, count: 1);

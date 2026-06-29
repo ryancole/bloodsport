@@ -46,6 +46,7 @@ namespace BloodsportSite.Api
                 .Include(m => m.TeamTwo)
                 .Include(m => m.SeasonWeek)
                     .ThenInclude(w => w.Season)
+                        .ThenInclude(s => s.MatchupParameters)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (matchup is null)
@@ -85,6 +86,7 @@ namespace BloodsportSite.Api
             {
                 matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(
                     season.RiotTournamentId.Value,
+                    parameters: season.MatchupParameters,
                     allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null);
                 await db.SaveChangesAsync();
             }

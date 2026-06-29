@@ -101,6 +101,7 @@ namespace BloodsportSite.Api
                 .Include(m => m.TeamOne).ThenInclude(pt => pt!.Team)
                 .Include(m => m.TeamTwo).ThenInclude(pt => pt!.Team)
                 .Include(m => m.PlayoffRound).ThenInclude(r => r.Playoff)
+                    .ThenInclude(p => p.Season).ThenInclude(s => s.MatchupParameters)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (matchup is null)
@@ -145,6 +146,7 @@ namespace BloodsportSite.Api
             {
                 matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(
                     playoff.RiotTournamentId.Value,
+                    parameters: playoff.Season.MatchupParameters,
                     allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null);
                 await db.SaveChangesAsync();
             }
