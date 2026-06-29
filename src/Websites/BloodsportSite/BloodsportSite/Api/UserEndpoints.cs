@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.BlazorForm;
 using BloodsportSite.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -84,9 +85,9 @@ namespace BloodsportSite.Api
         private static async Task<IResult> UpdateDisplayNameAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] string displayName)
+            [Microsoft.AspNetCore.Mvc.FromForm] UpdateDisplayNameForm form)
         {
-            displayName = displayName.Trim();
+            var displayName = form.DisplayName.Trim();
 
             if (string.IsNullOrEmpty(displayName))
                 return Results.Redirect("/profile?display_name_error=invalid");

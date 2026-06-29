@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.BlazorForm;
 using Camille.Enums;
 using Camille.RiotGames;
 using Microsoft.EntityFrameworkCore;
@@ -24,11 +25,10 @@ namespace BloodsportSite.Api
             IConfiguration config,
             RiotGamesApi riotApi,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] string gameName,
-            [Microsoft.AspNetCore.Mvc.FromForm] string tagLine)
+            [Microsoft.AspNetCore.Mvc.FromForm] RiotLinkForm form)
         {
-            gameName = gameName.Trim();
-            tagLine = tagLine.Trim().TrimStart('#');
+            var gameName = form.GameName.Trim();
+            var tagLine = form.TagLine.Trim().TrimStart('#');
 
             if (string.IsNullOrEmpty(gameName) || string.IsNullOrEmpty(tagLine))
                 return Results.Redirect("/profile?riot_error=invalid_input");
@@ -87,8 +87,10 @@ namespace BloodsportSite.Api
         private static async Task<IResult> UnlinkAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] long riotAccountId)
+            [Microsoft.AspNetCore.Mvc.FromForm] RiotUnlinkForm form)
         {
+            var riotAccountId = form.RiotAccountId;
+
             var oid = context.User.FindFirst("oid")?.Value
                    ?? context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
 
