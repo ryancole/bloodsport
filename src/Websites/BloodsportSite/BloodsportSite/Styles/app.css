@@ -10,6 +10,9 @@
 @layer components {
     .page-wrap   { @apply mx-auto max-w-6xl px-6 py-6; }
     .page-title  { @apply text-2xl font-bold text-gray-900; }
+    /* h1 is focused on navigation via <FocusOnNavigate> (accessibility);
+       it's tabindex=-1 and not keyboard-reachable, so hide the focus ring. */
+    .page-title:focus { @apply outline-none; }
     /* Sky underline accent beneath every page heading. */
     .page-title::after {
         @apply mt-1.5 block h-[3px] w-10 rounded-full bg-sky-500;
