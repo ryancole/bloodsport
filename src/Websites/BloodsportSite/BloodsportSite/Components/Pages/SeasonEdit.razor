@@ -2,6 +2,7 @@
 @attribute [Authorize(Roles = "Champions.Admin")]
 @using Bloodsport.Data.Sql
 @using Bloodsport.Entity.Database
+@using Camille.Enums
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
@@ -34,6 +35,22 @@ else
                     else
                     {
                         <option value="@((int)value)">@value</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <label class="label">Riot Region</label>
+            <select name="riotRegion" class="input">
+                @foreach (var value in Enum.GetValues<TournamentRegion>())
+                {
+                    if (value.ToString() == season.RiotRegion)
+                    {
+                        <option value="@value" selected>@value</option>
+                    }
+                    else
+                    {
+                        <option value="@value">@value</option>
                     }
                 }
             </select>

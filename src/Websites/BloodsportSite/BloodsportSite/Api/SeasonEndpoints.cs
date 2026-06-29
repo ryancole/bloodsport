@@ -102,6 +102,7 @@ namespace BloodsportSite.Api
             IDbContextFactory<SqlDbContext> dbFactory,
             long id,
             [Microsoft.AspNetCore.Mvc.FromForm] SeasonStatus status,
+            [Microsoft.AspNetCore.Mvc.FromForm] TournamentRegion riotRegion,
             [Microsoft.AspNetCore.Mvc.FromForm] bool? registrationOpen = null,
             [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
         {
@@ -115,6 +116,7 @@ namespace BloodsportSite.Api
                 return Results.Redirect("/seasons?error=season_not_found");
 
             season.Status = status;
+            season.RiotRegion = riotRegion.ToString();
             season.RegistrationOpen = registrationOpen ?? false;
             season.EstimatedDateStart = DateTime.TryParse(startDate, out var d) ? d : null;
 
