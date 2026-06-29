@@ -1,1 +1,58 @@
-<p class="py-8 text-center text-gray-500"><em>Loading…</em></p>
+@* 8-bit CAL badge that flips frame-by-frame like a coin. Pure SVG + CSS
+   (no JS) so it renders under both static SSR and interactive WASM. *@
+
+<div class="flex flex-col items-center justify-center gap-3 py-8" role="status" aria-live="polite">
+    <svg width="48" height="48" viewBox="0 0 32 32" style="shape-rendering:crispEdges;image-rendering:pixelated;border-radius:6px;overflow:hidden" aria-hidden="true">
+        <g class="cal-loader-flip">
+            <rect width="32" height="32" fill="#111827" />
+            <g fill="#ffffff">
+                @* C *@
+                <rect x="6" y="10" width="2" height="2" /><rect x="8" y="10" width="2" height="2" /><rect x="10" y="10" width="2" height="2" />
+                <rect x="6" y="12" width="2" height="2" />
+                <rect x="6" y="14" width="2" height="2" />
+                <rect x="6" y="16" width="2" height="2" />
+                <rect x="6" y="18" width="2" height="2" /><rect x="8" y="18" width="2" height="2" /><rect x="10" y="18" width="2" height="2" />
+                @* A *@
+                <rect x="14" y="10" width="2" height="2" /><rect x="16" y="10" width="2" height="2" /><rect x="18" y="10" width="2" height="2" />
+                <rect x="14" y="12" width="2" height="2" /><rect x="18" y="12" width="2" height="2" />
+                <rect x="14" y="14" width="2" height="2" /><rect x="16" y="14" width="2" height="2" /><rect x="18" y="14" width="2" height="2" />
+                <rect x="14" y="16" width="2" height="2" /><rect x="18" y="16" width="2" height="2" />
+                <rect x="14" y="18" width="2" height="2" /><rect x="18" y="18" width="2" height="2" />
+                @* L *@
+                <rect x="22" y="10" width="2" height="2" />
+                <rect x="22" y="12" width="2" height="2" />
+                <rect x="22" y="14" width="2" height="2" />
+                <rect x="22" y="16" width="2" height="2" />
+                <rect x="22" y="18" width="2" height="2" /><rect x="24" y="18" width="2" height="2" /><rect x="26" y="18" width="2" height="2" />
+            </g>
+            <g fill="#0ea5e9">
+                <rect x="6" y="22" width="22" height="2" />
+                <rect x="8" y="24" width="18" height="2" />
+            </g>
+        </g>
+    </svg>
+    <span class="text-sm text-gray-500">Loading…</span>
+</div>
+
+<style>
+    .cal-loader-flip {
+        transform-box: fill-box;
+        transform-origin: 50% 50%;
+        animation: cal-loader-flip 1s steps(1, end) infinite;
+    }
+
+    @@keyframes cal-loader-flip {
+        0%   { transform: scaleX(1); }
+        20%  { transform: scaleX(0.45); }
+        40%  { transform: scaleX(0.12); }
+        55%  { transform: scaleX(-0.45); }
+        70%  { transform: scaleX(-1); }
+        85%  { transform: scaleX(-0.45); }
+        92%  { transform: scaleX(0.45); }
+        100% { transform: scaleX(1); }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .cal-loader-flip { animation: none; }
+    }
+</style>
