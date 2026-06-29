@@ -36,6 +36,9 @@ namespace Bloodsport.Entity.Database
         public virtual Playoff Playoff { get; set; }
 
         [JsonIgnore]
+        public virtual SeasonMatchupParameters MatchupParameters { get; set; }
+
+        [JsonIgnore]
         public virtual ICollection<SeasonWeek> SeasonWeeks { get; set; } = [];
 
         [JsonIgnore]
