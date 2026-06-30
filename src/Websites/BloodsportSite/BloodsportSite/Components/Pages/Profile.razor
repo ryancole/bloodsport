@@ -34,7 +34,7 @@ else
 {
     @if (pendingInvites.Count > 0)
     {
-        <div class="card mb-6">
+        <div class="mb-8">
             <h2 class="mb-3 section-title">Team Invites</h2>
             @if (inviteAccepted)
             {
@@ -105,13 +105,11 @@ else
         <dd class="text-gray-700">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
-    <div class="card mb-6">
+    <div class="mb-8">
         <ProfileRiotAccountsTable Accounts="user.RiotAccounts" RiotError="@riotError" />
     </div>
 
-    <div class="card">
-        <ProfileTeamsTable TeamRows="teamRows" />
-    </div>
+    <ProfileTeamsTable TeamRows="teamRows" />
 }
 
 @code {
