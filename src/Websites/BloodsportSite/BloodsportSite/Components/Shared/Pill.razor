@@ -1,7 +1,7 @@
 @* Global pill/badge. Color drives the palette; an optional icon renders as a glyph,
    in a filled circle by default (the dashboard status-pill style) or bare when
    IconCircle is false. See PillColor.cs and StatusIcons.cs. *@
-<span class="badge @(HasIcon ? "gap-1.5" : null) @ColorClass @Class" title="@Title">
+<span class="badge @(HasIcon ? "sm:gap-1.5" : null) @ColorClass @Class" title="@(Title ?? Text)">
     @if (HasIcon)
     {
         if (IconCircle)
@@ -15,14 +15,17 @@
             <Icon Path="@IconPath" />
         }
     }
-    @if (ChildContent is not null)
-    {
-        @ChildContent
-    }
-    else
-    {
-        @Text
-    }
+    @* With an icon, hide the label on small screens so the pill collapses to an icon-only badge. *@
+    <span class="@(HasIcon ? "hidden sm:inline" : null)">
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @Text
+        }
+    </span>
 </span>
 
 @code {

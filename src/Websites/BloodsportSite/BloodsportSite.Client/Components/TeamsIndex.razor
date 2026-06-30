@@ -41,8 +41,8 @@ else
                     @foreach (var team in result.Items)
                     {
                         <tr>
-                            <td><a href="/teams/@team.Id" class="link inline-flex items-center gap-2"><TeamFlag FlagUrl="@team.FlagUrl" />@team.Name</a></td>
-                            <td><a href="/users/@team.ManagerId" class="link inline-flex items-center gap-2"><TeamFlag FlagUrl="@team.ManagerFlagUrl" />@team.ManagerName</a></td>
+                            <td><a href="/teams/@team.Id" class="link inline-flex max-w-full items-center gap-2"><TeamFlag FlagUrl="@team.FlagUrl" /><span class="truncate">@team.Name</span></a></td>
+                            <td><a href="/users/@team.ManagerId" class="link inline-flex max-w-full items-center gap-2"><TeamFlag FlagUrl="@team.ManagerFlagUrl" /><span class="truncate">@team.ManagerName</span></a></td>
                             <td>@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                         </tr>
                     }

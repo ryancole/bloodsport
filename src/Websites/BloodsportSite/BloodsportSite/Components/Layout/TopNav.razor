@@ -3,37 +3,51 @@
 @inject IDbContextFactory<SqlDbContext> DbFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<header class="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6">
-    <a href="" class="flex items-center gap-2 text-base font-bold text-white no-underline hover:text-sky-400">
-        <img src="cal-logo.svg" alt="CAL" class="h-8 w-8" />
-        Champions Amateur League
-    </a>
+<header class="sticky top-0 z-40 border-b border-gray-800 bg-gray-900">
+    <div class="relative flex h-14 items-center gap-3 px-6">
+        <a href="" class="flex shrink-0 items-center gap-2 text-base font-bold whitespace-nowrap text-white no-underline hover:text-sky-400">
+            <img src="cal-logo.svg" alt="CAL" class="h-8 w-8" />
+            Champions Amateur League
+        </a>
 
-    <span class="mx-1 h-5 w-px bg-white/10"></span>
+        @* Pure-CSS toggle: the label flips this checkbox, and `peer-checked` reveals the menu (this is static SSR, no Blazor interactivity). *@
+        <input type="checkbox" id="nav-toggle" class="peer sr-only" />
 
-    <nav class="flex items-center gap-1">
-        <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="news">News</NavLink>
-        <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="format">Format</NavLink>
-        <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="rules">Rules</NavLink>
-        <span class="mx-1 h-5 w-px bg-white/10"></span>
-        <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="teams">Teams</NavLink>
-        <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="users">Users</NavLink>
-        <span class="mx-1 h-5 w-px bg-white/10"></span>
-        <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="seasons">Seasons</NavLink>
-        <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="playoffs">Playoffs</NavLink>
-    </nav>
+        <div class="absolute inset-x-0 top-full hidden flex-col gap-1 border-b border-gray-800 bg-gray-900 p-4 peer-checked:flex lg:static lg:flex lg:flex-1 lg:flex-row lg:items-center lg:gap-3 lg:border-0 lg:bg-transparent lg:p-0"
+             onclick="document.getElementById('nav-toggle').checked = false">
+            <span class="hidden h-5 w-px bg-white/10 lg:mx-1 lg:inline-block"></span>
 
-    <div class="ml-auto flex items-center">
-        <AuthorizeView>
-            <Authorized>
-                <a href="/profile" class="flex items-center gap-2 text-sm text-gray-300 no-underline hover:text-white">
-                    <UserFlag LogoUrl="@logoUrl" OnDark="true" />@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)
-                </a>
-            </Authorized>
-            <NotAuthorized>
-                <a href="/auth/login" class="text-sm text-gray-300 no-underline hover:text-white">Log in</a>
-            </NotAuthorized>
-        </AuthorizeView>
+            <nav class="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-1">
+                <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="news">News</NavLink>
+                <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="format">Format</NavLink>
+                <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="rules">Rules</NavLink>
+                <span class="hidden h-5 w-px bg-white/10 lg:mx-1 lg:inline-block"></span>
+                <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="teams">Teams</NavLink>
+                <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="users">Users</NavLink>
+                <span class="hidden h-5 w-px bg-white/10 lg:mx-1 lg:inline-block"></span>
+                <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="seasons">Seasons</NavLink>
+                <NavLink class="@LinkClass" ActiveClass="@LinkActiveClass" href="playoffs">Playoffs</NavLink>
+            </nav>
+
+            <div class="mt-2 flex items-center border-t border-gray-800 pt-3 lg:mt-0 lg:ml-auto lg:border-0 lg:pt-0">
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/profile" class="flex items-center gap-2 text-sm text-gray-300 no-underline hover:text-white">
+                            <UserFlag LogoUrl="@logoUrl" OnDark="true" />@(displayName ?? context.User.FindFirst("preferred_username")?.Value ?? context.User.Identity?.Name)
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/auth/login" class="text-sm text-gray-300 no-underline hover:text-white">Log in</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+
+        <label for="nav-toggle" class="ml-auto inline-flex cursor-pointer items-center justify-center rounded p-2 text-gray-300 hover:bg-white/10 hover:text-white lg:hidden" aria-label="Toggle navigation menu">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </label>
     </div>
 </header>
 

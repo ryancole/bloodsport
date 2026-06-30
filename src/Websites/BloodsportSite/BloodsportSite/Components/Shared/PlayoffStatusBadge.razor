@@ -1,6 +1,6 @@
 @using Bloodsport.Entity.Database
 
-<Pill Color="@BadgeColor" IconPath="@StatusIcon">@Status</Pill>
+<Pill Color="@BadgeColor" IconPath="@StatusIcon" Title="@Status.ToString()">@Status</Pill>
 
 @code {
     [Parameter, EditorRequired] public PlayoffStatus Status { get; set; }
