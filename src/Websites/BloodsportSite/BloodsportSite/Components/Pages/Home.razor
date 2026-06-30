@@ -16,16 +16,16 @@ else
 {
     <div class="space-y-6">
         <!-- stat row -->
-        <div class="flex flex-row justify-center gap-4">
-            <div class="w-44 rounded-xl bg-sky-50 p-5 text-center sm:w-44">
+        <div class="grid grid-cols-3 gap-3 sm:flex sm:flex-row sm:justify-center sm:gap-4">
+            <div class="rounded-xl bg-sky-50 p-3 text-center sm:w-44 sm:p-5">
                 <span class="block text-3xl font-bold text-sky-900">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
                 <span class="text-sm font-medium text-sky-700">Active seasons</span>
             </div>
-            <div class="w-44 rounded-xl bg-amber-50 p-5 text-center sm:w-44">
+            <div class="rounded-xl bg-amber-50 p-3 text-center sm:w-44 sm:p-5">
                 <span class="block text-3xl font-bold text-amber-900">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
                 <span class="text-sm font-medium text-amber-700">Active playoffs</span>
             </div>
-            <div class="w-44 rounded-xl bg-emerald-50 p-5 text-center sm:w-44">
+            <div class="rounded-xl bg-emerald-50 p-3 text-center sm:w-44 sm:p-5">
                 <span class="block text-3xl font-bold text-emerald-900">@resultsThisWeek</span>
                 <span class="text-sm font-medium text-emerald-700">Results this week</span>
             </div>
@@ -78,31 +78,36 @@ else
                 <div class="divide-y divide-gray-100">
                     @foreach (var item in activityFeed)
                     {
-                        <div class="flex flex-wrap items-center gap-3 py-2 text-sm">
-                            <Pill Color="@(item.IsPlayoff ? PillColor.Amber : PillColor.Sky)" IconPath="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)">@(item.IsPlayoff ? "Playoff" : "Regular")</Pill>
-                            <div class="min-w-0">
-                                @if (item.WinnerName is not null)
+                        @* Mobile: pill (icon-only) + matchup name on the left, time-ago pushed right; winner and context hidden until sm. *@
+                        <div class="flex items-center gap-3 py-2 text-sm sm:flex-wrap">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <Pill Color="@(item.IsPlayoff ? PillColor.Amber : PillColor.Sky)" IconPath="@(item.IsPlayoff ? PlayoffIcon : RegularIcon)">@(item.IsPlayoff ? "Playoff" : "Regular")</Pill>
+                                <div class="hidden min-w-0 sm:block">
+                                    @if (item.WinnerName is not null)
+                                    {
+                                        <a href="@item.WinnerUrl" class="inline-flex items-center gap-2 font-medium text-gray-900 no-underline hover:text-sky-600">
+                                            <TeamFlag LogoUrl="@item.WinnerLogoUrl" />
+                                            @item.WinnerName
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-400">—</span>
+                                    }
+                                </div>
+                            </div>
+                            <a href="@item.MatchupUrl" class="font-medium whitespace-nowrap text-gray-900 no-underline hover:text-sky-600">@item.MatchupName</a>
+                            <div class="ml-auto flex items-center gap-3 text-gray-500">
+                                @if (item.ContextUrl is not null)
                                 {
-                                    <a href="@item.WinnerUrl" class="inline-flex items-center gap-2 font-medium text-gray-900 no-underline hover:text-sky-600">
-                                        <TeamFlag LogoUrl="@item.WinnerLogoUrl" />
-                                        @item.WinnerName
-                                    </a>
+                                    <a href="@item.ContextUrl" class="hidden text-gray-500 no-underline hover:text-sky-600 sm:inline">@item.Context</a>
                                 }
                                 else
                                 {
-                                    <span class="text-gray-400">—</span>
+                                    <span class="hidden sm:inline">@item.Context</span>
                                 }
+                                <span class="text-xs text-gray-400" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
                             </div>
-                            <a href="@item.MatchupUrl" class="font-medium text-gray-900 no-underline hover:text-sky-600">@item.MatchupName</a>
-                            @if (item.ContextUrl is not null)
-                            {
-                                <a href="@item.ContextUrl" class="ml-auto text-gray-500 no-underline hover:text-sky-600">@item.Context</a>
-                            }
-                            else
-                            {
-                                <span class="ml-auto text-gray-500">@item.Context</span>
-                            }
-                            <span class="text-xs text-gray-400" title="@item.Date.ToLocalTime().ToString("MMM d, yyyy h:mm tt")">@item.TimeAgo</span>
                         </div>
                     }
                 </div>
