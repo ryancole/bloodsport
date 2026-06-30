@@ -1,5 +1,6 @@
 @page "/seasons/create"
 @attribute [Authorize(Roles = "Champions.Admin")]
+@using Bloodsport.Entity.Database
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.WebUtilities
 @inject NavigationManager NavigationManager
@@ -31,6 +32,44 @@
     <div>
         <label class="label">Estimated Start Date <span class="font-normal text-gray-400">(optional)</span></label>
         <input type="date" name="startDate" class="input" />
+    </div>
+
+    <h2 class="text-lg font-semibold pt-2">Matchup Settings</h2>
+    <div>
+        <label class="label">Team Size</label>
+        <select name="teamSize" class="input">
+            @for (int i = 1; i <= 5; i++)
+            {
+                <option value="@i" selected="@(i == 5)">@i</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label class="label">Pick Type</label>
+        <select name="pickType" class="input">
+            @foreach (var value in SeasonMatchupParameters.PickTypes)
+            {
+                <option value="@value" selected="@(value == "TOURNAMENT_DRAFT")">@value</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label class="label">Map Type</label>
+        <select name="mapType" class="input">
+            @foreach (var value in SeasonMatchupParameters.MapTypes)
+            {
+                <option value="@value" selected="@(value == "SUMMONERS_RIFT")">@value</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label class="label">Spectator Type</label>
+        <select name="spectatorType" class="input">
+            @foreach (var value in SeasonMatchupParameters.SpectatorTypes)
+            {
+                <option value="@value" selected="@(value == "ALL")">@value</option>
+            }
+        </select>
     </div>
     <div class="flex items-center gap-3">
         <button type="submit" class="btn btn-primary">Create</button>

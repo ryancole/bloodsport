@@ -1,6 +1,7 @@
 using Azure.Communication.Email;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.BlazorForm;
 using Bloodsport.Common.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,11 +33,10 @@ namespace BloodsportSite.Api
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
             long teamId,
-            [Microsoft.AspNetCore.Mvc.FromForm] string gameName,
-            [Microsoft.AspNetCore.Mvc.FromForm] string tagLine)
+            [Microsoft.AspNetCore.Mvc.FromForm] TeamInviteForm form)
         {
-            gameName = gameName?.Trim() ?? "";
-            tagLine = tagLine?.Trim() ?? "";
+            var gameName = form.GameName.Trim();
+            var tagLine = form.TagLine.Trim();
 
             if (string.IsNullOrEmpty(gameName) || string.IsNullOrEmpty(tagLine))
                 return Results.Redirect($"/teams/{teamId}?invite_error=invalid_input");

@@ -46,6 +46,7 @@ namespace BloodsportSite.Api
                 .Include(m => m.TeamTwo)
                 .Include(m => m.SeasonWeek)
                     .ThenInclude(w => w.Season)
+                        .ThenInclude(s => s.MatchupParameters)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (matchup is null)
@@ -81,11 +82,23 @@ namespace BloodsportSite.Api
                 .Select(a => a.Puuid)
                 .ToArrayAsync();
 
+            var metadata = JsonSerializer.Serialize(new
+            {
+                matchupType = "SeasonWeekMatchup",
+                matchupId = matchup.Id,
+                seasonId = season.Id,
+                seasonWeekId = matchup.SeasonWeekId,
+                teamOneId = matchup.TeamOneId,
+                teamTwoId = matchup.TeamTwoId,
+            });
+
             try
             {
                 matchup.TournamentCode = await riotClient.CreateTournamentCodeAsync(
                     season.RiotTournamentId.Value,
-                    allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null);
+                    parameters: season.MatchupParameters,
+                    allowedParticipants: allowedPuuids.Length > 0 ? allowedPuuids : null,
+                    metadata: metadata);
                 await db.SaveChangesAsync();
             }
             catch (HttpRequestException)

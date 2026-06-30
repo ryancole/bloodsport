@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.BlazorForm;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodsportSite.Api
@@ -26,14 +27,13 @@ namespace BloodsportSite.Api
         private static async Task<IResult> CreateAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] string title,
-            [Microsoft.AspNetCore.Mvc.FromForm] string markdown)
+            [Microsoft.AspNetCore.Mvc.FromForm] PostForm form)
         {
             if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
-            title = title.Trim();
-            markdown = markdown.Trim();
+            var title = form.Title.Trim();
+            var markdown = form.Markdown.Trim();
 
             if (string.IsNullOrEmpty(title))
                 return Results.Redirect("/news/create?error=invalid_title");
@@ -68,14 +68,13 @@ namespace BloodsportSite.Api
             long id,
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] string title,
-            [Microsoft.AspNetCore.Mvc.FromForm] string markdown)
+            [Microsoft.AspNetCore.Mvc.FromForm] PostForm form)
         {
             if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
-            title = title.Trim();
-            markdown = markdown.Trim();
+            var title = form.Title.Trim();
+            var markdown = form.Markdown.Trim();
 
             if (string.IsNullOrEmpty(title))
                 return Results.Redirect($"/news/{id}/edit?error=invalid_title");
@@ -101,9 +100,9 @@ namespace BloodsportSite.Api
             long id,
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] string body)
+            [Microsoft.AspNetCore.Mvc.FromForm] CommentForm form)
         {
-            body = body.Trim();
+            var body = form.Body.Trim();
 
             if (string.IsNullOrEmpty(body))
                 return Results.Redirect($"/news/{id}?comment_error=empty");

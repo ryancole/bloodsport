@@ -1,5 +1,6 @@
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.BlazorForm;
 using BloodsportSite.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -77,9 +78,9 @@ namespace BloodsportSite.Api
         private static async Task<IResult> CreateAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] string name)
+            [Microsoft.AspNetCore.Mvc.FromForm] TeamCreateForm form)
         {
-            name = name.Trim();
+            var name = form.Name.Trim();
 
             if (string.IsNullOrEmpty(name))
                 return Results.Redirect("/teams/create?error=invalid_name");
@@ -107,10 +108,10 @@ namespace BloodsportSite.Api
             IDbContextFactory<SqlDbContext> dbFactory,
             TeamLogoService teamLogoService,
             long id,
-            [Microsoft.AspNetCore.Mvc.FromForm] string name,
+            [Microsoft.AspNetCore.Mvc.FromForm] TeamEditForm form,
             IFormFile? logo)
         {
-            name = name.Trim();
+            var name = form.Name.Trim();
 
             if (string.IsNullOrEmpty(name))
                 return Results.Redirect($"/teams/{id}/edit?error=invalid_name");

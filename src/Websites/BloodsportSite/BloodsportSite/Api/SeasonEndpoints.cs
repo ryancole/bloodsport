@@ -3,6 +3,7 @@ using Azure.Messaging.ServiceBus;
 using Bloodsport.Data.Sql;
 using Bloodsport.Entity.ServiceBus;
 using Bloodsport.Entity.Database;
+using Bloodsport.Entity.BlazorForm;
 using Camille.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,24 +64,21 @@ namespace BloodsportSite.Api
         private static async Task<IResult> CreateAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
-            [Microsoft.AspNetCore.Mvc.FromForm] string name,
-            [Microsoft.AspNetCore.Mvc.FromForm] int length = 6,
-            [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
+            [Microsoft.AspNetCore.Mvc.FromForm] SeasonCreateForm form)
         {
             if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
-            name = name.Trim();
+            var name = form.Name.Trim();
 
             if (string.IsNullOrEmpty(name))
                 return Results.Redirect("/seasons/create?error=invalid_name");
 
-            DateTime? parsedStartDate = DateTime.TryParse(startDate, out var d) ? d : null;
+            DateTime? parsedStartDate = DateTime.TryParse(form.StartDate, out var d) ? d : null;
 
             await using var db = dbFactory.CreateDbContext();
 
-            if (length < 3 || length > 8)
-                length = 6;
+            var length = form.Length is >= 3 and <= 8 ? form.Length : 6;
 
             var season = new Season
             {
@@ -93,6 +91,16 @@ namespace BloodsportSite.Api
             db.Seasons.Add(season);
             await db.SaveChangesAsync();
 
+            db.SeasonMatchupParameters.Add(new SeasonMatchupParameters
+            {
+                SeasonId = season.Id,
+                TeamSize = NormalizeTeamSize(form.TeamSize),
+                PickType = NormalizePickType(form.PickType),
+                MapType = NormalizeMapType(form.MapType),
+                SpectatorType = NormalizeSpectatorType(form.SpectatorType),
+            });
+            await db.SaveChangesAsync();
+
             return Results.Redirect("/seasons");
         }
 
@@ -101,24 +109,38 @@ namespace BloodsportSite.Api
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
             long id,
-            [Microsoft.AspNetCore.Mvc.FromForm] SeasonStatus status,
-            [Microsoft.AspNetCore.Mvc.FromForm] TournamentRegion riotRegion,
-            [Microsoft.AspNetCore.Mvc.FromForm] bool? registrationOpen = null,
-            [Microsoft.AspNetCore.Mvc.FromForm] string? startDate = null)
+            [Microsoft.AspNetCore.Mvc.FromForm] SeasonEditForm form)
         {
             if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
 
             await using var db = dbFactory.CreateDbContext();
-            var season = await db.Seasons.FirstOrDefaultAsync(s => s.Id == id);
+            var season = await db.Seasons
+                .Include(s => s.MatchupParameters)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if (season is null)
                 return Results.Redirect("/seasons?error=season_not_found");
 
-            season.Status = status;
-            season.RiotRegion = riotRegion.ToString();
-            season.RegistrationOpen = registrationOpen ?? false;
-            season.EstimatedDateStart = DateTime.TryParse(startDate, out var d) ? d : null;
+            season.Status = form.Status;
+            season.RiotRegion = Enum.TryParse<TournamentRegion>(form.RiotRegion, ignoreCase: true, out var region)
+                ? region.ToString()
+                : TournamentRegion.NA.ToString();
+            season.RegistrationOpen = form.RegistrationOpen ?? false;
+            season.EstimatedDateStart = DateTime.TryParse(form.StartDate, out var d) ? d : null;
+
+            // Upsert the matchup parameters — older seasons may predate the table.
+            var parameters = season.MatchupParameters;
+            if (parameters is null)
+            {
+                parameters = new SeasonMatchupParameters { SeasonId = season.Id };
+                db.SeasonMatchupParameters.Add(parameters);
+            }
+
+            parameters.TeamSize = NormalizeTeamSize(form.TeamSize);
+            parameters.PickType = NormalizePickType(form.PickType);
+            parameters.MapType = NormalizeMapType(form.MapType);
+            parameters.SpectatorType = NormalizeSpectatorType(form.SpectatorType);
 
             await db.SaveChangesAsync();
 
@@ -130,8 +152,10 @@ namespace BloodsportSite.Api
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
             long id,
-            [Microsoft.AspNetCore.Mvc.FromForm] long teamId)
+            [Microsoft.AspNetCore.Mvc.FromForm] SeasonRegistrationForm form)
         {
+            var teamId = form.TeamId;
+
             await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
@@ -181,8 +205,10 @@ namespace BloodsportSite.Api
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
             long id,
-            [Microsoft.AspNetCore.Mvc.FromForm] long teamId)
+            [Microsoft.AspNetCore.Mvc.FromForm] SeasonRegistrationForm form)
         {
+            var teamId = form.TeamId;
+
             await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
 
@@ -283,6 +309,20 @@ namespace BloodsportSite.Api
 
             return Results.Redirect($"/playoffs/{playoff.Id}");
         }
+
+        // Riot only accepts a fixed set of values for these — fall back to the
+        // default if the submitted value isn't recognized.
+        private static int NormalizeTeamSize(int teamSize) =>
+            teamSize is >= 1 and <= 5 ? teamSize : 5;
+
+        private static string NormalizePickType(string? value) =>
+            value is not null && SeasonMatchupParameters.PickTypes.Contains(value) ? value : "TOURNAMENT_DRAFT";
+
+        private static string NormalizeMapType(string? value) =>
+            value is not null && SeasonMatchupParameters.MapTypes.Contains(value) ? value : "SUMMONERS_RIFT";
+
+        private static string NormalizeSpectatorType(string? value) =>
+            value is not null && SeasonMatchupParameters.SpectatorTypes.Contains(value) ? value : "ALL";
 
         private static async Task<User?> GetCurrentUserAsync(HttpContext context, SqlDbContext db)
         {
