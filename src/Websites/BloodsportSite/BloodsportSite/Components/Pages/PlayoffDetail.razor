@@ -46,7 +46,7 @@ else
         </AuthorizeView>
     </div>
 
-    <dl class="mb-6 grid grid-cols-[140px_1fr] gap-y-2 text-sm">
+    <dl class="mb-6 grid grid-cols-[140px_1fr] sm:grid-cols-[140px_1fr_140px_1fr] gap-x-8 gap-y-2 text-sm">
         <dt class="font-medium text-gray-500">Season</dt>
         <dd><a href="/seasons/@playoff.SeasonId" class="link">@playoff.Season.Name</a></dd>
 
@@ -56,14 +56,27 @@ else
         <dt class="font-medium text-gray-500">Region</dt>
         <dd class="text-gray-700">@playoff.RiotRegion</dd>
 
+        @if (playoff.Season.MatchupParameters is { } mp)
+        {
+            <dt class="font-medium text-gray-500">Team Size</dt>
+            <dd class="text-gray-700">@(mp.TeamSize)v@(mp.TeamSize)</dd>
+
+            <dt class="font-medium text-gray-500">Pick Type</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.PickType)</dd>
+
+            <dt class="font-medium text-gray-500">Map</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.MapType)</dd>
+
+            <dt class="font-medium text-gray-500">Spectators</dt>
+            <dd class="text-gray-700">@MatchupParameterLabels.Humanize(mp.SpectatorType)</dd>
+        }
+
         <dt class="font-medium text-gray-500">Teams</dt>
         <dd class="text-gray-700">@playoff.PlayoffTeams.Count</dd>
 
         <dt class="font-medium text-gray-500">Created</dt>
         <dd class="text-gray-700">@playoff.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
-
-    <MatchupSettingsCard Parameters="playoff.Season.MatchupParameters" CssClass="mb-6 max-w-md" />
 
     @if (grandFinalWinner is not null)
     {

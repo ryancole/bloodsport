@@ -91,12 +91,6 @@ else
 
         <dt class="font-medium text-gray-500">Estimated End</dt>
         <dd class="text-gray-700">@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
-
-        @if (season.Playoff is not null)
-        {
-            <dt class="font-medium text-gray-500">Playoff</dt>
-            <dd><a href="/playoffs/@season.Playoff.Id" class="link">@season.Playoff.Name</a></dd>
-        }
     </dl>
 
     @if (season.Status == SeasonStatus.PreSeason)
@@ -167,6 +161,26 @@ else
                 }
             </div>
         }
+    }
+
+    @if (season.Status == SeasonStatus.Completed && season.Playoff is not null)
+    {
+        <div class="card mb-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="section-title mb-1 flex items-center gap-2">
+                        <span class="text-2xl">🏆</span> Post-Season Playoffs
+                    </h2>
+                    <p class="max-w-2xl text-gray-600">
+                        The regular season has completed. The league has advanced into the post-season
+                        playoffs, where the qualifying teams face off in a bracket to crown the champion.
+                    </p>
+                </div>
+                <a href="/playoffs/@season.Playoff.Id" class="btn btn-primary whitespace-nowrap">
+                    View @season.Playoff.Name
+                </a>
+            </div>
+        </div>
     }
 
     @if (season.Status == SeasonStatus.Active || season.Status == SeasonStatus.Completed)
