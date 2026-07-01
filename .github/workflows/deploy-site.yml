@@ -27,6 +27,19 @@ jobs:
           Invoke-WebRequest -Uri "https://github.com/tailwindlabs/tailwindcss/releases/download/$version/tailwindcss-windows-x64.exe" -OutFile tailwindcss.exe
           "$pwd" | Out-File -FilePath $env:GITHUB_PATH -Append
 
+      # Generate wwwroot/app.css before publish so it exists at project-evaluation time
+      # and gets picked up by the static web assets scan. Relying on the in-build MSBuild
+      # target alone left it out of the endpoints manifest on the runner (404 at runtime).
+      - name: Build Tailwind CSS
+        shell: pwsh
+        working-directory: src/Websites/BloodsportSite/BloodsportSite
+        run: |
+          & "$env:GITHUB_WORKSPACE/tailwindcss.exe" -i Styles/app.css -o wwwroot/app.css --minify
+          if (-not (Test-Path wwwroot/app.css) -or (Get-Item wwwroot/app.css).Length -eq 0) {
+            throw "Tailwind produced no wwwroot/app.css"
+          }
+          Write-Host "Generated app.css ($((Get-Item wwwroot/app.css).Length) bytes)"
+
       - name: Publish
         run: dotnet publish src/Websites/BloodsportSite/BloodsportSite/BloodsportSite.csproj --configuration Release --output ./publish
 
