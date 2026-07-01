@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360" role="img" aria-label="Join a team">
+  <defs>
+    
+    <clipPath id="round1"><rect x="0" y="0" width="360" height="360" rx="14"></rect></clipPath>
+    <radialGradient id="glow1" cx="0.78" cy="0.08" r="0.95">
+      <stop offset="0" stop-color="#2f9ee0" stop-opacity="0.28"></stop>
+      <stop offset="0.6" stop-color="#2f9ee0" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="soft1" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7"></feGaussianBlur>
+    </filter>
+  </defs>
+  <g clip-path="url(#round1)">
+    <rect x="0" y="0" width="360" height="360" fill="#0e1a2b"></rect>
+    <rect x="0" y="0" width="360" height="360" fill="url(#glow1)"></rect>
+    <rect x="0" y="0" width="360" height="5" fill="#2f9ee0"></rect>
+    <text x="34" y="46" font-family="&#39;Barlow&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" font-size="12" font-weight="600" letter-spacing="2.64" fill="#5f7d9c">01 · JOIN</text>
+    <circle cx="62" cy="138" r="28" fill="#1c3350" stroke="#0e1a2b" stroke-width="3"></circle>
+    <circle cx="158" cy="144" r="26" fill="#24476b" stroke="#0e1a2b" stroke-width="3"></circle>
+    <circle cx="80" cy="176" r="20" fill="#16588c" stroke="#0e1a2b" stroke-width="3"></circle>
+    <circle cx="152" cy="174" r="22" fill="#1c3350" stroke="#0e1a2b" stroke-width="3"></circle>
+    <circle cx="110" cy="128" r="32" fill="#2f9ee0" stroke="#0e1a2b" stroke-width="3"></circle>
+    <text x="34" y="248" font-family="&#39;Barlow Condensed&#39;,&#39;Oswald&#39;,&#39;Arial Narrow&#39;,&#39;Roboto Condensed&#39;,sans-serif" font-size="38" font-weight="700" fill="#ffffff">Join a team</text>
+    <text x="34" y="278" font-family="&#39;Barlow&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" font-size="15" fill="#9fb4cb">Lock in a roster with friends or</text>
+    <text x="34" y="300" font-family="&#39;Barlow&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" font-size="15" fill="#9fb4cb">find open spots on squads looking</text>
+    <text x="34" y="322" font-family="&#39;Barlow&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" font-size="15" fill="#9fb4cb">for players.</text>
+  </g>
+</svg>
