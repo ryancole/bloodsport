@@ -32,14 +32,9 @@
         <Content Remove="Styles\**" />
         <None Include="Styles\**" />
     </ItemGroup>
-    <ItemGroup>
-      <Content Update="wwwroot\app.css">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-
-    <!-- Compile Tailwind CSS before each build so wwwroot/app.css is always up to date. -->
-    <Target Name="BuildTailwindCss" BeforeTargets="Compile">
+    <!-- Compile Tailwind CSS before static web asset discovery so wwwroot/app.css exists
+         when DefineStaticWebAssets scans wwwroot and gets registered in the manifest. -->
+    <Target Name="BuildTailwindCss" BeforeTargets="ResolveProjectStaticWebAssets;Compile">
         <Exec Command="tailwindcss -i Styles/app.css -o wwwroot/app.css --minify" WorkingDirectory="$(MSBuildProjectDirectory)" />
     </Target>
 
