@@ -17,9 +17,9 @@ else
     <div class="space-y-6">
         <!-- stat row -->
         <div class="grid grid-cols-3 gap-3 sm:flex sm:flex-row sm:justify-center sm:gap-4">
-            <div class="rounded-xl bg-sky-50 p-3 text-center sm:w-44 sm:p-5">
-                <span class="block text-3xl font-bold text-sky-900">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
-                <span class="text-sm font-medium text-sky-700">Active seasons</span>
+            <div class="rounded-xl bg-brand-50 p-3 text-center sm:w-44 sm:p-5">
+                <span class="block text-3xl font-bold text-brand-900">@seasons.Count(s => s.Status == SeasonStatus.Active || s.Status == SeasonStatus.Upcoming)</span>
+                <span class="text-sm font-medium text-brand-700">Active seasons</span>
             </div>
             <div class="rounded-xl bg-amber-50 p-3 text-center sm:w-44 sm:p-5">
                 <span class="block text-3xl font-bold text-amber-900">@activePlayoffs.Count(p => p.Status == PlayoffStatus.Active)</span>
@@ -43,7 +43,7 @@ else
             <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                 <div class="mb-4 flex items-center justify-between">
                     <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Latest news</span>
-                    <a href="/news" class="text-sm text-sky-600 no-underline hover:text-sky-700">All →</a>
+                    <a href="/news" class="text-sm text-brand-600 no-underline hover:text-brand-700">All →</a>
                 </div>
                 <div class="divide-y divide-gray-100">
                     @foreach (var post in recentPosts)
@@ -54,9 +54,9 @@ else
                                 <span>·</span>
                                 <span>@post.DateCreated.ToString("MMM d, yyyy")</span>
                                 <span>·</span>
-                                <a href="/news/@post.Id#comments" class="text-sky-600 no-underline hover:text-sky-700">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
+                                <a href="/news/@post.Id#comments" class="text-brand-600 no-underline hover:text-brand-700">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
                             </div>
-                            <a href="/news/@post.Id" class="mt-1 block text-lg font-semibold text-gray-900 no-underline hover:text-sky-600">@post.Title</a>
+                            <a href="/news/@post.Id" class="mt-1 block text-lg font-semibold text-gray-900 no-underline hover:text-brand-600">@post.Title</a>
                             <p class="mt-1 text-sm text-gray-600">@Excerpt(post.Markdown)</p>
                         </div>
                     }
@@ -85,7 +85,7 @@ else
                                 <div class="hidden min-w-0 sm:block">
                                     @if (item.WinnerName is not null)
                                     {
-                                        <a href="@item.WinnerUrl" class="inline-flex items-center gap-2 font-medium text-gray-900 no-underline hover:text-sky-600">
+                                        <a href="@item.WinnerUrl" class="inline-flex items-center gap-2 font-medium text-gray-900 no-underline hover:text-brand-600">
                                             <TeamFlag LogoUrl="@item.WinnerLogoUrl" />
                                             @item.WinnerName
                                         </a>
@@ -96,11 +96,11 @@ else
                                     }
                                 </div>
                             </div>
-                            <a href="@item.MatchupUrl" class="font-medium whitespace-nowrap text-gray-900 no-underline hover:text-sky-600">@item.MatchupName</a>
+                            <a href="@item.MatchupUrl" class="font-medium whitespace-nowrap text-gray-900 no-underline hover:text-brand-600">@item.MatchupName</a>
                             <div class="ml-auto flex items-center gap-3 text-gray-500">
                                 @if (item.ContextUrl is not null)
                                 {
-                                    <a href="@item.ContextUrl" class="hidden text-gray-500 no-underline hover:text-sky-600 sm:inline">@item.Context</a>
+                                    <a href="@item.ContextUrl" class="hidden text-gray-500 no-underline hover:text-brand-600 sm:inline">@item.Context</a>
                                 }
                                 else
                                 {

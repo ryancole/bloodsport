@@ -30,7 +30,7 @@ else
         @foreach (var post in posts)
         {
             <article class="py-6 first:pt-0">
-                <a href="/news/@post.Id" class="text-xl font-semibold text-gray-900 no-underline hover:text-sky-600">@post.Title</a>
+                <a href="/news/@post.Id" class="text-xl font-semibold text-gray-900 no-underline hover:text-brand-600">@post.Title</a>
                 <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                     <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
                     <span>·</span>
@@ -39,7 +39,7 @@ else
                     <a href="/news/@post.Id#comments" class="link">@post.PostComments.Count @(post.PostComments.Count == 1 ? "comment" : "comments")</a>
                 </div>
                 <p class="mt-2 text-gray-600">@Excerpt(post.Markdown)</p>
-                <a href="/news/@post.Id" class="mt-2 inline-block text-sm font-medium text-sky-600 no-underline hover:text-sky-700">Read more →</a>
+                <a href="/news/@post.Id" class="mt-2 inline-block text-sm font-medium text-brand-600 no-underline hover:text-brand-700">Read more →</a>
             </article>
         }
     </div>
