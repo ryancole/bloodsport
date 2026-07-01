@@ -14,7 +14,7 @@
         @for (var p = windowStart; p <= windowEnd; p++)
         {
             var pageNum = p;
-            <button type="button" @onclick="() => OnPageChanged.InvokeAsync(pageNum)" class="rounded border px-3 py-1 text-sm @(CurrentPage == pageNum ? "border-sky-600 bg-sky-600 text-white" : "border-gray-200 text-gray-700 hover:bg-gray-100")">@pageNum</button>
+            <button type="button" @onclick="() => OnPageChanged.InvokeAsync(pageNum)" class="rounded border px-3 py-1 text-sm @(CurrentPage == pageNum ? "border-brand-600 bg-brand-600 text-white" : "border-gray-200 text-gray-700 hover:bg-gray-100")">@pageNum</button>
         }
         @if (windowEnd < TotalPages)
         {

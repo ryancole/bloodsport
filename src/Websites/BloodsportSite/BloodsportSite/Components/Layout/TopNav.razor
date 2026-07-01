@@ -5,7 +5,7 @@
 
 <header class="sticky top-0 z-40 border-b border-gray-800 bg-gray-900">
     <div class="relative flex h-14 items-center gap-3 px-6">
-        <a href="" class="group flex shrink-0 items-center gap-2 text-base font-bold whitespace-nowrap text-white no-underline hover:text-sky-400" aria-label="Champions Amateur League" title="Champions Amateur League">
+        <a href="" class="group flex shrink-0 items-center gap-2 text-base font-bold whitespace-nowrap text-white no-underline hover:text-brand-400" aria-label="Champions Amateur League" title="Champions Amateur League">
             <img src="cal-logo.svg" alt="CAL" class="h-8 w-8 transition-[filter] duration-200 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.7)]" />
         </a>
 
@@ -54,7 +54,7 @@
 @code {
     // Kept as consts so all nav links share one definition; Tailwind still scans these literals.
     private const string LinkClass = "rounded px-3 py-1.5 text-sm font-medium text-gray-300 no-underline transition-colors hover:bg-white/10 hover:text-white";
-    private const string LinkActiveClass = "bg-sky-500/15 text-sky-300!";
+    private const string LinkActiveClass = "bg-brand-500/15 text-brand-300!";
 
     private string? displayName;
     private string? logoUrl;
