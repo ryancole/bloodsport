@@ -21,6 +21,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/teams/{id}/delete", DeleteAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/teams/{id}/leave", LeaveAsync)
+                .RequireAuthorization();
+
             endpoints.MapPost("/teams/{id}/members/{membershipId}/activate", ActivateMemberAsync)
                 .RequireAuthorization();
 
@@ -171,6 +174,38 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/teams");
+        }
+
+        // Member: remove the current user's own membership(s) from a team they belong to.
+        private static async Task<IResult> LeaveAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var memberships = await db.TeamMemberships
+                .Where(m => m.TeamId == id && m.RiotAccount.UserId == user.Id)
+                .ToListAsync();
+
+            if (memberships.Count > 0)
+            {
+                db.TeamMemberships.RemoveRange(memberships);
+                await db.SaveChangesAsync();
+            }
+
+            // Return the user to wherever they clicked Leave from (e.g. their profile),
+            // falling back to the team page. Only allow local paths to avoid open redirects.
+            var returnUrl = context.Request.Form["returnUrl"].ToString();
+            var redirectTo = returnUrl.StartsWith('/') && !returnUrl.StartsWith("//")
+                ? returnUrl
+                : $"/teams/{id}";
+
+            return Results.Redirect(redirectTo);
         }
 
         private static Task<IResult> ActivateMemberAsync(

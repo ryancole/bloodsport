@@ -43,6 +43,13 @@ else
                 </form>
             </div>
         }
+        else if (isMember)
+        {
+            <form method="post" action="/api/teams/@team.Id/leave">
+                <AntiforgeryToken />
+                <button type="submit" class="btn btn-danger">Leave Team</button>
+            </form>
+        }
     </div>
 
     <dl class="mb-8 grid grid-cols-[120px_1fr] gap-y-2 text-sm">
@@ -233,6 +240,7 @@ else
     private List<PlayoffTeam> playoffEntries = [];
     private bool notFound;
     private bool isManager;
+    private bool isMember;
     private string? inviteError;
     private bool inviteSent;
     private string? memberError;
@@ -314,6 +322,7 @@ else
         if (oid is not null)
         {
             isManager = team.Manager.EntraObjectId == oid;
+            isMember = team.TeamMemberships.Any(m => m.RiotAccount.User.EntraObjectId == oid);
 
             if (isManager)
             {
