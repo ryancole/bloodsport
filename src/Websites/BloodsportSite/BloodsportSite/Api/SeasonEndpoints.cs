@@ -27,6 +27,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/seasons/{id}/unregister", UnregisterAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/seasons/{id}/remove-team", RemoveTeamAsync)
+                .RequireAuthorization();
+
             endpoints.MapPost("/seasons/{id}/build", BuildAsync)
                 .RequireAuthorization();
 
@@ -240,14 +243,63 @@ namespace BloodsportSite.Api
             return Results.Redirect($"/teams/{teamId}");
         }
 
+        // Admin: remove any team's registration from a season before it has been built
+        private static async Task<IResult> RemoveTeamAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            [Microsoft.AspNetCore.Mvc.FromForm] SeasonRegistrationForm form)
+        {
+            if (!context.User.IsInRole("Champions.Admin"))
+                return Results.Forbid();
+
+            var teamId = form.TeamId;
+
+            await using var db = dbFactory.CreateDbContext();
+
+            var season = await db.Seasons
+                .Include(s => s.SeasonWeeks)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (season is null)
+                return Results.Redirect("/seasons?error=season_not_found");
+
+            // Once the schedule is built the season is locked; teams can't be pulled out.
+            if (season.SeasonWeeks.Count > 0)
+                return Results.Redirect($"/seasons/{id}?error=already_built");
+
+            var registration = await db.SeasonRegistrations
+                .FirstOrDefaultAsync(r => r.SeasonId == id && r.TeamId == teamId);
+
+            if (registration is not null)
+            {
+                db.SeasonRegistrations.Remove(registration);
+                await db.SaveChangesAsync();
+            }
+
+            return Results.Redirect($"/seasons/{id}");
+        }
+
         // Admin: build the regular season schedule by queuing the BuildRegularSeason function
         private static async Task<IResult> BuildAsync(
             HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
             ServiceBusClient serviceBusClient,
             long id)
         {
             if (!context.User.IsInRole("Champions.Admin"))
                 return Results.Forbid();
+
+            await using var db = await dbFactory.CreateDbContextAsync();
+
+            // Refuse to build while any registered team can't field a full lineup. The admin
+            // must remove the team from the season or have it add players first.
+            var hasUnderStrengthTeam = await db.SeasonRegistrations
+                .Where(r => r.SeasonId == id)
+                .AnyAsync(r => r.Team.TeamMemberships.Count(m => m.Active) < TeamMembership.MinActiveMembers);
+
+            if (hasUnderStrengthTeam)
+                return Results.Redirect($"/seasons/{id}?error=under_strength_teams");
 
             await using var sender = serviceBusClient.CreateSender("build-regular-season");
 

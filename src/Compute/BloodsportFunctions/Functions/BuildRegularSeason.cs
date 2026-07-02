@@ -53,6 +53,8 @@ namespace BloodsportFunctions.Functions
             var season = await db.Seasons
                 .Include(s => s.SeasonRegistrations)
                     .ThenInclude(r => r.Team)
+                        .ThenInclude(t => t.TeamMemberships)
+                            .ThenInclude(m => m.RiotAccount)
                 .Include(s => s.SeasonWeeks)
                 .FirstOrDefaultAsync(s => s.Id == seasonId);
 
@@ -73,6 +75,22 @@ namespace BloodsportFunctions.Functions
             {
                 _logger.LogWarning("Season {seasonId} already has weeks built. Skipping.", seasonId);
                 await messageActions.CompleteMessageAsync(message);
+                return;
+            }
+
+            // Every registered team must be able to field a lineup. Rather than silently
+            // dropping under-strength teams, abort the build so an admin can either remove
+            // those teams from the season or have them add players first.
+            var underStrengthTeamIds = season.SeasonRegistrations
+                .Where(r => r.Team.TeamMemberships.Count(m => m.Active) < TeamMembership.MinActiveMembers)
+                .Select(r => r.TeamId)
+                .ToList();
+
+            if (underStrengthTeamIds.Count > 0)
+            {
+                _logger.LogError("Season {seasonId} has {count} registered team(s) with fewer than {min} active members: {teamIds}. Aborting build.",
+                    seasonId, underStrengthTeamIds.Count, TeamMembership.MinActiveMembers, string.Join(", ", underStrengthTeamIds));
+                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "UnderStrengthTeams", deadLetterErrorDescription: $"All registered teams must have at least {TeamMembership.MinActiveMembers} active members before the season can be built.");
                 return;
             }
 
@@ -111,6 +129,23 @@ namespace BloodsportFunctions.Functions
                 LoseCount = 0,
             });
             db.TeamSeasonResults.AddRange(seasonResults);
+
+            // Lock in each team's active roster for the season.
+            var rosters = season.SeasonRegistrations.Select(r => new TeamSeasonRoster
+            {
+                TeamId = r.TeamId,
+                SeasonId = seasonId,
+                Team = r.Team,
+                Season = season,
+                RosterJson = JsonSerializer.Serialize(new TeamSeasonRosterJson
+                {
+                    AllowedSummonerNames = r.Team.TeamMemberships
+                        .Where(m => m.Active)
+                        .Select(m => $"{m.RiotAccount.GameName}#{m.RiotAccount.TagLine}")
+                        .ToList()
+                }),
+            });
+            db.TeamSeasonRosters.AddRange(rosters);
 
             await db.SaveChangesAsync();
 

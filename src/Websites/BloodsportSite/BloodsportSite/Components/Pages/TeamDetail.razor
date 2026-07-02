@@ -43,6 +43,13 @@ else
                 </form>
             </div>
         }
+        else if (isMember)
+        {
+            <form method="post" action="/api/teams/@team.Id/leave">
+                <AntiforgeryToken />
+                <button type="submit" class="btn btn-danger">Leave Team</button>
+            </form>
+        }
     </div>
 
     <dl class="mb-8 grid grid-cols-[120px_1fr] gap-y-2 text-sm">
@@ -90,10 +97,51 @@ else
         </div>
     }
 
-    <h2 class="mb-2 mt-8 section-title">Members</h2>
-    <p class="mb-3 text-sm text-gray-500">Teams are limited to 7 members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of players on this roster.</p>
+    <div class="mb-3 mt-8 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="section-title">Members</h2>
+        <div class="flex flex-wrap items-center gap-3">
+            @if (team.TeamMemberships.Count > 0)
+            {
+                <div class="flex items-center gap-1 text-sm text-gray-500">
+                    <span>@team.TeamMemberships.Count(m => m.Active) of @TeamMembership.MaxActiveMembers roster spots active</span>
+                    <span class="group relative inline-flex" tabindex="0">
+                        <Icon Path="@StatusIcons.QuestionMarkCircle" Class="h-3.5 w-3.5 cursor-help text-gray-400 hover:text-gray-600" />
+                        <span role="tooltip" class="pointer-events-none absolute right-0 top-full z-20 mt-2 w-64 whitespace-normal rounded-md bg-gray-900 px-3 py-2 text-xs font-normal normal-case tracking-normal text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100">
+                            A team can have at most @TeamMembership.MaxActiveMembers active members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of active players on this roster.
+                        </span>
+                    </span>
+                </div>
+            }
+            @if (isManager && joinableRiotAccounts.Count > 0)
+            {
+                <form method="post" action="/api/teams/@team.Id/join" class="flex items-center gap-2">
+                    <AntiforgeryToken />
+                    @if (joinableRiotAccounts.Count == 1)
+                    {
+                        <input type="hidden" name="riotAccountId" value="@joinableRiotAccounts[0].Id" />
+                        <button type="submit" class="btn btn-primary btn-sm">Join with @joinableRiotAccounts[0].GameName#@joinableRiotAccounts[0].TagLine</button>
+                    }
+                    else
+                    {
+                        <select name="riotAccountId" class="input max-w-[250px] text-sm">
+                            @foreach (var acct in joinableRiotAccounts)
+                            {
+                                <option value="@acct.Id">@acct.GameName#@acct.TagLine</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Join Team</button>
+                    }
+                </form>
+            }
+        </div>
+    </div>
 
-    <TeamMembersTable Memberships="@team.TeamMemberships" />
+    @if (memberError is not null)
+    {
+        <div class="alert alert-danger mb-4">@memberError</div>
+    }
+
+    <TeamMembersTable Memberships="@team.TeamMemberships" TeamId="@team.Id" IsManager="@isManager" />
 
     <h2 class="mb-3 mt-8 section-title">Matchups</h2>
 
@@ -229,8 +277,11 @@ else
     private List<PlayoffTeam> playoffEntries = [];
     private bool notFound;
     private bool isManager;
+    private bool isMember;
+    private List<RiotAccount> joinableRiotAccounts = [];
     private string? inviteError;
     private bool inviteSent;
+    private string? memberError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -240,6 +291,15 @@ else
         if (query.TryGetValue("invite_sent", out _))
             inviteSent = true;
 
+        if (query.TryGetValue("member_error", out var memberErrorCode))
+        {
+            memberError = (string?)memberErrorCode switch
+            {
+                "active_full" => $"A team can have at most {TeamMembership.MaxActiveMembers} active members. Deactivate someone before activating another.",
+                _             => "An unknown error occurred. Please try again.",
+            };
+        }
+
         if (query.TryGetValue("invite_error", out var errorCode))
         {
             inviteError = (string?)errorCode switch
@@ -248,7 +308,6 @@ else
                 "account_not_found" => "No linked Riot account found with that Game Name and Tag.",
                 "already_member"   => "That Riot account is already a member of this team.",
                 "already_invited"  => "That Riot account already has a pending invite.",
-                "roster_full"      => "This team already has the maximum of 7 members.",
                 _                  => "An unknown error occurred. Please try again.",
             };
         }
@@ -301,6 +360,7 @@ else
         if (oid is not null)
         {
             isManager = team.Manager.EntraObjectId == oid;
+            isMember = team.TeamMemberships.Any(m => m.RiotAccount.User.EntraObjectId == oid);
 
             if (isManager)
             {
@@ -308,6 +368,13 @@ else
                     .Include(i => i.RiotAccount)
                     .Where(i => i.TeamId == Id && i.Status == TeamInviteStatus.Pending)
                     .OrderByDescending(i => i.DateCreated)
+                    .ToListAsync();
+
+                // The manager's own Riot accounts that aren't already members of this team.
+                joinableRiotAccounts = await db.RiotAccounts
+                    .Where(r => r.User.EntraObjectId == oid
+                             && !db.TeamMemberships.Any(m => m.TeamId == Id && m.RiotAccountId == r.Id))
+                    .OrderBy(r => r.GameName)
                     .ToListAsync();
             }
         }

@@ -33,7 +33,7 @@ else
                     {
                         <form method="post" action="/api/seasons/@season.Id/build">
                             <AntiforgeryToken />
-                            <button type="submit" class="btn btn-primary">Build Season</button>
+                            <button type="submit" class="btn btn-primary" disabled="@(season.SeasonRegistrations.Count == 0 || underStrengthTeams.Count > 0)" title="@(season.SeasonRegistrations.Count == 0 ? "At least one team must be registered before the season can be built." : underStrengthTeams.Count > 0 ? $"All registered teams need at least {TeamMembership.MinActiveMembers} active members before the season can be built." : null)">Build Season</button>
                         </form>
                     }
                     @if (season.SeasonWeeks.Count > 0 && !season.RegistrationOpen && season.Status == SeasonStatus.PreSeason)
@@ -71,6 +71,9 @@ else
         <dt class="font-medium text-gray-500">Region</dt>
         <dd class="text-gray-700">@season.RiotRegion</dd>
 
+        <dt class="font-medium text-gray-500">Registered Teams</dt>
+        <dd class="text-gray-700">@season.SeasonRegistrations.Count</dd>
+
         @if (season.MatchupParameters is { } mp)
         {
             <dt class="font-medium text-gray-500">Team Size</dt>
@@ -92,6 +95,33 @@ else
         <dt class="font-medium text-gray-500">Estimated End</dt>
         <dd class="text-gray-700">@(season.EstimatedDateEnd?.ToLocalTime().ToString("MMMM d, yyyy") ?? "TBD")</dd>
     </dl>
+
+    <AuthorizeView Roles="Champions.Admin">
+        <Authorized>
+            @if (season.SeasonWeeks.Count == 0 && underStrengthTeams.Count > 0)
+            {
+                <div role="alert" class="alert alert-danger mb-6">
+                    <strong>Roster Warning:</strong> The following registered team@(underStrengthTeams.Count == 1 ? "" : "s") @(underStrengthTeams.Count == 1 ? "does" : "do") not have the minimum @TeamMembership.MinActiveMembers active members. This season cannot be built until each one reaches @TeamMembership.MinActiveMembers active members or is removed.
+                    <ul class="mt-2 space-y-1">
+                        @foreach (var team in underStrengthTeams)
+                        {
+                            <li class="flex flex-wrap items-center justify-between gap-3">
+                                <span>
+                                    <a href="/teams/@team.Id" class="link"><strong>@team.Name</strong></a>
+                                    <span class="text-gray-600"> — @team.TeamMemberships.Count(m => m.Active)/@TeamMembership.MinActiveMembers active</span>
+                                </span>
+                                <form method="post" action="/api/seasons/@season.Id/remove-team">
+                                    <AntiforgeryToken />
+                                    <input type="hidden" name="teamId" value="@team.Id" />
+                                    <button type="submit" class="btn btn-secondary btn-sm">Remove from season</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </Authorized>
+    </AuthorizeView>
 
     @if (season.Status == SeasonStatus.PreSeason)
     {
@@ -210,6 +240,7 @@ else
     private bool notFound;
     private List<Team> eligibleTeams = [];
     private List<Team> alreadyRegisteredTeams = [];
+    private List<Team> underStrengthTeams = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -234,6 +265,12 @@ else
             notFound = true;
             return;
         }
+
+        underStrengthTeams = season.SeasonRegistrations
+            .Select(r => r.Team)
+            .Where(t => t.TeamMemberships.Count(m => m.Active) < TeamMembership.MinActiveMembers)
+            .OrderBy(t => t.Name)
+            .ToList();
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var oid = authState.User.FindFirst("oid")?.Value

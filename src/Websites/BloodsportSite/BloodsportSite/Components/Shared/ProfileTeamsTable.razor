@@ -11,7 +11,7 @@ else
     <div class="overflow-x-auto">
         <table class="tbl">
             <thead>
-                <tr><th>Team</th><th>Role</th><th>Created</th></tr>
+                <tr><th>Team</th><th>Role</th><th>Created</th><th></th></tr>
             </thead>
             <tbody>
                 @foreach (var row in TeamRows)
@@ -20,6 +20,16 @@ else
                         <td><a href="/teams/@row.Team.Id" class="link inline-flex items-center gap-2"><TeamFlag LogoUrl="@row.Team.LogoUrl" />@row.Team.Name</a></td>
                         <td>@row.Role</td>
                         <td>@row.Team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        <td class="text-right">
+                            @if (row.Role == "Member")
+                            {
+                                <form method="post" action="/api/teams/@row.Team.Id/leave">
+                                    <AntiforgeryToken />
+                                    <input type="hidden" name="returnUrl" value="/profile" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Leave Team</button>
+                                </form>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

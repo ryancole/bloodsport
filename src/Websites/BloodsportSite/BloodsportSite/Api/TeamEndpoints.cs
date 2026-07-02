@@ -21,6 +21,21 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/teams/{id}/delete", DeleteAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/teams/{id}/join", JoinAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/teams/{id}/leave", LeaveAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/teams/{id}/members/{membershipId}/activate", ActivateMemberAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/teams/{id}/members/{membershipId}/deactivate", DeactivateMemberAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/teams/{id}/members/{membershipId}/remove", RemoveMemberAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -165,6 +180,166 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/teams");
+        }
+
+        // Manager: add one of the manager's own Riot accounts as a member of the team they manage.
+        private static async Task<IResult> JoinAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect("/teams");
+
+            if (!long.TryParse(context.Request.Form["riotAccountId"], out var riotAccountId))
+                return Results.Redirect($"/teams/{id}");
+
+            // The Riot account must belong to the current (manager) user.
+            var riotAccount = await db.RiotAccounts
+                .FirstOrDefaultAsync(r => r.Id == riotAccountId && r.UserId == user.Id);
+
+            if (riotAccount is null)
+                return Results.Redirect($"/teams/{id}");
+
+            var alreadyMember = await db.TeamMemberships
+                .AnyAsync(m => m.TeamId == id && m.RiotAccountId == riotAccountId);
+
+            if (!alreadyMember)
+            {
+                db.TeamMemberships.Add(new TeamMembership
+                {
+                    TeamId = id,
+                    Team = team,
+                    RiotAccountId = riotAccount.Id,
+                    RiotAccount = riotAccount,
+                    Active = false,
+                });
+
+                await db.SaveChangesAsync();
+            }
+
+            return Results.Redirect($"/teams/{id}");
+        }
+
+        // Member: remove the current user's own membership(s) from a team they belong to.
+        private static async Task<IResult> LeaveAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var memberships = await db.TeamMemberships
+                .Where(m => m.TeamId == id && m.RiotAccount.UserId == user.Id)
+                .ToListAsync();
+
+            if (memberships.Count > 0)
+            {
+                db.TeamMemberships.RemoveRange(memberships);
+                await db.SaveChangesAsync();
+            }
+
+            // Return the user to wherever they clicked Leave from (e.g. their profile),
+            // falling back to the team page. Only allow local paths to avoid open redirects.
+            var returnUrl = context.Request.Form["returnUrl"].ToString();
+            var redirectTo = returnUrl.StartsWith('/') && !returnUrl.StartsWith("//")
+                ? returnUrl
+                : $"/teams/{id}";
+
+            return Results.Redirect(redirectTo);
+        }
+
+        private static Task<IResult> ActivateMemberAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId)
+            => SetMemberActiveAsync(context, dbFactory, id, membershipId, true);
+
+        private static Task<IResult> DeactivateMemberAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId)
+            => SetMemberActiveAsync(context, dbFactory, id, membershipId, false);
+
+        private static async Task<IResult> SetMemberActiveAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId,
+            bool active)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect("/teams");
+
+            var membership = await db.TeamMemberships
+                .FirstOrDefaultAsync(m => m.Id == membershipId && m.TeamId == id);
+
+            if (membership is null)
+                return Results.Redirect($"/teams/{id}");
+
+            if (active && !membership.Active)
+            {
+                var activeCount = await db.TeamMemberships.CountAsync(m => m.TeamId == id && m.Active);
+                if (activeCount >= TeamMembership.MaxActiveMembers)
+                    return Results.Redirect($"/teams/{id}?member_error=active_full");
+            }
+
+            membership.Active = active;
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/teams/{id}");
+        }
+
+        // Manager: remove a member's membership from a team they manage.
+        private static async Task<IResult> RemoveMemberAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect("/teams");
+
+            var membership = await db.TeamMemberships
+                .FirstOrDefaultAsync(m => m.Id == membershipId && m.TeamId == id);
+
+            if (membership is not null)
+            {
+                db.TeamMemberships.Remove(membership);
+                await db.SaveChangesAsync();
+            }
+
+            return Results.Redirect($"/teams/{id}");
         }
 
         private static async Task<User?> GetCurrentUserAsync(HttpContext context, SqlDbContext db)
