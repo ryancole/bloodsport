@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BloodsportFunctions;
 
@@ -20,6 +21,10 @@ public class Program
         var builder = FunctionsApplication.CreateBuilder(args);
 
         builder.ConfigureFunctionsWebApplication();
+
+        // Quiet EF Core's Information-level "Executed DbCommand" logs in the worker: they get
+        // serialized to JSON by the logging pipeline, which drove excess memory use in the web app.
+        builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
 
         if (builder.Environment.IsDevelopment())
             builder.Configuration.AddUserSecrets<Program>();
