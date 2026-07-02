@@ -11,18 +11,7 @@ else
             <thead>
                 <tr>
                     <th>Riot ID</th><th>User</th>
-                    <th class="overflow-visible">
-                        <span class="inline-flex items-center gap-1">
-                            Status
-                            <span class="font-normal text-gray-400">(@ActiveCount/@TeamMembership.MaxActiveMembers active)</span>
-                            <span class="group relative inline-flex" tabindex="0">
-                                <Icon Path="@StatusIcons.QuestionMarkCircle" Class="h-3.5 w-3.5 cursor-help text-gray-400 hover:text-gray-600" />
-                                <span role="tooltip" class="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-64 -translate-x-1/2 whitespace-normal rounded-md bg-gray-900 px-3 py-2 text-xs font-normal normal-case tracking-normal text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100">
-                                    A team can have at most @TeamMembership.MaxActiveMembers active members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of active players on this roster.
-                                </span>
-                            </span>
-                        </span>
-                    </th>
+                    <th>Status</th>
                     <th>Joined</th>
                     @if (IsManager)
                     {
@@ -50,20 +39,26 @@ else
                         @if (IsManager)
                         {
                             <td class="text-right">
-                                @if (membership.Active)
-                                {
-                                    <form method="post" action="/api/teams/@TeamId/members/@membership.Id/deactivate">
+                                <div class="flex items-center justify-end gap-2">
+                                    @if (membership.Active)
+                                    {
+                                        <form method="post" action="/api/teams/@TeamId/members/@membership.Id/deactivate">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="btn btn-secondary btn-sm">Deactivate</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" action="/api/teams/@TeamId/members/@membership.Id/activate">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="btn btn-primary btn-sm" disabled="@(ActiveCount >= TeamMembership.MaxActiveMembers)" title="@(ActiveCount >= TeamMembership.MaxActiveMembers ? $"Roster is full ({TeamMembership.MaxActiveMembers} active members)." : null)">Activate</button>
+                                        </form>
+                                    }
+                                    <form method="post" action="/api/teams/@TeamId/members/@membership.Id/remove">
                                         <AntiforgeryToken />
-                                        <button type="submit" class="btn btn-secondary btn-sm">Deactivate</button>
+                                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                                     </form>
-                                }
-                                else
-                                {
-                                    <form method="post" action="/api/teams/@TeamId/members/@membership.Id/activate">
-                                        <AntiforgeryToken />
-                                        <button type="submit" class="btn btn-primary btn-sm" disabled="@(ActiveCount >= TeamMembership.MaxActiveMembers)" title="@(ActiveCount >= TeamMembership.MaxActiveMembers ? $"Roster is full ({TeamMembership.MaxActiveMembers} active members)." : null)">Activate</button>
-                                    </form>
-                                }
+                                </div>
                             </td>
                         }
                     </tr>

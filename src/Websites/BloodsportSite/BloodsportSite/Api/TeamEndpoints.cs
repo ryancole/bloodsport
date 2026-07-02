@@ -21,6 +21,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/teams/{id}/delete", DeleteAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/teams/{id}/join", JoinAsync)
+                .RequireAuthorization();
+
             endpoints.MapPost("/teams/{id}/leave", LeaveAsync)
                 .RequireAuthorization();
 
@@ -28,6 +31,9 @@ namespace BloodsportSite.Api
                 .RequireAuthorization();
 
             endpoints.MapPost("/teams/{id}/members/{membershipId}/deactivate", DeactivateMemberAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/teams/{id}/members/{membershipId}/remove", RemoveMemberAsync)
                 .RequireAuthorization();
 
             return endpoints;
@@ -176,6 +182,53 @@ namespace BloodsportSite.Api
             return Results.Redirect("/teams");
         }
 
+        // Manager: add one of the manager's own Riot accounts as a member of the team they manage.
+        private static async Task<IResult> JoinAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect("/teams");
+
+            if (!long.TryParse(context.Request.Form["riotAccountId"], out var riotAccountId))
+                return Results.Redirect($"/teams/{id}");
+
+            // The Riot account must belong to the current (manager) user.
+            var riotAccount = await db.RiotAccounts
+                .FirstOrDefaultAsync(r => r.Id == riotAccountId && r.UserId == user.Id);
+
+            if (riotAccount is null)
+                return Results.Redirect($"/teams/{id}");
+
+            var alreadyMember = await db.TeamMemberships
+                .AnyAsync(m => m.TeamId == id && m.RiotAccountId == riotAccountId);
+
+            if (!alreadyMember)
+            {
+                db.TeamMemberships.Add(new TeamMembership
+                {
+                    TeamId = id,
+                    Team = team,
+                    RiotAccountId = riotAccount.Id,
+                    RiotAccount = riotAccount,
+                    Active = false,
+                });
+
+                await db.SaveChangesAsync();
+            }
+
+            return Results.Redirect($"/teams/{id}");
+        }
+
         // Member: remove the current user's own membership(s) from a team they belong to.
         private static async Task<IResult> LeaveAsync(
             HttpContext context,
@@ -255,6 +308,36 @@ namespace BloodsportSite.Api
 
             membership.Active = active;
             await db.SaveChangesAsync();
+
+            return Results.Redirect($"/teams/{id}");
+        }
+
+        // Manager: remove a member's membership from a team they manage.
+        private static async Task<IResult> RemoveMemberAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect("/teams");
+
+            var membership = await db.TeamMemberships
+                .FirstOrDefaultAsync(m => m.Id == membershipId && m.TeamId == id);
+
+            if (membership is not null)
+            {
+                db.TeamMemberships.Remove(membership);
+                await db.SaveChangesAsync();
+            }
 
             return Results.Redirect($"/teams/{id}");
         }

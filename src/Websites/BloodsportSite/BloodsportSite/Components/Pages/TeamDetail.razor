@@ -97,7 +97,44 @@ else
         </div>
     }
 
-    <h2 class="mb-3 mt-8 section-title">Members</h2>
+    <div class="mb-3 mt-8 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="section-title">Members</h2>
+        <div class="flex flex-wrap items-center gap-3">
+            @if (team.TeamMemberships.Count > 0)
+            {
+                <div class="flex items-center gap-1 text-sm text-gray-500">
+                    <span>@team.TeamMemberships.Count(m => m.Active) of @TeamMembership.MaxActiveMembers roster spots active</span>
+                    <span class="group relative inline-flex" tabindex="0">
+                        <Icon Path="@StatusIcons.QuestionMarkCircle" Class="h-3.5 w-3.5 cursor-help text-gray-400 hover:text-gray-600" />
+                        <span role="tooltip" class="pointer-events-none absolute right-0 top-full z-20 mt-2 w-64 whitespace-normal rounded-md bg-gray-900 px-3 py-2 text-xs font-normal normal-case tracking-normal text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100">
+                            A team can have at most @TeamMembership.MaxActiveMembers active members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of active players on this roster.
+                        </span>
+                    </span>
+                </div>
+            }
+            @if (isManager && joinableRiotAccounts.Count > 0)
+            {
+                <form method="post" action="/api/teams/@team.Id/join" class="flex items-center gap-2">
+                    <AntiforgeryToken />
+                    @if (joinableRiotAccounts.Count == 1)
+                    {
+                        <input type="hidden" name="riotAccountId" value="@joinableRiotAccounts[0].Id" />
+                        <button type="submit" class="btn btn-primary btn-sm">Join with @joinableRiotAccounts[0].GameName#@joinableRiotAccounts[0].TagLine</button>
+                    }
+                    else
+                    {
+                        <select name="riotAccountId" class="input max-w-[250px] text-sm">
+                            @foreach (var acct in joinableRiotAccounts)
+                            {
+                                <option value="@acct.Id">@acct.GameName#@acct.TagLine</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Join Team</button>
+                    }
+                </form>
+            }
+        </div>
+    </div>
 
     @if (memberError is not null)
     {
@@ -241,6 +278,7 @@ else
     private bool notFound;
     private bool isManager;
     private bool isMember;
+    private List<RiotAccount> joinableRiotAccounts = [];
     private string? inviteError;
     private bool inviteSent;
     private string? memberError;
@@ -330,6 +368,13 @@ else
                     .Include(i => i.RiotAccount)
                     .Where(i => i.TeamId == Id && i.Status == TeamInviteStatus.Pending)
                     .OrderByDescending(i => i.DateCreated)
+                    .ToListAsync();
+
+                // The manager's own Riot accounts that aren't already members of this team.
+                joinableRiotAccounts = await db.RiotAccounts
+                    .Where(r => r.User.EntraObjectId == oid
+                             && !db.TeamMemberships.Any(m => m.TeamId == Id && m.RiotAccountId == r.Id))
+                    .OrderBy(r => r.GameName)
                     .ToListAsync();
             }
         }
