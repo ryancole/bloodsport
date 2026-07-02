@@ -90,10 +90,14 @@ else
         </div>
     }
 
-    <h2 class="mb-2 mt-8 section-title">Members</h2>
-    <p class="mb-3 text-sm text-gray-500">Teams are limited to 7 members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of players on this roster.</p>
+    <h2 class="mb-3 mt-8 section-title">Members</h2>
 
-    <TeamMembersTable Memberships="@team.TeamMemberships" />
+    @if (memberError is not null)
+    {
+        <div class="alert alert-danger mb-4">@memberError</div>
+    }
+
+    <TeamMembersTable Memberships="@team.TeamMemberships" TeamId="@team.Id" IsManager="@isManager" />
 
     <h2 class="mb-3 mt-8 section-title">Matchups</h2>
 
@@ -231,6 +235,7 @@ else
     private bool isManager;
     private string? inviteError;
     private bool inviteSent;
+    private string? memberError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -240,6 +245,15 @@ else
         if (query.TryGetValue("invite_sent", out _))
             inviteSent = true;
 
+        if (query.TryGetValue("member_error", out var memberErrorCode))
+        {
+            memberError = (string?)memberErrorCode switch
+            {
+                "active_full" => $"A team can have at most {TeamMembership.MaxActiveMembers} active members. Deactivate someone before activating another.",
+                _             => "An unknown error occurred. Please try again.",
+            };
+        }
+
         if (query.TryGetValue("invite_error", out var errorCode))
         {
             inviteError = (string?)errorCode switch
@@ -248,7 +262,6 @@ else
                 "account_not_found" => "No linked Riot account found with that Game Name and Tag.",
                 "already_member"   => "That Riot account is already a member of this team.",
                 "already_invited"  => "That Riot account already has a pending invite.",
-                "roster_full"      => "This team already has the maximum of 7 members.",
                 _                  => "An unknown error occurred. Please try again.",
             };
         }

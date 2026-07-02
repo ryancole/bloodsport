@@ -9,7 +9,23 @@ else
     <div class="overflow-x-auto">
         <table class="tbl">
             <thead>
-                <tr><th>Riot ID</th><th>User</th><th>Joined</th></tr>
+                <tr>
+                    <th>Riot ID</th><th>User</th>
+                    <th>
+                        <span class="inline-flex items-center gap-1">
+                            Status
+                            <span class="font-normal text-gray-400">(@ActiveCount/@TeamMembership.MaxActiveMembers active)</span>
+                            <span class="cursor-help text-gray-400 hover:text-gray-600" title="A team can have at most @TeamMembership.MaxActiveMembers active members (5 starters + 2 bench). Each week during a season, your lineup must be made up entirely of active players on this roster.">
+                                <Icon Path="@StatusIcons.QuestionMarkCircle" Class="h-3.5 w-3.5" />
+                            </span>
+                        </span>
+                    </th>
+                    <th>Joined</th>
+                    @if (IsManager)
+                    {
+                        <th></th>
+                    }
+                </tr>
             </thead>
             <tbody>
                 @foreach (var membership in Memberships)
@@ -17,7 +33,36 @@ else
                     <tr>
                         <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(membership.RiotAccount.GameName)-@Uri.EscapeDataString(membership.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link"><strong>@membership.RiotAccount.GameName#@membership.RiotAccount.TagLine</strong></a></td>
                         <td><a href="/users/@membership.RiotAccount.User.Id" class="link inline-flex items-center gap-2"><UserFlag LogoUrl="@membership.RiotAccount.User.LogoUrl" />@membership.RiotAccount.User.DisplayName</a></td>
+                        <td>
+                            @if (membership.Active)
+                            {
+                                <Pill Color="PillColor.Green">Active</Pill>
+                            }
+                            else
+                            {
+                                <Pill Color="PillColor.Gray">Inactive</Pill>
+                            }
+                        </td>
                         <td>@membership.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        @if (IsManager)
+                        {
+                            <td class="text-right">
+                                @if (membership.Active)
+                                {
+                                    <form method="post" action="/api/teams/@TeamId/members/@membership.Id/deactivate">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="btn btn-secondary btn-sm">Deactivate</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form method="post" action="/api/teams/@TeamId/members/@membership.Id/activate">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="btn btn-primary btn-sm" disabled="@(ActiveCount >= TeamMembership.MaxActiveMembers)" title="@(ActiveCount >= TeamMembership.MaxActiveMembers ? $"Roster is full ({TeamMembership.MaxActiveMembers} active members)." : null)">Activate</button>
+                                    </form>
+                                }
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -27,4 +72,8 @@ else
 
 @code {
     [Parameter, EditorRequired] public ICollection<TeamMembership> Memberships { get; set; } = [];
+    [Parameter] public long TeamId { get; set; }
+    [Parameter] public bool IsManager { get; set; }
+
+    private int ActiveCount => Memberships.Count(m => m.Active);
 }

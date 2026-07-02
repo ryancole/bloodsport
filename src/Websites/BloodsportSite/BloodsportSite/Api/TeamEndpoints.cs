@@ -21,6 +21,12 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/teams/{id}/delete", DeleteAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/teams/{id}/members/{membershipId}/activate", ActivateMemberAsync)
+                .RequireAuthorization();
+
+            endpoints.MapPost("/teams/{id}/members/{membershipId}/deactivate", DeactivateMemberAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -165,6 +171,57 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/teams");
+        }
+
+        private static Task<IResult> ActivateMemberAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId)
+            => SetMemberActiveAsync(context, dbFactory, id, membershipId, true);
+
+        private static Task<IResult> DeactivateMemberAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId)
+            => SetMemberActiveAsync(context, dbFactory, id, membershipId, false);
+
+        private static async Task<IResult> SetMemberActiveAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            long membershipId,
+            bool active)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect("/teams");
+
+            var membership = await db.TeamMemberships
+                .FirstOrDefaultAsync(m => m.Id == membershipId && m.TeamId == id);
+
+            if (membership is null)
+                return Results.Redirect($"/teams/{id}");
+
+            if (active && !membership.Active)
+            {
+                var activeCount = await db.TeamMemberships.CountAsync(m => m.TeamId == id && m.Active);
+                if (activeCount >= TeamMembership.MaxActiveMembers)
+                    return Results.Redirect($"/teams/{id}?member_error=active_full");
+            }
+
+            membership.Active = active;
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/teams/{id}");
         }
 
         private static async Task<User?> GetCurrentUserAsync(HttpContext context, SqlDbContext db)

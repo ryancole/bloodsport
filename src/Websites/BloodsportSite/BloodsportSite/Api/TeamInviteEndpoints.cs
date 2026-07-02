@@ -57,10 +57,6 @@ namespace BloodsportSite.Api
             if (riotAccount is null)
                 return Results.Redirect($"/teams/{teamId}?invite_error=account_not_found");
 
-            var memberCount = await db.TeamMemberships.CountAsync(m => m.TeamId == teamId);
-            if (memberCount >= 7)
-                return Results.Redirect($"/teams/{teamId}?invite_error=roster_full");
-
             var alreadyMember = await db.TeamMemberships
                 .AnyAsync(m => m.TeamId == teamId && m.RiotAccountId == riotAccount.Id);
 
@@ -135,10 +131,6 @@ namespace BloodsportSite.Api
             if (invite is null || invite.RiotAccount.UserId != user.Id)
                 return Results.Redirect("/profile");
 
-            var memberCount = await db.TeamMemberships.CountAsync(m => m.TeamId == invite.TeamId);
-            if (memberCount >= 7)
-                return Results.Redirect("/profile?invite_error=roster_full");
-
             invite.Status = TeamInviteStatus.Accepted;
 
             db.TeamMemberships.Add(new TeamMembership
@@ -147,6 +139,7 @@ namespace BloodsportSite.Api
                 Team = invite.Team,
                 RiotAccountId = invite.RiotAccountId,
                 RiotAccount = invite.RiotAccount,
+                Active = false
             });
 
             await db.SaveChangesAsync();
