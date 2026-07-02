@@ -78,28 +78,28 @@ namespace BloodsportFunctions.Functions
                 return;
             }
 
-            // Only teams with a full-enough active roster can field a lineup, so under-strength
-            // teams are dropped from the schedule entirely rather than scheduled into matchups
-            // they can't fill.
-            var eligibleRegistrations = season.SeasonRegistrations
-                .Where(r => r.Team.TeamMemberships.Count(m => m.Active) >= TeamMembership.MinActiveMembers)
-                .ToList();
-
-            var excludedTeamIds = season.SeasonRegistrations
+            // Every registered team must be able to field a lineup. Rather than silently
+            // dropping under-strength teams, abort the build so an admin can either remove
+            // those teams from the season or have them add players first.
+            var underStrengthTeamIds = season.SeasonRegistrations
+                .Where(r => r.Team.TeamMemberships.Count(m => m.Active) < TeamMembership.MinActiveMembers)
                 .Select(r => r.TeamId)
-                .Except(eligibleRegistrations.Select(r => r.TeamId))
                 .ToList();
 
-            if (excludedTeamIds.Count > 0)
-                _logger.LogWarning("Season {seasonId}: excluding {count} team(s) with fewer than {min} active members: {teamIds}",
-                    seasonId, excludedTeamIds.Count, TeamMembership.MinActiveMembers, string.Join(", ", excludedTeamIds));
+            if (underStrengthTeamIds.Count > 0)
+            {
+                _logger.LogError("Season {seasonId} has {count} registered team(s) with fewer than {min} active members: {teamIds}. Aborting build.",
+                    seasonId, underStrengthTeamIds.Count, TeamMembership.MinActiveMembers, string.Join(", ", underStrengthTeamIds));
+                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "UnderStrengthTeams", deadLetterErrorDescription: $"All registered teams must have at least {TeamMembership.MinActiveMembers} active members before the season can be built.");
+                return;
+            }
 
-            int teamCount = eligibleRegistrations.Count;
+            int teamCount = season.SeasonRegistrations.Count;
 
             if (teamCount < 2)
             {
-                _logger.LogError("Season {seasonId} has fewer than 2 teams with enough active members ({count}).", seasonId, teamCount);
-                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InsufficientTeams", deadLetterErrorDescription: $"At least 2 teams with {TeamMembership.MinActiveMembers} or more active members must be registered.");
+                _logger.LogError("Season {seasonId} has fewer than 2 registered teams ({count}).", seasonId, teamCount);
+                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InsufficientTeams", deadLetterErrorDescription: "At least 2 teams must be registered.");
                 return;
             }
 
@@ -116,8 +116,8 @@ namespace BloodsportFunctions.Functions
             await db.SaveChangesAsync(); // flush so weeks get their DB-generated IDs
 
             _logger.LogInformation("Building matchups for season {seasonId} across {teamCount} teams.", seasonId, teamCount);
-            var teamIds = eligibleRegistrations.Select(r => r.TeamId).ToList();
-            var teamNames = eligibleRegistrations.ToDictionary(r => r.TeamId, r => r.Team.Name);
+            var teamIds = season.SeasonRegistrations.Select(r => r.TeamId).ToList();
+            var teamNames = season.SeasonRegistrations.ToDictionary(r => r.TeamId, r => r.Team.Name);
             var matchups = BuildMatchups(weeks, teamIds, teamNames);
             db.SeasonWeekMatchups.AddRange(matchups);
 
@@ -130,8 +130,8 @@ namespace BloodsportFunctions.Functions
             });
             db.TeamSeasonResults.AddRange(seasonResults);
 
-            // Lock in each eligible team's active roster for the season.
-            var rosters = eligibleRegistrations.Select(r => new TeamSeasonRoster
+            // Lock in each team's active roster for the season.
+            var rosters = season.SeasonRegistrations.Select(r => new TeamSeasonRoster
             {
                 TeamId = r.TeamId,
                 SeasonId = seasonId,
