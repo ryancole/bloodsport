@@ -53,6 +53,8 @@ namespace BloodsportFunctions.Functions
             var season = await db.Seasons
                 .Include(s => s.SeasonRegistrations)
                     .ThenInclude(r => r.Team)
+                        .ThenInclude(t => t.TeamMemberships)
+                            .ThenInclude(m => m.RiotAccount)
                 .Include(s => s.SeasonWeeks)
                 .FirstOrDefaultAsync(s => s.Id == seasonId);
 
@@ -76,12 +78,28 @@ namespace BloodsportFunctions.Functions
                 return;
             }
 
-            int teamCount = season.SeasonRegistrations.Count;
+            // Only teams with a full-enough active roster can field a lineup, so under-strength
+            // teams are dropped from the schedule entirely rather than scheduled into matchups
+            // they can't fill.
+            var eligibleRegistrations = season.SeasonRegistrations
+                .Where(r => r.Team.TeamMemberships.Count(m => m.Active) >= TeamMembership.MinActiveMembers)
+                .ToList();
+
+            var excludedTeamIds = season.SeasonRegistrations
+                .Select(r => r.TeamId)
+                .Except(eligibleRegistrations.Select(r => r.TeamId))
+                .ToList();
+
+            if (excludedTeamIds.Count > 0)
+                _logger.LogWarning("Season {seasonId}: excluding {count} team(s) with fewer than {min} active members: {teamIds}",
+                    seasonId, excludedTeamIds.Count, TeamMembership.MinActiveMembers, string.Join(", ", excludedTeamIds));
+
+            int teamCount = eligibleRegistrations.Count;
 
             if (teamCount < 2)
             {
-                _logger.LogError("Season {seasonId} has fewer than 2 registered teams ({count}).", seasonId, teamCount);
-                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InsufficientTeams", deadLetterErrorDescription: "At least 2 teams must be registered.");
+                _logger.LogError("Season {seasonId} has fewer than 2 teams with enough active members ({count}).", seasonId, teamCount);
+                await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InsufficientTeams", deadLetterErrorDescription: $"At least 2 teams with {TeamMembership.MinActiveMembers} or more active members must be registered.");
                 return;
             }
 
@@ -98,8 +116,8 @@ namespace BloodsportFunctions.Functions
             await db.SaveChangesAsync(); // flush so weeks get their DB-generated IDs
 
             _logger.LogInformation("Building matchups for season {seasonId} across {teamCount} teams.", seasonId, teamCount);
-            var teamIds = season.SeasonRegistrations.Select(r => r.TeamId).ToList();
-            var teamNames = season.SeasonRegistrations.ToDictionary(r => r.TeamId, r => r.Team.Name);
+            var teamIds = eligibleRegistrations.Select(r => r.TeamId).ToList();
+            var teamNames = eligibleRegistrations.ToDictionary(r => r.TeamId, r => r.Team.Name);
             var matchups = BuildMatchups(weeks, teamIds, teamNames);
             db.SeasonWeekMatchups.AddRange(matchups);
 
@@ -111,6 +129,23 @@ namespace BloodsportFunctions.Functions
                 LoseCount = 0,
             });
             db.TeamSeasonResults.AddRange(seasonResults);
+
+            // Lock in each eligible team's active roster for the season.
+            var rosters = eligibleRegistrations.Select(r => new TeamSeasonRoster
+            {
+                TeamId = r.TeamId,
+                SeasonId = seasonId,
+                Team = r.Team,
+                Season = season,
+                RosterJson = JsonSerializer.Serialize(new TeamSeasonRosterJson
+                {
+                    AllowedSummonerNames = r.Team.TeamMemberships
+                        .Where(m => m.Active)
+                        .Select(m => $"{m.RiotAccount.GameName}#{m.RiotAccount.TagLine}")
+                        .ToList()
+                }),
+            });
+            db.TeamSeasonRosters.AddRange(rosters);
 
             await db.SaveChangesAsync();
 
