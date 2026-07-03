@@ -24,6 +24,6 @@ Assignments AS (
     FROM ShuffledAccounts sa
     JOIN NumberedTeams nt ON nt.RowNum = CEILING(sa.RowNum * 1.0 / 7)
 )
-INSERT INTO [dbo].[TeamMemberships] ([TeamId], [RiotAccountId])
-SELECT TeamId, RiotAccountId
+INSERT INTO [dbo].[TeamMemberships] ([TeamId], [RiotAccountId], [Active])
+SELECT TeamId, RiotAccountId, 1
 FROM Assignments;
