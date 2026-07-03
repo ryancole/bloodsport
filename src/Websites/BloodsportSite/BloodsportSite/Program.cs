@@ -159,22 +159,6 @@ namespace BloodsportSite
             options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         }
 
-        private static readonly string[] _adjectives = [
-            "Swift", "Bold", "Fierce", "Silent", "Iron", "Crimson", "Jade", "Storm",
-            "Shadow", "Frost", "Blazing", "Steel", "Onyx", "Silver", "Golden", "Phantom"
-        ];
-
-        private static readonly string[] _nouns = [
-            "Falcon", "Wolf", "Raven", "Dragon", "Viper", "Phoenix", "Titan", "Specter",
-            "Hunter", "Striker", "Warden", "Sentinel", "Reaper", "Ember", "Cipher", "Blade"
-        ];
-
-        private static string GenerateRandomDisplayName()
-        {
-            var rng = Random.Shared;
-            return _adjectives[rng.Next(_adjectives.Length)] + _nouns[rng.Next(_nouns.Length)];
-        }
-
         private static void ConfigureOpenIdConnect(OpenIdConnectOptions options)
         {
             options.Scope.Add("email");
@@ -204,11 +188,18 @@ namespace BloodsportSite
                 var email = context.Principal?.FindFirst("email")?.Value
                          ?? context.Principal?.FindFirst("preferred_username")?.Value;
 
+                var displayName = context.Principal?.FindFirst("name")?.Value?.Trim();
+
+                if (string.IsNullOrEmpty(displayName))
+                {
+                    return;
+                }
+
                 var user = await db.Users.FirstOrDefaultAsync(u => u.EntraObjectId == oid);
 
                 if (user is null)
                 {
-                    db.Users.Add(new User { EntraObjectId = oid, DisplayName = GenerateRandomDisplayName(), Email = email });
+                    db.Users.Add(new User { EntraObjectId = oid, DisplayName = displayName, Email = email });
                 }
                 else if (email is not null && user.Email != email)
                 {
