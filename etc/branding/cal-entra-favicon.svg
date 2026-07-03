@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+  <!-- Entra company-branding favicon: same CAL pixel wordmark as cal-discord-logo.svg, sized to Entra's required 32x32 output. Full-bleed dark background (no rounded corners) so it reads cleanly at 32px. -->
+  <rect width="32" height="32" fill="#111827"/>
+  <g fill="#ffffff">
+    <rect x="5" y="8" width="2" height="2"/><rect x="7" y="8" width="2" height="2"/><rect x="9" y="8" width="2" height="2"/>
+    <rect x="5" y="10" width="2" height="2"/>
+    <rect x="5" y="12" width="2" height="2"/>
+    <rect x="5" y="14" width="2" height="2"/>
+    <rect x="5" y="16" width="2" height="2"/><rect x="7" y="16" width="2" height="2"/><rect x="9" y="16" width="2" height="2"/>
+    <rect x="13" y="8" width="2" height="2"/><rect x="15" y="8" width="2" height="2"/><rect x="17" y="8" width="2" height="2"/>
+    <rect x="13" y="10" width="2" height="2"/><rect x="17" y="10" width="2" height="2"/>
+    <rect x="13" y="12" width="2" height="2"/><rect x="15" y="12" width="2" height="2"/><rect x="17" y="12" width="2" height="2"/>
+    <rect x="13" y="14" width="2" height="2"/><rect x="17" y="14" width="2" height="2"/>
+    <rect x="13" y="16" width="2" height="2"/><rect x="17" y="16" width="2" height="2"/>
+    <rect x="21" y="8" width="2" height="2"/>
+    <rect x="21" y="10" width="2" height="2"/>
+    <rect x="21" y="12" width="2" height="2"/>
+    <rect x="21" y="14" width="2" height="2"/>
+    <rect x="21" y="16" width="2" height="2"/><rect x="23" y="16" width="2" height="2"/><rect x="25" y="16" width="2" height="2"/>
+  </g>
+  <g fill="#0ea5e9">
+    <rect x="5" y="20" width="22" height="2"/>
+    <rect x="7" y="22" width="18" height="2"/>
+  </g>
+</svg>
