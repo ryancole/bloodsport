@@ -109,9 +109,17 @@
 
     private RenderFragment Render(Slogan s) => __builder =>
     {
-        <div class="[writing-mode:vertical-rl] rotate-180 select-none whitespace-nowrap text-center leading-tight">
-            <span class="text-9xl font-semibold uppercase tracking-[0.25em] text-gold-600">@s.Quote</span>
-            <span class="mt-6 inline-block text-xl font-semibold uppercase tracking-[0.3em] text-brand-600">@s.Attribution</span>
+        // The text is set vertically, so its length runs down the page. Scale the
+        // whole block's font-size by the (approx) per-character advance — quote at
+        // 1em plus the smaller attribution — so even the longest quote fits within
+        // the viewport height (88vh leaves a margin + scrollbar room). Short quotes
+        // hit the 7rem cap instead of ballooning. min() picks whichever is smaller.
+        var advance = s.Quote.Length + (int)Math.Ceiling(0.28 * s.Attribution.Length) + 4;
+        var fontSize = $"font-size: min(7rem, calc(88vh / {advance}))";
+
+        <div class="[writing-mode:vertical-rl] rotate-180 select-none whitespace-nowrap text-center leading-tight" style="@fontSize">
+            <span class="font-semibold uppercase tracking-[0.25em] text-gold-600" style="font-size:1em">@s.Quote</span>
+            <span class="mt-6 inline-block font-semibold uppercase tracking-[0.3em] text-brand-600" style="font-size:0.28em">@s.Attribution</span>
         </div>
     };
 }
