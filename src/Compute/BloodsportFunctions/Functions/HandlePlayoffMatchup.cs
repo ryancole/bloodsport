@@ -100,25 +100,27 @@ public class HandlePlayoffMatchup
         var winningPlayoffTeam = winningMembership.TeamId == teamOneId ? matchup.TeamOne : matchup.TeamTwo;
         var losingPlayoffTeam  = winningMembership.TeamId == teamOneId ? matchup.TeamTwo : matchup.TeamOne;
 
-        // Roster validation against season rosters.
-        var seasonId = matchup.PlayoffRound.Playoff.SeasonId;
+        // Roster validation against the playoff rosters (snapshotted from the season
+        // rosters when the bracket was built), consistent with tournament-code generation
+        // and the matchup display.
+        var playoffId = matchup.PlayoffRound.Playoff.Id;
 
         var participantAccounts = await db.RiotAccounts
             .Where(a => allPuuids.Contains(a.Puuid))
             .ToListAsync();
 
-        var teamOneRoster = await db.TeamSeasonRosters
-            .FirstOrDefaultAsync(r => r.TeamId == teamOneId && r.SeasonId == seasonId);
+        var teamOneRoster = await db.TeamPlayoffRosters
+            .FirstOrDefaultAsync(r => r.TeamId == teamOneId && r.PlayoffId == playoffId);
 
-        var teamTwoRoster = await db.TeamSeasonRosters
-            .FirstOrDefaultAsync(r => r.TeamId == teamTwoId && r.SeasonId == seasonId);
+        var teamTwoRoster = await db.TeamPlayoffRosters
+            .FirstOrDefaultAsync(r => r.TeamId == teamTwoId && r.PlayoffId == playoffId);
 
         var teamOneAllowed = teamOneRoster is not null
-            ? (JsonSerializer.Deserialize<TeamSeasonRosterJson>(teamOneRoster.RosterJson)?.AllowedSummonerNames ?? [])
+            ? (JsonSerializer.Deserialize<TeamPlayoffRosterJson>(teamOneRoster.RosterJson)?.AllowedSummonerNames ?? [])
             : (ICollection<string>)[];
 
         var teamTwoAllowed = teamTwoRoster is not null
-            ? (JsonSerializer.Deserialize<TeamSeasonRosterJson>(teamTwoRoster.RosterJson)?.AllowedSummonerNames ?? [])
+            ? (JsonSerializer.Deserialize<TeamPlayoffRosterJson>(teamTwoRoster.RosterJson)?.AllowedSummonerNames ?? [])
             : (ICollection<string>)[];
 
         var winnerAllowed = winningMembership.TeamId == teamOneId ? teamOneAllowed : teamTwoAllowed;
