@@ -7,6 +7,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject BloodsportSite.Services.BlobSasService BlobSasService
+@inject BloodsportSite.Services.CareerStatsService CareerStatsService
 
 
 <PageTitle>@(team?.Name ?? "Team") | BSAL</PageTitle>
@@ -62,6 +63,59 @@ else
         <dt class="font-medium text-gray-500">Created</dt>
         <dd class="text-gray-700">@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
+
+    @if (career is not null)
+    {
+        <div class="mb-8 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Career</span>
+                @if (career.Titles > 0)
+                {
+                    <span class="inline-flex items-center gap-1 text-sm font-semibold text-amber-600">
+                        <Icon Path="@StatusIcons.Star" Class="h-4 w-4" />
+                        @career.Titles @(career.Titles == 1 ? "title" : "titles")
+                    </span>
+                }
+            </div>
+            <dl class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div>
+                    <dt class="text-xs uppercase tracking-wide text-gray-400">All-Time Record</dt>
+                    <dd class="mt-1 text-lg font-bold text-gray-900">
+                        <span class="text-green-700">@career.RegularSeasonWins</span><span class="text-gray-300">–</span><span class="text-red-700">@career.RegularSeasonLosses</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs uppercase tracking-wide text-gray-400">Win %</dt>
+                    <dd class="mt-1 text-lg font-bold text-gray-900">@(career.WinPct is { } pct ? pct.ToString("P0") : "—")</dd>
+                </div>
+                <div>
+                    <dt class="text-xs uppercase tracking-wide text-gray-400">Seasons</dt>
+                    <dd class="mt-1 text-lg font-bold text-gray-900">@career.SeasonsPlayed</dd>
+                </div>
+                <div>
+                    <dt class="text-xs uppercase tracking-wide text-gray-400">Playoff Apps</dt>
+                    <dd class="mt-1 text-lg font-bold text-gray-900">@career.PlayoffAppearances</dd>
+                </div>
+                @if (career.BestSeasonWins is not null)
+                {
+                    <div>
+                        <dt class="text-xs uppercase tracking-wide text-gray-400">Best Season</dt>
+                        <dd class="mt-1 text-lg font-bold text-gray-900">
+                            @career.BestSeasonWins<span class="text-gray-300">–</span>@career.BestSeasonLosses
+                            <span class="block text-xs font-normal text-gray-500">@career.BestSeasonName</span>
+                        </dd>
+                    </div>
+                }
+                @if (career.RunnerUps > 0)
+                {
+                    <div>
+                        <dt class="text-xs uppercase tracking-wide text-gray-400">Runner-up</dt>
+                        <dd class="mt-1 text-lg font-bold text-gray-900">@career.RunnerUps</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+    }
 
     @if (isManager)
     {
@@ -278,6 +332,7 @@ else
     private List<SeasonWeekMatchup> matchups = [];
     private Dictionary<long, TeamSeasonResult> seasonResults = [];
     private List<PlayoffTeam> playoffEntries = [];
+    private BloodsportSite.Services.TeamCareerStats? career;
     private bool notFound;
     private bool isManager;
     private bool isMember;
@@ -338,6 +393,8 @@ else
                 .Where(pt => pt.TeamId == Id)
                 .OrderByDescending(pt => pt.Playoff.DateCreated)
                 .ToListAsync();
+
+            career = await CareerStatsService.GetTeamCareerStatsAsync(Id);
         }
 
         if (team is null)
