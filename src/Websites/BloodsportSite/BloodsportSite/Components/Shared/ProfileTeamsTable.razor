@@ -21,7 +21,7 @@ else
                         <td>@row.Role</td>
                         <td>@row.Team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
                         <td class="text-right">
-                            @if (row.Role == "Member")
+                            @if (row.Role.Contains("Member"))
                             {
                                 <form method="post" action="/api/teams/@row.Team.Id/leave">
                                     <AntiforgeryToken />
