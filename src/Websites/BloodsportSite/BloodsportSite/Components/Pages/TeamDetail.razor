@@ -33,22 +33,25 @@ else
             }
             <h1 class="page-title">@team.Name</h1>
         </div>
-        @if (isManager)
+        @if (isManager || isMember)
         {
             <div class="flex items-center gap-2">
-                <a href="/teams/@team.Id/edit" class="btn btn-secondary">Edit</a>
-                <form method="post" action="/api/teams/@team.Id/delete">
-                    <AntiforgeryToken />
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
+                @if (isManager)
+                {
+                    <a href="/teams/@team.Id/edit" class="btn btn-secondary">Edit</a>
+                    <form method="post" action="/api/teams/@team.Id/delete">
+                        <AntiforgeryToken />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                }
+                @if (isMember)
+                {
+                    <form method="post" action="/api/teams/@team.Id/leave">
+                        <AntiforgeryToken />
+                        <button type="submit" class="btn btn-danger">Leave Team</button>
+                    </form>
+                }
             </div>
-        }
-        else if (isMember)
-        {
-            <form method="post" action="/api/teams/@team.Id/leave">
-                <AntiforgeryToken />
-                <button type="submit" class="btn btn-danger">Leave Team</button>
-            </form>
         }
     </div>
 
