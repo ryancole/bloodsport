@@ -9,7 +9,7 @@
     var sideClass = Random.Shared.Next(2) == 0 ? "left-0" : "right-0";
 }
 
-<div aria-hidden="true" class="pointer-events-none fixed inset-y-0 @sideClass z-30 hidden w-[max(0px,calc((100vw-72rem)/2))] xl:flex items-center justify-center">
+<div aria-hidden="true" class="pointer-events-none fixed inset-y-0 @sideClass -z-10 hidden w-[max(0px,calc((100vw-72rem)/2))] xl:flex items-center justify-center">
     @Render(slogan)
 </div>
 
@@ -87,13 +87,31 @@
         new("Float like a butterfly, sting like a bee", "Muhammad Ali"),
         new("It ain't about how hard you hit", "Rocky Balboa"),
         new("Say what again, I dare you", "Jules Winnfield"),
+
+        // The house special — Bloodsport (the site's namesake) and the Muscles
+        // from Brussels himself, including a couple of his real interview lines.
+        new("Brick not hit back", "Senzo Tanaka"),
+        new("You break my record, now I break you", "Chong Li"),
+        new("You are next", "Chong Li"),
+        new("The world's greatest warriors fight in a battle to the death", "Bloodsport"),
+        new("The future has a bad attitude", "Universal Soldier"),
+        new("Don't hunt what you can't kill", "Hard Target"),
+        new("I'm aware I am rare", "Jean-Claude Van Damme"),
+        new("I'm the Fred Astaire of karate", "Jean-Claude Van Damme"),
+        new("Time waits for no man", "Timecop"),
+        new("Twice the Van Damme, twice the action", "Double Impact"),
+        new("Terror goes into overtime", "Sudden Death"),
+        new("For me, it was Tuesday", "M. Bison"),
+        new("You've got paid vacation coming, starting right now", "Guile"),
+        new("You're all gonna die", "Andrew Scott"),
+        new("He'll fight for the only family he has left", "Lionheart"),
     ];
 
     private RenderFragment Render(Slogan s) => __builder =>
     {
         <div class="[writing-mode:vertical-rl] rotate-180 select-none whitespace-nowrap text-center leading-tight">
-            <span class="text-sm font-semibold uppercase tracking-[0.25em] text-gold-600">@s.Quote</span>
-            <span class="mt-3 inline-block text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-600">@s.Attribution</span>
+            <span class="text-9xl font-semibold uppercase tracking-[0.25em] text-gold-600">@s.Quote</span>
+            <span class="mt-6 inline-block text-xl font-semibold uppercase tracking-[0.3em] text-brand-600">@s.Attribution</span>
         </div>
     };
 }
