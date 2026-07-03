@@ -30,7 +30,7 @@ else
         @foreach (var post in posts)
         {
             <article class="py-6 first:pt-0">
-                <a href="/news/@post.Id" class="text-xl font-semibold text-gray-900 no-underline hover:text-brand-600">@post.Title</a>
+                <a href="/news/@post.Id" class="inline-block border-l-[3px] border-brand-500 pl-2.5 text-xl font-semibold text-gray-900 no-underline hover:text-brand-600">@post.Title</a>
                 <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                     <time>@post.DateCreated.ToString("MMMM d, yyyy")</time>
                     <span>·</span>
