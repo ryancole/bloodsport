@@ -22,20 +22,12 @@
 
     private RenderFragment Render(Slogan s) => __builder =>
     {
-        // The text is set vertically, so its length runs down the page. The quote
-        // and attribution each get their own line (parallel vertical columns), so
-        // scale the whole block's font-size by the quote's (approx) per-character
-        // advance alone — letting the quote grow to fill the viewport height (88vh
-        // leaves a margin + scrollbar room) without the attribution eating into the
-        // same line's budget. The shorter attribution column sits alongside, and
-        // may overlap the quote's length when it's long — which is fine here. Short
-        // quotes hit the 7rem cap instead of ballooning. min() picks the smaller.
-        var advance = s.Quote.Length + 2;
-        var fontSize = $"font-size: min(7rem, calc(88vh / {advance}))";
-
-        <div class="[writing-mode:vertical-rl] rotate-180 select-none whitespace-nowrap text-center leading-tight" style="@fontSize">
-            <div class="font-semibold uppercase tracking-[0.25em] text-gold-600" style="font-size:1em">@s.Quote</div>
-            <div class="font-semibold uppercase tracking-[0.3em] text-brand-600" style="font-size:0.28em; margin-block-start:0.5em">@s.Attribution</div>
+        // A small, fixed text size. The quote and attribution each get their own
+        // line (parallel vertical columns) but stay at a restrained scale rather
+        // than growing to fill the gutter height.
+        <div class="[writing-mode:vertical-rl] rotate-180 select-none whitespace-nowrap text-center leading-tight">
+            <div class="text-sm font-semibold uppercase tracking-[0.25em] text-gold-600">@s.Quote</div>
+            <div class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-600" style="margin-block-start:0.5rem">@s.Attribution</div>
         </div>
     };
 }
