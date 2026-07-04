@@ -105,26 +105,27 @@ else
         <dd class="text-gray-700">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
+    @{
+        var isLooking = user.UserRecruitment?.IsLookingForTeam == true;
+    }
     <div class="mb-8">
-        <h2 class="mb-3 section-title">Looking for a Team</h2>
-        @{
-            var isLooking = user.UserRecruitment?.IsLookingForTeam == true;
-        }
-        @if (isLooking)
-        {
-            <div class="alert alert-success mb-3">You're marked as looking for a team. Team managers can find and recruit you.</div>
-        }
-        else
-        {
-            <p class="mb-3 text-sm text-gray-600">Let team managers know you're available to be recruited. Select the lanes you play.</p>
-        }
+        <div class="mb-3 flex items-center gap-3">
+            <h2 class="section-title">Looking for a Team</h2>
+            @if (isLooking)
+            {
+                <span class="badge bg-green-100 text-green-800">Available</span>
+            }
+            else
+            {
+                <span class="badge bg-gray-100 text-gray-500">Not listed</span>
+            }
+        </div>
 
-        <form method="post" action="/api/users/update-recruitment">
-            <AntiforgeryToken />
-            <input type="hidden" name="isLookingForTeam" value="true" />
-            <fieldset class="mb-4">
-                <legend class="mb-2 text-sm font-medium text-gray-500">Lanes</legend>
-                <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <form method="post" action="/api/users/update-recruitment" class="flex flex-wrap items-center gap-3">
+                <AntiforgeryToken />
+                <input type="hidden" name="isLookingForTeam" value="true" />
+                <div class="flex flex-wrap gap-2" role="group" aria-label="Lanes">
                     @foreach (var lane in allLanes)
                     {
                         <label class="cursor-pointer" title="@lane">
@@ -134,18 +135,18 @@ else
                         </label>
                     }
                 </div>
-            </fieldset>
-            <button type="submit" class="btn btn-primary">@(isLooking ? "Update lanes" : "Mark me as looking for a team")</button>
-        </form>
-
-        @if (isLooking)
-        {
-            <form method="post" action="/api/users/update-recruitment" class="mt-3">
-                <AntiforgeryToken />
-                <input type="hidden" name="isLookingForTeam" value="false" />
-                <button type="submit" class="btn btn-secondary">Stop looking for a team</button>
+                <button type="submit" class="btn btn-primary">@(isLooking ? "Save" : "Mark as looking")</button>
             </form>
-        }
+
+            @if (isLooking)
+            {
+                <form method="post" action="/api/users/update-recruitment">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="isLookingForTeam" value="false" />
+                    <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 hover:underline">Stop looking</button>
+                </form>
+            }
+        </div>
     </div>
 
     <div class="mb-8">
