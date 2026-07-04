@@ -20,8 +20,9 @@ namespace Bloodsport.Data.Sql
             base.OnModelCreating(modelBuilder);
 
             new TeamEntityConfiguration().Configure(modelBuilder.Entity<Team>());
-            new TeamMembershipEntityConfiguration().Configure(modelBuilder.Entity<TeamMembership>());
             new TeamInviteEntityConfiguration().Configure(modelBuilder.Entity<TeamInvite>());
+            new TeamMembershipEntityConfiguration().Configure(modelBuilder.Entity<TeamMembership>());
+            new TeamRecruitmentEntityConfiguration().Configure(modelBuilder.Entity<TeamRecruitment>());
 
             new SeasonEntityConfiguration().Configure(modelBuilder.Entity<Season>());
             new SeasonRegistrationEntityConfiguration().Configure(modelBuilder.Entity<SeasonRegistration>());
@@ -101,6 +102,8 @@ namespace Bloodsport.Data.Sql
         public DbSet<SeasonMatchupParameters> SeasonMatchupParameters { get; set; }
 
         public DbSet<UserRecruitment> UserRecruitments { get; set; }
+
+        public DbSet<TeamRecruitment> TeamRecruitments { get; set; }
 
         #endregion
     }

@@ -24,6 +24,9 @@ namespace Bloodsport.Entity.Database
         public required virtual User Manager { get; set; }
 
         [JsonIgnore]
+        public virtual TeamRecruitment TeamRecruitment { get; set; }
+
+        [JsonIgnore]
         public virtual ICollection<TeamInvite> TeamInvites { get; set; } = [];
 
         [JsonIgnore]
