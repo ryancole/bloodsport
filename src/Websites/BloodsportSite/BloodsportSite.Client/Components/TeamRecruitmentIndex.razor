@@ -1,0 +1,143 @@
+@rendermode InteractiveWebAssembly
+@using BloodsportSite.Client.Models
+@inject HttpClient Http
+
+@if (result is null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-2">
+                <input type="search" class="input w-64" placeholder="Search by name…"
+                       @bind="searchInput" @bind:event="oninput" @onkeydown="HandleSearchKey" />
+                <button class="btn btn-secondary" @onclick="ApplySearch">Search</button>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500">Lane:</span>
+                <div class="flex gap-1.5">
+                    @foreach (var l in laneOrder)
+                    {
+                        var isActive = laneFilter == l;
+                        <button type="button" title="@l" aria-pressed="@isActive" @onclick="() => ToggleLane(l)"
+                                class="rounded-md bg-[#0e1a2b] p-1 ring-2 transition @(isActive ? "opacity-100 ring-brand-500" : "opacity-40 ring-transparent hover:opacity-70")">
+                            <img src="/image/lanes/@(l.ToString().ToLowerInvariant()).svg" width="26" height="26" alt="@l" />
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+        <Pager CurrentPage="result.Page" TotalPages="result.TotalPages" OnPageChanged="GoToPage" />
+    </div>
+
+    @if (result.Items.Count == 0)
+    {
+        <p class="py-4 text-center text-gray-500">No teams are recruiting right now.</p>
+    }
+    else
+    {
+        <div class="overflow-x-auto">
+            <table class="tbl">
+                <thead>
+                    <tr><th>Team</th><th>Lanes Needed</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var team in result.Items)
+                    {
+                        <tr>
+                            <td><a href="/teams/@team.Id" class="link inline-flex items-center gap-2"><TeamFlag FlagUrl="@team.FlagUrl" />@team.Name</a></td>
+                            <td>
+                                @if (team.Lanes.Count == 0)
+                                {
+                                    <span class="text-gray-400">—</span>
+                                }
+                                else
+                                {
+                                    <div class="flex gap-1.5">
+                                        @foreach (var lane in laneOrder.Where(l => team.Lanes.Contains(l)))
+                                        {
+                                            <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="24" height="24" alt="@lane" title="@lane" class="rounded-md bg-[#0e1a2b] p-0.5" />
+                                        }
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    private const int PageSize = 20;
+
+    private static readonly TeamRecruitmentLanes[] laneOrder =
+    [
+        TeamRecruitmentLanes.Top,
+        TeamRecruitmentLanes.Jungle,
+        TeamRecruitmentLanes.Middle,
+        TeamRecruitmentLanes.Bottom,
+        TeamRecruitmentLanes.Support,
+    ];
+
+    private PagedResult<RecruitmentTeamListItem>? result;
+    private string? search;
+    private string searchInput = "";
+    private TeamRecruitmentLanes? laneFilter;
+    private int currentPage = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OperatingSystem.IsBrowser())
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        var url = $"/api/recruitment/teams?page={currentPage}&pageSize={PageSize}";
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            url += $"&search={Uri.EscapeDataString(search)}";
+        }
+        if (laneFilter is not null)
+        {
+            url += $"&lane={laneFilter}";
+        }
+
+        result = await Http.GetFromJsonAsync<PagedResult<RecruitmentTeamListItem>>(url);
+        if (result is not null)
+        {
+            currentPage = result.Page;
+        }
+    }
+
+    private async Task ApplySearch()
+    {
+        search = string.IsNullOrWhiteSpace(searchInput) ? null : searchInput.Trim();
+        currentPage = 1;
+        await LoadAsync();
+    }
+
+    private async Task HandleSearchKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await ApplySearch();
+    }
+
+    private async Task ToggleLane(TeamRecruitmentLanes lane)
+    {
+        laneFilter = laneFilter == lane ? null : lane;
+        currentPage = 1;
+        await LoadAsync();
+    }
+
+    private async Task GoToPage(int page)
+    {
+        currentPage = page;
+        await LoadAsync();
+    }
+}
