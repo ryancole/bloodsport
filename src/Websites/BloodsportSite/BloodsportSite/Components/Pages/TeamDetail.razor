@@ -64,6 +64,57 @@ else
         <dd class="text-gray-700">@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
+    @if (IsRecruiting)
+    {
+        <div class="alert alert-success mb-8 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span class="font-medium">This team is recruiting players.</span>
+            @if (selectedLanes.Count > 0)
+            {
+                <span class="inline-flex flex-wrap items-center gap-1.5">
+                    <span class="text-green-700">Lanes needed:</span>
+                    @foreach (var lane in laneOrder.Where(l => selectedLanes.Contains(l)))
+                    {
+                        <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="28" height="28" alt="@lane" title="@lane" class="rounded-md bg-[#0e1a2b] p-1" />
+                    }
+                </span>
+            }
+        </div>
+    }
+
+    @if (isManager)
+    {
+        <div class="mb-8">
+            <h2 class="mb-3 section-title">Recruiting</h2>
+
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <form method="post" action="/api/teams/@team.Id/update-recruitment" class="flex flex-wrap items-center gap-3">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="isLookingForUser" value="true" />
+                    <div class="flex flex-wrap gap-2" role="group" aria-label="Lanes needed">
+                        @foreach (var lane in laneOrder)
+                        {
+                            <label class="cursor-pointer" title="@lane">
+                                <input type="checkbox" name="lanes" value="@lane" checked="@selectedLanes.Contains(lane)" class="peer sr-only" />
+                                <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="32" height="32" alt="@lane"
+                                     class="rounded-md bg-[#0e1a2b] p-1 opacity-40 ring-2 ring-transparent transition hover:opacity-70 peer-checked:opacity-100 peer-checked:ring-brand-500" />
+                            </label>
+                        }
+                    </div>
+                    <button type="submit" class="btn btn-primary">@(IsRecruiting ? "Save" : "Mark as recruiting")</button>
+                </form>
+
+                @if (IsRecruiting)
+                {
+                    <form method="post" action="/api/teams/@team.Id/update-recruitment">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="isLookingForUser" value="false" />
+                        <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 hover:underline">Stop recruiting</button>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+
     @if (career is not null)
     {
         <div class="mb-8 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
@@ -327,7 +378,18 @@ else
 @code {
     [Parameter] public long Id { get; set; }
 
+    private static readonly TeamRecruitmentLanes[] laneOrder =
+    [
+        TeamRecruitmentLanes.Top,
+        TeamRecruitmentLanes.Jungle,
+        TeamRecruitmentLanes.Middle,
+        TeamRecruitmentLanes.Bottom,
+        TeamRecruitmentLanes.Support,
+    ];
+
     private Bloodsport.Entity.Database.Team? team;
+    private bool IsRecruiting => team?.TeamRecruitment?.IsLookingForUser == true;
+    private HashSet<TeamRecruitmentLanes> selectedLanes = [];
     private List<TeamInvite> pendingInvites = [];
     private List<SeasonWeekMatchup> matchups = [];
     private Dictionary<long, TeamSeasonResult> seasonResults = [];
@@ -374,6 +436,7 @@ else
 
         team = await db.Teams
             .Include(t => t.Manager)
+            .Include(t => t.TeamRecruitment)
             .Include(t => t.TeamMemberships)
                 .ThenInclude(m => m.RiotAccount)
                     .ThenInclude(r => r.User)
@@ -383,6 +446,8 @@ else
 
         if (team is not null)
         {
+            selectedLanes = team.TeamRecruitment?.Lanes.ToHashSet() ?? [];
+
             seasonResults = await db.TeamSeasonResults
                 .Where(r => r.TeamId == Id)
                 .ToDictionaryAsync(r => r.SeasonId);
