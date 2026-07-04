@@ -28,4 +28,11 @@ namespace Bloodsport.Entity.Database
 
         #endregion
     }
+
+    public enum TeamInviteStatus
+    {
+        Pending = 0,
+        Accepted = 1,
+        Declined = 2,
+    }
 }
