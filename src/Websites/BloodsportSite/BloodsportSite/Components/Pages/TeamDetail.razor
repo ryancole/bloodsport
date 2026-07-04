@@ -185,7 +185,7 @@ else
             <div class="overflow-x-auto">
                 <table class="tbl">
                     <thead>
-                        <tr><th>Riot ID</th><th>Sent</th></tr>
+                        <tr><th>Riot ID</th><th>Sent</th><th></th></tr>
                     </thead>
                     <tbody>
                         @foreach (var invite in pendingInvites)
@@ -193,6 +193,12 @@ else
                             <tr>
                                 <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(invite.RiotAccount.GameName)-@Uri.EscapeDataString(invite.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link"><strong>@invite.RiotAccount.GameName#@invite.RiotAccount.TagLine</strong></a></td>
                                 <td>@invite.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                                <td>
+                                    <form method="post" action="/api/invites/@invite.Id/cancel">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                                    </form>
+                                </td>
                             </tr>
                         }
                     </tbody>

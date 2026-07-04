@@ -22,6 +22,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/invites/{id}/decline", DeclineAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/invites/{id}/cancel", CancelAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -168,6 +171,31 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/profile");
+        }
+
+        // Manager: abort a pending invite their team has sent.
+        private static async Task<IResult> CancelAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var invite = await db.TeamInvites
+                .Include(i => i.Team)
+                .FirstOrDefaultAsync(i => i.Id == id && i.Status == TeamInviteStatus.Pending);
+
+            if (invite is null || invite.Team.ManagerId != user.Id)
+                return Results.Redirect("/teams");
+
+            var teamId = invite.TeamId;
+            db.TeamInvites.Remove(invite);
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/teams/{teamId}");
         }
 
         private static async Task<User?> GetCurrentUserAsync(HttpContext context, SqlDbContext db)
