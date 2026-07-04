@@ -20,7 +20,6 @@ namespace Bloodsport.Data.Sql
             base.OnModelCreating(modelBuilder);
 
             new TeamEntityConfiguration().Configure(modelBuilder.Entity<Team>());
-            new UserEntityConfiguration().Configure(modelBuilder.Entity<User>());
             new TeamMembershipEntityConfiguration().Configure(modelBuilder.Entity<TeamMembership>());
             new TeamInviteEntityConfiguration().Configure(modelBuilder.Entity<TeamInvite>());
 
@@ -48,6 +47,9 @@ namespace Bloodsport.Data.Sql
 
             new PostEntityConfiguration().Configure(modelBuilder.Entity<Post>());
             new PostCommentEntityConfiguration().Configure(modelBuilder.Entity<PostComment>());
+
+            new UserEntityConfiguration().Configure(modelBuilder.Entity<User>());
+            new UserRecruitmentEntityConfiguration().Configure(modelBuilder.Entity<UserRecruitment>());
         }
 
         #endregion
@@ -97,6 +99,8 @@ namespace Bloodsport.Data.Sql
         public DbSet<PostComment> PostComments { get; set; }
 
         public DbSet<SeasonMatchupParameters> SeasonMatchupParameters { get; set; }
+
+        public DbSet<UserRecruitment> UserRecruitments { get; set; }
 
         #endregion
     }

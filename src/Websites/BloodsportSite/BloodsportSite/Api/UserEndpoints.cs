@@ -18,6 +18,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/users/update-logo", UpdateLogoAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/users/update-recruitment", UpdateRecruitmentAsync)
+                .RequireAuthorization();
+
             return endpoints;
         }
 
@@ -127,6 +130,39 @@ namespace BloodsportSite.Api
                 return Results.Redirect("/profile?logo_error=invalid_logo");
 
             user.LogoUrl = logoUrl;
+            await db.SaveChangesAsync();
+
+            return Results.Redirect("/profile");
+        }
+
+        private static async Task<IResult> UpdateRecruitmentAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            [Microsoft.AspNetCore.Mvc.FromForm] UpdateRecruitmentForm form)
+        {
+            var lanes = context.Request.Form["lanes"]
+                .Where(v => Enum.TryParse<UserRecruitmentLanes>(v, out _))
+                .Select(Enum.Parse<UserRecruitmentLanes>)
+                .Distinct()
+                .OrderBy(l => l)
+                .ToList();
+
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/profile");
+
+            var recruitment = await db.UserRecruitments.FirstOrDefaultAsync(r => r.UserId == user.Id);
+
+            if (recruitment is null)
+            {
+                recruitment = new UserRecruitment { UserId = user.Id };
+                db.UserRecruitments.Add(recruitment);
+            }
+
+            recruitment.IsLookingForTeam = form.IsLookingForTeam;
+            recruitment.Lanes = form.IsLookingForTeam ? lanes : [];
             await db.SaveChangesAsync();
 
             return Results.Redirect("/profile");

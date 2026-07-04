@@ -106,6 +106,48 @@ else
     </dl>
 
     <div class="mb-8">
+        <h2 class="mb-3 section-title">Looking for a Team</h2>
+        @{
+            var isLooking = user.UserRecruitment?.IsLookingForTeam == true;
+        }
+        @if (isLooking)
+        {
+            <div class="alert alert-success mb-3">You're marked as looking for a team. Team managers can find and recruit you.</div>
+        }
+        else
+        {
+            <p class="mb-3 text-sm text-gray-600">Let team managers know you're available to be recruited. Select the lanes you play.</p>
+        }
+
+        <form method="post" action="/api/users/update-recruitment">
+            <AntiforgeryToken />
+            <input type="hidden" name="isLookingForTeam" value="true" />
+            <fieldset class="mb-3">
+                <legend class="mb-2 text-sm font-medium text-gray-500">Lanes</legend>
+                <div class="flex flex-wrap gap-4">
+                    @foreach (var lane in allLanes)
+                    {
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" name="lanes" value="@lane" checked="@selectedLanes.Contains(lane)" />
+                            <span class="text-sm text-gray-700">@lane</span>
+                        </label>
+                    }
+                </div>
+            </fieldset>
+            <button type="submit" class="btn btn-primary">@(isLooking ? "Update lanes" : "Mark me as looking for a team")</button>
+        </form>
+
+        @if (isLooking)
+        {
+            <form method="post" action="/api/users/update-recruitment" class="mt-3">
+                <AntiforgeryToken />
+                <input type="hidden" name="isLookingForTeam" value="false" />
+                <button type="submit" class="btn btn-secondary">Stop looking for a team</button>
+            </form>
+        }
+    </div>
+
+    <div class="mb-8">
         <ProfileRiotAccountsTable Accounts="user.RiotAccounts" RiotError="@riotError" />
     </div>
 
@@ -120,6 +162,9 @@ else
     private string? displayNameError;
     private string? logoError;
     private bool inviteAccepted;
+
+    private static readonly UserRecruitmentLanes[] allLanes = Enum.GetValues<UserRecruitmentLanes>();
+    private HashSet<UserRecruitmentLanes> selectedLanes = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -171,10 +216,13 @@ else
                             .ThenInclude(t => t.TeamMemberships)
                 .Include(u => u.ManagedTeams)
                     .ThenInclude(t => t.TeamMemberships)
+                .Include(u => u.UserRecruitment)
                 .FirstOrDefaultAsync(u => u.EntraObjectId == oid);
 
             if (user is not null)
             {
+                selectedLanes = user.UserRecruitment?.Lanes.ToHashSet() ?? [];
+
                 var managedTeamIds = user.ManagedTeams.Select(t => t.Id).ToHashSet();
                 var memberTeams = user.RiotAccounts.SelectMany(a => a.TeamMemberships).Select(m => m.Team).DistinctBy(t => t.Id);
 
