@@ -9,5 +9,6 @@ public record RecruitmentListItem(
     long UserId,
     string DisplayName,
     string? FlagUrl,
-    List<RiotAccountRecruitmentLanes> Lanes
+    List<RiotAccountRecruitmentLanes> Lanes,
+    bool AlreadyInvited
 );

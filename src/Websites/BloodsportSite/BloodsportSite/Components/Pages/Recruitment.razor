@@ -1,4 +1,11 @@
 @page "/recruitment"
+@using Bloodsport.Data.Sql
+@using BloodsportSite.Client.Models
+@using Microsoft.AspNetCore.Antiforgery
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<SqlDbContext> DbFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAntiforgery Antiforgery
 
 <PageTitle>Recruitment | BSAL</PageTitle>
 
@@ -7,8 +14,36 @@
 
 <h2 class="mb-4 section-title">Players looking for a team</h2>
 
-<BloodsportSite.Client.Components.RecruitmentIndex />
+<BloodsportSite.Client.Components.RecruitmentIndex ManagedTeams="managedTeams" AntiforgeryToken="@antiforgeryToken" />
 
 <h2 class="mb-4 mt-12 section-title">Teams recruiting players</h2>
 
 <BloodsportSite.Client.Components.TeamRecruitmentIndex />
+
+@code {
+    [CascadingParameter] public HttpContext? HttpContext { get; set; }
+
+    private List<ManagedTeam> managedTeams = [];
+    private string? antiforgeryToken;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Only available during static server rendering; used to authorize the invite form posts.
+        if (HttpContext is not null)
+            antiforgeryToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var oid = authState.User.FindFirst("oid")?.Value
+               ?? authState.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+        if (oid is not null)
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            managedTeams = await db.Teams
+                .Where(t => t.Manager.EntraObjectId == oid)
+                .OrderBy(t => t.Name)
+                .Select(t => new ManagedTeam(t.Id, t.Name))
+                .ToListAsync();
+        }
+    }
+}

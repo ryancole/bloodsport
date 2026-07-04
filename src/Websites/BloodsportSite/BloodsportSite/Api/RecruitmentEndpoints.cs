@@ -16,12 +16,14 @@ namespace BloodsportSite.Api
         }
 
         private static async Task<IResult> ListLookingForTeamAsync(
+            HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
             BlobSasService blobSasService,
             int page = 1,
             int pageSize = 20,
             string? search = null,
-            RiotAccountRecruitmentLanes? lane = null)
+            RiotAccountRecruitmentLanes? lane = null,
+            long? teamId = null)
         {
             pageSize = Math.Clamp(pageSize, 1, 100);
 
@@ -54,6 +56,26 @@ namespace BloodsportSite.Api
                 .Include(r => r.RiotAccountRecruitment)
                 .ToListAsync();
 
+            // When a team the caller manages is supplied, flag which of these accounts it has
+            // already invited so the client can disable the invite button for them.
+            var invitedAccountIds = new HashSet<long>();
+            if (teamId is { } tid)
+            {
+                var oid = context.User.FindFirst("oid")?.Value
+                       ?? context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+                if (oid is not null && await db.Teams.AnyAsync(t => t.Id == tid && t.Manager.EntraObjectId == oid))
+                {
+                    var accountIds = accounts.Select(a => a.Id).ToList();
+                    invitedAccountIds = (await db.TeamInvites
+                        .Where(i => i.TeamId == tid
+                                 && i.Status == TeamInviteStatus.Pending
+                                 && accountIds.Contains(i.RiotAccountId))
+                        .Select(i => i.RiotAccountId)
+                        .ToListAsync()).ToHashSet();
+                }
+            }
+
             var items = accounts.Select(r => new
             {
                 RiotAccountId = r.Id,
@@ -63,6 +85,7 @@ namespace BloodsportSite.Api
                 r.User.DisplayName,
                 FlagUrl = blobSasService.GetSasUrl(r.User.LogoUrl?.Replace("/original.", "/flag.")),
                 Lanes = r.RiotAccountRecruitment!.Lanes.ToList(),
+                AlreadyInvited = invitedAccountIds.Contains(r.Id),
             });
 
             return Results.Ok(new
