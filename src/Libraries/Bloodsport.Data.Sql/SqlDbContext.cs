@@ -44,13 +44,14 @@ namespace Bloodsport.Data.Sql
             new TeamPlayoffRosterEntityConfiguration().Configure(modelBuilder.Entity<TeamPlayoffRoster>());
 
             new RiotAccountEntityConfiguration().Configure(modelBuilder.Entity<RiotAccount>());
+            new RiotAccountRecruitmentEntityConfiguration().Configure(modelBuilder.Entity<RiotAccountRecruitment>());
+
             new RiotLobbyEventEntityConfiguration().Configure(modelBuilder.Entity<RiotLobbyEvent>());
 
             new PostEntityConfiguration().Configure(modelBuilder.Entity<Post>());
             new PostCommentEntityConfiguration().Configure(modelBuilder.Entity<PostComment>());
 
             new UserEntityConfiguration().Configure(modelBuilder.Entity<User>());
-            new UserRecruitmentEntityConfiguration().Configure(modelBuilder.Entity<UserRecruitment>());
         }
 
         #endregion
@@ -101,7 +102,7 @@ namespace Bloodsport.Data.Sql
 
         public DbSet<SeasonMatchupParameters> SeasonMatchupParameters { get; set; }
 
-        public DbSet<UserRecruitment> UserRecruitments { get; set; }
+        public DbSet<RiotAccountRecruitment> RiotAccountRecruitments { get; set; }
 
         public DbSet<TeamRecruitment> TeamRecruitments { get; set; }
 

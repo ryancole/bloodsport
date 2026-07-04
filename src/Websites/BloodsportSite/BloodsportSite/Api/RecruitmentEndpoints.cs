@@ -21,45 +21,48 @@ namespace BloodsportSite.Api
             int page = 1,
             int pageSize = 20,
             string? search = null,
-            UserRecruitmentLanes? lane = null)
+            RiotAccountRecruitmentLanes? lane = null)
         {
             pageSize = Math.Clamp(pageSize, 1, 100);
 
             await using var db = await dbFactory.CreateDbContextAsync();
 
-            var query = db.Users
-                .Where(u => u.UserRecruitment != null && u.UserRecruitment.IsLookingForTeam);
+            var query = db.RiotAccounts
+                .Where(r => r.RiotAccountRecruitment != null && r.RiotAccountRecruitment.IsLookingForTeam);
 
             if (!string.IsNullOrWhiteSpace(search))
             {
                 search = search.Trim();
-                query = query.Where(u => u.DisplayName.Contains(search));
+                query = query.Where(r => r.GameName.Contains(search) || r.User.DisplayName.Contains(search));
             }
 
             if (lane is not null)
             {
-                query = query.Where(u => u.UserRecruitment!.Lanes.Contains(lane.Value));
+                query = query.Where(r => r.RiotAccountRecruitment!.Lanes.Contains(lane.Value));
             }
 
             var totalCount = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
             page = totalPages == 0 ? 1 : Math.Clamp(page, 1, totalPages);
 
-            var users = await query
-                .OrderBy(u => u.DisplayName)
-                .ThenBy(u => u.Id)
+            var accounts = await query
+                .OrderBy(r => r.GameName)
+                .ThenBy(r => r.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Include(u => u.UserRecruitment)
+                .Include(r => r.User)
+                .Include(r => r.RiotAccountRecruitment)
                 .ToListAsync();
 
-            var items = users.Select(u => new
+            var items = accounts.Select(r => new
             {
-                u.Id,
-                u.DisplayName,
-                u.DateCreated,
-                FlagUrl = blobSasService.GetSasUrl(u.LogoUrl?.Replace("/original.", "/flag.")),
-                Lanes = u.UserRecruitment!.Lanes.ToList(),
+                RiotAccountId = r.Id,
+                r.GameName,
+                r.TagLine,
+                UserId = r.UserId,
+                r.User.DisplayName,
+                FlagUrl = blobSasService.GetSasUrl(r.User.LogoUrl?.Replace("/original.", "/flag.")),
+                Lanes = r.RiotAccountRecruitment!.Lanes.ToList(),
             });
 
             return Results.Ok(new

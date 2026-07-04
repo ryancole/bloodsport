@@ -309,6 +309,37 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.ToTable("RiotAccounts");
                 });
 
+            modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccountRecruitment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<bool>("IsLookingForTeam")
+                        .HasColumnType("bit");
+
+                    b.PrimitiveCollection<string>("Lanes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("RiotAccountId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RiotAccountId")
+                        .IsUnique();
+
+                    b.ToTable("RiotAccountRecruitments");
+                });
+
             modelBuilder.Entity("Bloodsport.Entity.Database.RiotLobbyEvent", b =>
                 {
                     b.Property<long>("Id")
@@ -837,37 +868,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.UserRecruitment", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<bool>("IsLookingForTeam")
-                        .HasColumnType("bit");
-
-                    b.PrimitiveCollection<string>("Lanes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserRecruitments");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.Playoff", b =>
                 {
                     b.HasOne("Bloodsport.Entity.Database.Season", "Season")
@@ -996,6 +996,17 @@ namespace Bloodsport.Data.Sql.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccountRecruitment", b =>
+                {
+                    b.HasOne("Bloodsport.Entity.Database.RiotAccount", "RiotAccount")
+                        .WithOne("RiotAccountRecruitment")
+                        .HasForeignKey("Bloodsport.Entity.Database.RiotAccountRecruitment", "RiotAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RiotAccount");
                 });
 
             modelBuilder.Entity("Bloodsport.Entity.Database.SeasonMatchupParameters", b =>
@@ -1201,17 +1212,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Bloodsport.Entity.Database.UserRecruitment", b =>
-                {
-                    b.HasOne("Bloodsport.Entity.Database.User", "User")
-                        .WithOne("UserRecruitment")
-                        .HasForeignKey("Bloodsport.Entity.Database.UserRecruitment", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Bloodsport.Entity.Database.Playoff", b =>
                 {
                     b.Navigation("PlayoffRounds");
@@ -1243,6 +1243,9 @@ namespace Bloodsport.Data.Sql.Migrations
 
             modelBuilder.Entity("Bloodsport.Entity.Database.RiotAccount", b =>
                 {
+                    b.Navigation("RiotAccountRecruitment")
+                        .IsRequired();
+
                     b.Navigation("TeamInvites");
 
                     b.Navigation("TeamMemberships");
@@ -1306,9 +1309,6 @@ namespace Bloodsport.Data.Sql.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("RiotAccounts");
-
-                    b.Navigation("UserRecruitment")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

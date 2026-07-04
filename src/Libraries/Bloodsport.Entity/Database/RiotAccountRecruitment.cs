@@ -2,17 +2,17 @@
 
 namespace Bloodsport.Entity.Database
 {
-    public class UserRecruitment
+    public class RiotAccountRecruitment
     {
         #region Properties
 
         public long Id { get; private set; }
 
-        public required long UserId { get; set; }
+        public required long RiotAccountId { get; set; }
 
         public bool IsLookingForTeam { get; set; }
 
-        public ICollection<UserRecruitmentLanes> Lanes { get; set; } = [];
+        public ICollection<RiotAccountRecruitmentLanes> Lanes { get; set; } = [];
 
         public DateTime DateCreated { get; private set; }
 
@@ -21,12 +21,12 @@ namespace Bloodsport.Entity.Database
         #region Navigation Properties
 
         [JsonIgnore]
-        public virtual User User { get; set; }
+        public virtual RiotAccount RiotAccount { get; set; }
 
         #endregion
     }
 
-    public enum UserRecruitmentLanes
+    public enum RiotAccountRecruitmentLanes
     {
         #region Values
 

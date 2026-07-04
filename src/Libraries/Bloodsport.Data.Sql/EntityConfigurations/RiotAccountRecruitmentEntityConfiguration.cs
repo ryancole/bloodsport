@@ -5,19 +5,19 @@ using Bloodsport.Entity.Database;
 
 namespace Bloodsport.Data.Sql.EntityConfigurations
 {
-    internal class UserRecruitmentEntityConfiguration : IEntityTypeConfiguration<UserRecruitment>
+    internal class RiotAccountRecruitmentEntityConfiguration : IEntityTypeConfiguration<RiotAccountRecruitment>
     {
         #region Methods
 
-        public void Configure(EntityTypeBuilder<UserRecruitment> builder)
+        public void Configure(EntityTypeBuilder<RiotAccountRecruitment> builder)
         {
             builder
                 .Property(t => t.DateCreated)
                 .HasDefaultValueSql("GETUTCDATE()");
 
             builder
-                .HasOne(m => m.User)
-                .WithOne(m => m.UserRecruitment);
+                .HasOne(m => m.RiotAccount)
+                .WithOne(m => m.RiotAccountRecruitment);
         }
 
         #endregion

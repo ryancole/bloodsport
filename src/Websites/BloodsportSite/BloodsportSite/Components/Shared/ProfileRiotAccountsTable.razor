@@ -32,14 +32,44 @@ else
     <div class="overflow-x-auto">
         <table class="tbl">
             <thead>
-                <tr><th>Riot ID</th><th>Linked</th><th></th></tr>
+                <tr><th class="w-[22%]">Riot ID</th><th class="w-[14%]">Linked</th><th class="w-[48%]">Looking for a Team</th><th class="w-[16%]"></th></tr>
             </thead>
             <tbody>
                 @foreach (var account in Accounts.OrderBy(a => a.GameName))
                 {
+                    var looking = account.RiotAccountRecruitment?.IsLookingForTeam == true;
                     <tr>
                         <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(account.GameName)-@Uri.EscapeDataString(account.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link"><strong>@account.GameName#@account.TagLine</strong></a></td>
                         <td>@account.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                        <td class="whitespace-normal">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <form method="post" action="/api/users/update-recruitment" class="flex flex-wrap items-center gap-2">
+                                    <AntiforgeryToken />
+                                    <input type="hidden" name="riotAccountId" value="@account.Id" />
+                                    <input type="hidden" name="isLookingForTeam" value="true" />
+                                    <div class="flex gap-1.5" role="group" aria-label="Lanes">
+                                        @foreach (var lane in allLanes)
+                                        {
+                                            <label class="cursor-pointer" title="@lane">
+                                                <input type="checkbox" name="lanes" value="@lane" checked="@(account.RiotAccountRecruitment?.Lanes.Contains(lane) == true)" class="peer sr-only" />
+                                                <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="26" height="26" alt="@lane"
+                                                     class="rounded-md bg-[#0e1a2b] p-0.5 opacity-40 ring-2 ring-transparent transition hover:opacity-70 peer-checked:opacity-100 peer-checked:ring-brand-500" />
+                                            </label>
+                                        }
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary btn-sm">@(looking ? "Save" : "Mark")</button>
+                                </form>
+                                @if (looking)
+                                {
+                                    <form method="post" action="/api/users/update-recruitment">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="riotAccountId" value="@account.Id" />
+                                        <input type="hidden" name="isLookingForTeam" value="false" />
+                                        <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 hover:underline">Stop</button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
                         <td>
                             <form method="post" action="/api/riot/unlink">
                                 <AntiforgeryToken />
@@ -57,4 +87,13 @@ else
 @code {
     [Parameter, EditorRequired] public ICollection<RiotAccount> Accounts { get; set; } = [];
     [Parameter] public string? RiotError { get; set; }
+
+    private static readonly RiotAccountRecruitmentLanes[] allLanes =
+    [
+        RiotAccountRecruitmentLanes.Top,
+        RiotAccountRecruitmentLanes.Jungle,
+        RiotAccountRecruitmentLanes.Middle,
+        RiotAccountRecruitmentLanes.Bottom,
+        RiotAccountRecruitmentLanes.Support,
+    ];
 }

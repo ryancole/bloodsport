@@ -141,8 +141,8 @@ namespace BloodsportSite.Api
             [Microsoft.AspNetCore.Mvc.FromForm] UpdateRecruitmentForm form)
         {
             var lanes = context.Request.Form["lanes"]
-                .Where(v => Enum.TryParse<UserRecruitmentLanes>(v, out _))
-                .Select(Enum.Parse<UserRecruitmentLanes>)
+                .Where(v => Enum.TryParse<RiotAccountRecruitmentLanes>(v, out _))
+                .Select(Enum.Parse<RiotAccountRecruitmentLanes>)
                 .Distinct()
                 .OrderBy(l => l)
                 .ToList();
@@ -153,12 +153,20 @@ namespace BloodsportSite.Api
             if (user is null)
                 return Results.Redirect("/profile");
 
-            var recruitment = await db.UserRecruitments.FirstOrDefaultAsync(r => r.UserId == user.Id);
+            // The Riot account must belong to the current user.
+            var account = await db.RiotAccounts
+                .Include(r => r.RiotAccountRecruitment)
+                .FirstOrDefaultAsync(r => r.Id == form.RiotAccountId && r.UserId == user.Id);
+
+            if (account is null)
+                return Results.Redirect("/profile");
+
+            var recruitment = account.RiotAccountRecruitment;
 
             if (recruitment is null)
             {
-                recruitment = new UserRecruitment { UserId = user.Id };
-                db.UserRecruitments.Add(recruitment);
+                recruitment = new RiotAccountRecruitment { RiotAccountId = account.Id };
+                db.RiotAccountRecruitments.Add(recruitment);
             }
 
             recruitment.IsLookingForTeam = form.IsLookingForTeam;

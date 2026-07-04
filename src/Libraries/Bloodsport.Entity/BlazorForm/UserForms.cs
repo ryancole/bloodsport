@@ -7,6 +7,8 @@ namespace Bloodsport.Entity.BlazorForm
 
     public class UpdateRecruitmentForm
     {
+        public long RiotAccountId { get; set; }
+
         public bool IsLookingForTeam { get; set; }
     }
 }

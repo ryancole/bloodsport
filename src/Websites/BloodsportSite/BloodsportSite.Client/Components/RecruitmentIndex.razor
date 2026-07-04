@@ -41,22 +41,28 @@ else
         <div class="overflow-x-auto">
             <table class="tbl">
                 <thead>
-                    <tr><th>Name</th><th>Lanes</th></tr>
+                    <tr><th>Player</th><th>Lanes</th></tr>
                 </thead>
                 <tbody>
-                    @foreach (var user in result.Items)
+                    @foreach (var player in result.Items)
                     {
                         <tr>
-                            <td><a href="/users/@user.Id" class="link inline-flex items-center gap-2"><UserFlag FlagUrl="@user.FlagUrl" />@user.DisplayName</a></td>
                             <td>
-                                @if (user.Lanes.Count == 0)
+                                <div class="flex items-center gap-2">
+                                    <a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(player.GameName)-@Uri.EscapeDataString(player.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link">@player.GameName#@player.TagLine</a>
+                                    <span class="text-gray-400">·</span>
+                                    <a href="/users/@player.UserId" class="link inline-flex items-center gap-2"><UserFlag FlagUrl="@player.FlagUrl" />@player.DisplayName</a>
+                                </div>
+                            </td>
+                            <td>
+                                @if (player.Lanes.Count == 0)
                                 {
                                     <span class="text-gray-400">—</span>
                                 }
                                 else
                                 {
                                     <div class="flex gap-1.5">
-                                        @foreach (var lane in laneOrder.Where(l => user.Lanes.Contains(l)))
+                                        @foreach (var lane in laneOrder.Where(l => player.Lanes.Contains(l)))
                                         {
                                             <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="24" height="24" alt="@lane" title="@lane" class="rounded-md bg-[#0e1a2b] p-0.5" />
                                         }
@@ -74,19 +80,19 @@ else
 @code {
     private const int PageSize = 20;
 
-    private static readonly UserRecruitmentLanes[] laneOrder =
+    private static readonly RiotAccountRecruitmentLanes[] laneOrder =
     [
-        UserRecruitmentLanes.Top,
-        UserRecruitmentLanes.Jungle,
-        UserRecruitmentLanes.Middle,
-        UserRecruitmentLanes.Bottom,
-        UserRecruitmentLanes.Support,
+        RiotAccountRecruitmentLanes.Top,
+        RiotAccountRecruitmentLanes.Jungle,
+        RiotAccountRecruitmentLanes.Middle,
+        RiotAccountRecruitmentLanes.Bottom,
+        RiotAccountRecruitmentLanes.Support,
     ];
 
     private PagedResult<RecruitmentListItem>? result;
     private string? search;
     private string searchInput = "";
-    private UserRecruitmentLanes? laneFilter;
+    private RiotAccountRecruitmentLanes? laneFilter;
     private int currentPage = 1;
 
     protected override async Task OnInitializedAsync()
@@ -128,7 +134,7 @@ else
         if (e.Key == "Enter") await ApplySearch();
     }
 
-    private async Task ToggleLane(UserRecruitmentLanes lane)
+    private async Task ToggleLane(RiotAccountRecruitmentLanes lane)
     {
         laneFilter = laneFilter == lane ? null : lane;
         currentPage = 1;

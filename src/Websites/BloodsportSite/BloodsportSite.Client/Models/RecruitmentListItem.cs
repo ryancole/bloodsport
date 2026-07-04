@@ -3,9 +3,11 @@ using Bloodsport.Entity.Database;
 namespace BloodsportSite.Client.Models;
 
 public record RecruitmentListItem(
-    long Id,
+    long RiotAccountId,
+    string GameName,
+    string TagLine,
+    long UserId,
     string DisplayName,
-    DateTime DateCreated,
     string? FlagUrl,
-    List<UserRecruitmentLanes> Lanes
+    List<RiotAccountRecruitmentLanes> Lanes
 );
