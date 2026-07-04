@@ -105,13 +105,10 @@ else
         <dd class="text-gray-700">@user.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
     </dl>
 
-    @{
-        var isLooking = user.UserRecruitment?.IsLookingForTeam == true;
-    }
     <div class="mb-8">
         <div class="mb-3 flex items-center gap-3">
             <h2 class="section-title">Looking for a Team</h2>
-            @if (isLooking)
+            @if (IsLooking)
             {
                 <span class="badge bg-green-100 text-green-800">Available</span>
             }
@@ -135,10 +132,10 @@ else
                         </label>
                     }
                 </div>
-                <button type="submit" class="btn btn-primary">@(isLooking ? "Save" : "Mark as looking")</button>
+                <button type="submit" class="btn btn-primary">@(IsLooking ? "Save" : "Mark as looking")</button>
             </form>
 
-            @if (isLooking)
+            @if (IsLooking)
             {
                 <form method="post" action="/api/users/update-recruitment">
                     <AntiforgeryToken />
@@ -158,6 +155,7 @@ else
 
 @code {
     private Bloodsport.Entity.Database.User? user;
+    private bool IsLooking => user?.UserRecruitment?.IsLookingForTeam == true;
     private List<TeamInvite> pendingInvites = [];
     private List<(Bloodsport.Entity.Database.Team Team, string Role)> teamRows = [];
     private string? riotError;
