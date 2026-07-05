@@ -1,5 +1,6 @@
 .vs/
 .azurite/
+.certs/
 
 bin/
 obj/
