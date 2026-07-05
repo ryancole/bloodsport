@@ -34,7 +34,46 @@ function initAll() {
     initEasyMDE();
 }
 
+// Top-of-page loading bar, driven by Blazor's enhanced-navigation events.
+// Because the app renders with static SSR, link clicks are handled by an
+// AJAX fetch (enhanced navigation) with no native browser spinner, so we
+// surface progress ourselves. See the .nav-progress rules in Styles/app.css.
+function initNavProgress(blazor) {
+    const bar = document.createElement('div');
+    bar.className = 'nav-progress';
+    document.body.appendChild(bar);
+
+    let hideTimer, trickle, width = 0;
+
+    function start() {
+        clearTimeout(hideTimer);
+        width = 8;
+        bar.classList.add('nav-progress--active');
+        bar.style.width = width + '%';
+        clearInterval(trickle);
+        // Creep toward 90% while we wait on the server, easing as it goes.
+        trickle = setInterval(() => {
+            width = Math.min(width + (90 - width) * 0.1, 90);
+            bar.style.width = width + '%';
+        }, 200);
+    }
+
+    function done() {
+        clearInterval(trickle);
+        if (!bar.classList.contains('nav-progress--active')) return;
+        bar.style.width = '100%';
+        hideTimer = setTimeout(() => {
+            bar.classList.remove('nav-progress--active');
+            bar.style.width = '0';
+        }, 250);
+    }
+
+    blazor.addEventListener('enhancednavigationstart', start);
+    blazor.addEventListener('enhancednavigationend', done);
+}
+
 export function afterWebStarted(blazor) {
     initAll();
+    initNavProgress(blazor);
     blazor.addEventListener('enhancedload', initAll);
 }
