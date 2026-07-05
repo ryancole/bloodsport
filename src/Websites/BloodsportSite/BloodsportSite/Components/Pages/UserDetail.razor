@@ -1,5 +1,6 @@
 @page "/users/{id:long}"
 @using Bloodsport.Data.Sql
+@using Bloodsport.Entity.Database
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<SqlDbContext> DbFactory
 @inject BloodsportSite.Services.BlobSasService BlobSasService
@@ -21,8 +22,36 @@ else
         {
             <img src="@BlobSasService.GetSasUrl(user.LogoUrl)" alt="@user.DisplayName logo" class="h-16 w-16 object-contain" />
         }
+        else
+        {
+            <span class="inline-flex h-16 w-16 items-center justify-center rounded-md bg-gray-100 text-gray-400 ring-1 ring-black/20" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 16 16" fill="currentColor">
+                    <circle cx="8" cy="5" r="3" />
+                    <path d="M2 14c0-3.3 2.7-5 6-5s6 1.7 6 5z" />
+                </svg>
+            </span>
+        }
         <h1 class="page-title">@user.DisplayName</h1>
     </div>
+
+    @if (recruitingAccounts.Count > 0)
+    {
+        <div class="alert alert-success mb-8">
+            <p class="font-medium">@user.DisplayName is looking for a team.</p>
+            <div class="mt-2 space-y-1">
+                @foreach (var account in recruitingAccounts)
+                {
+                    <div class="flex flex-wrap items-center gap-2 text-sm">
+                        <span class="font-medium">@account.GameName#@account.TagLine</span>
+                        @foreach (var lane in laneOrder.Where(l => account.RiotAccountRecruitment!.Lanes.Contains(l)))
+                        {
+                            <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="24" height="24" alt="@lane" title="@lane" class="rounded-md bg-[#0e1a2b] p-0.5" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
 
     <dl class="mb-8 grid grid-cols-[120px_1fr] gap-y-2 text-sm">
         <dt class="font-medium text-gray-500">Member Since</dt>
@@ -87,8 +116,18 @@ else
 @code {
     [Parameter] public long Id { get; set; }
 
+    private static readonly RiotAccountRecruitmentLanes[] laneOrder =
+    [
+        RiotAccountRecruitmentLanes.Top,
+        RiotAccountRecruitmentLanes.Jungle,
+        RiotAccountRecruitmentLanes.Middle,
+        RiotAccountRecruitmentLanes.Bottom,
+        RiotAccountRecruitmentLanes.Support,
+    ];
+
     private Bloodsport.Entity.Database.User? user;
     private List<(Bloodsport.Entity.Database.Team Team, string Role)> teamRows = [];
+    private List<RiotAccount> recruitingAccounts = [];
     private bool notFound;
 
     protected override async Task OnInitializedAsync()
@@ -101,6 +140,8 @@ else
                 .ThenInclude(a => a.TeamMemberships)
                     .ThenInclude(m => m.Team)
                         .ThenInclude(t => t.TeamMemberships)
+            .Include(u => u.RiotAccounts)
+                .ThenInclude(a => a.RiotAccountRecruitment)
             .FirstOrDefaultAsync(u => u.Id == Id);
 
         if (user is null)
@@ -108,6 +149,11 @@ else
             notFound = true;
             return;
         }
+
+        recruitingAccounts = user.RiotAccounts
+            .Where(a => a.RiotAccountRecruitment?.IsLookingForTeam == true)
+            .OrderBy(a => a.GameName)
+            .ToList();
 
         var managedTeamIds = user.ManagedTeams.Select(t => t.Id).ToHashSet();
         var memberTeams = user.RiotAccounts.SelectMany(a => a.TeamMemberships).Select(m => m.Team).DistinctBy(t => t.Id);

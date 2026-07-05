@@ -21,6 +21,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/teams/{id}/delete", DeleteAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/teams/{id}/update-recruitment", UpdateRecruitmentAsync)
+                .RequireAuthorization();
+
             endpoints.MapPost("/teams/{id}/join", JoinAsync)
                 .RequireAuthorization();
 
@@ -158,6 +161,47 @@ namespace BloodsportSite.Api
             await db.SaveChangesAsync();
 
             return Results.Redirect("/teams");
+        }
+
+        private static async Task<IResult> UpdateRecruitmentAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long id,
+            [Microsoft.AspNetCore.Mvc.FromForm] UpdateTeamRecruitmentForm form)
+        {
+            var lanes = context.Request.Form["lanes"]
+                .Where(v => Enum.TryParse<TeamRecruitmentLanes>(v, out _))
+                .Select(Enum.Parse<TeamRecruitmentLanes>)
+                .Distinct()
+                .OrderBy(l => l)
+                .ToList();
+
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+
+            if (user is null)
+                return Results.Redirect("/teams");
+
+            var team = await db.Teams
+                .Include(t => t.TeamRecruitment)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ManagerId == user.Id);
+
+            if (team is null)
+                return Results.Redirect("/teams");
+
+            var recruitment = team.TeamRecruitment;
+
+            if (recruitment is null)
+            {
+                recruitment = new TeamRecruitment { TeamId = team.Id };
+                db.TeamRecruitments.Add(recruitment);
+            }
+
+            recruitment.IsLookingForUser = form.IsLookingForUser;
+            recruitment.Lanes = form.IsLookingForUser ? lanes : [];
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/teams/{id}");
         }
 
         private static async Task<IResult> DeleteAsync(

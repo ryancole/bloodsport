@@ -169,6 +169,8 @@ else
                     .ThenInclude(a => a.TeamMemberships)
                         .ThenInclude(m => m.Team)
                             .ThenInclude(t => t.TeamMemberships)
+                .Include(u => u.RiotAccounts)
+                    .ThenInclude(a => a.RiotAccountRecruitment)
                 .Include(u => u.ManagedTeams)
                     .ThenInclude(t => t.TeamMemberships)
                 .FirstOrDefaultAsync(u => u.EntraObjectId == oid);
@@ -191,7 +193,9 @@ else
                 pendingInvites = await db.TeamInvites
                     .Include(i => i.Team)
                     .Include(i => i.RiotAccount)
-                    .Where(i => riotAccountIds.Contains(i.RiotAccountId) && i.Status == TeamInviteStatus.Pending)
+                    .Where(i => riotAccountIds.Contains(i.RiotAccountId)
+                             && i.Status == TeamInviteStatus.Pending
+                             && i.Type == TeamInviteType.Invite)
                     .OrderByDescending(i => i.DateCreated)
                     .ToListAsync();
             }

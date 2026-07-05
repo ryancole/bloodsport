@@ -70,6 +70,8 @@
     .tbl th               { @apply truncate border-b border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-500; }
     .tbl td               { @apply truncate border-b border-gray-100 px-3 py-2 align-middle text-gray-700; }
     .tbl tbody tr:hover td { @apply bg-gray-50; }
+    /* Right-align the last column when it holds an action button (text-align inherits into the wrapping form). */
+    .tbl td:last-child:has(button, .btn) { @apply text-right; }
 
     .alert         { @apply rounded-md border px-4 py-3 text-sm; }
     .alert-info    { @apply border-brand-200 bg-brand-50 text-brand-800; }

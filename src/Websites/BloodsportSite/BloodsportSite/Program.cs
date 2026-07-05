@@ -136,6 +136,7 @@ namespace BloodsportSite
             app.MapGroup("/api").MapTeams();
             app.MapGroup("/api").MapTeamInvites();
             app.MapGroup("/api").MapUsers();
+            app.MapGroup("/api").MapRecruitment();
             app.MapGroup("/api").MapSeasons();
             app.MapGroup("/api").MapMatchups();
             app.MapGroup("/api").MapPlayoffs();

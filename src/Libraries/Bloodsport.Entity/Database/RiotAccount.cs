@@ -31,6 +31,9 @@ namespace Bloodsport.Entity.Database
         [JsonIgnore]
         public virtual ICollection<TeamInvite> TeamInvites { get; set; } = [];
 
+        [JsonIgnore]
+        public virtual RiotAccountRecruitment RiotAccountRecruitment { get; set; }
+
         #endregion
     }
 }

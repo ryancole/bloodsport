@@ -39,6 +39,35 @@ else
             <div class="flex items-center gap-2">
                 @if (isManager)
                 {
+                    <details class="relative">
+                        <summary class="btn btn-secondary cursor-pointer list-none [&::-webkit-details-marker]:hidden">@(IsRecruiting ? "Recruiting" : "Enable Recruitment")</summary>
+                        <div class="absolute right-0 z-20 mt-2 w-72 rounded-lg border border-gray-200 bg-white p-4 text-left shadow-lg">
+                            <div class="mb-2 text-sm font-medium text-gray-700">Lanes needed</div>
+                            <form method="post" action="/api/teams/@team.Id/update-recruitment">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="isLookingForUser" value="true" />
+                                <div class="mb-3 flex flex-wrap gap-2" role="group" aria-label="Lanes needed">
+                                    @foreach (var lane in laneOrder)
+                                    {
+                                        <label class="cursor-pointer" title="@lane">
+                                            <input type="checkbox" name="lanes" value="@lane" checked="@selectedLanes.Contains(lane)" class="peer sr-only" />
+                                            <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="32" height="32" alt="@lane"
+                                                 class="rounded-md bg-[#0e1a2b] p-1 opacity-40 ring-2 ring-transparent transition hover:opacity-70 peer-checked:opacity-100 peer-checked:ring-brand-500" />
+                                        </label>
+                                    }
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">@(IsRecruiting ? "Save" : "Start recruiting")</button>
+                            </form>
+                            @if (IsRecruiting)
+                            {
+                                <form method="post" action="/api/teams/@team.Id/update-recruitment" class="mt-2 text-center">
+                                    <AntiforgeryToken />
+                                    <input type="hidden" name="isLookingForUser" value="false" />
+                                    <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 hover:underline">Stop recruiting</button>
+                                </form>
+                            }
+                        </div>
+                    </details>
                     <a href="/teams/@team.Id/edit" class="btn btn-secondary">Edit</a>
                     <form method="post" action="/api/teams/@team.Id/delete">
                         <AntiforgeryToken />
@@ -62,6 +91,24 @@ else
 
         <dt class="font-medium text-gray-500">Created</dt>
         <dd class="text-gray-700">@team.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</dd>
+
+        <dt class="font-medium text-gray-500">Recruiting</dt>
+        <dd>
+            @if (IsRecruiting)
+            {
+                <span class="inline-flex flex-wrap items-center gap-2">
+                    <span class="text-gray-700">Yes</span>
+                    @foreach (var lane in laneOrder.Where(l => selectedLanes.Contains(l)))
+                    {
+                        <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="24" height="24" alt="@lane" title="@lane" class="rounded-md bg-[#0e1a2b] p-0.5" />
+                    }
+                </span>
+            }
+            else
+            {
+                <span class="text-gray-700">No</span>
+            }
+        </dd>
     </dl>
 
     @if (career is not null)
@@ -117,6 +164,11 @@ else
         </div>
     }
 
+    @if (applicationAccepted)
+    {
+        <div class="alert alert-success mb-4">Application accepted — the player has joined the team.</div>
+    }
+
     @if (isManager)
     {
         @if (inviteError is not null)
@@ -134,7 +186,7 @@ else
             <div class="overflow-x-auto">
                 <table class="tbl">
                     <thead>
-                        <tr><th>Riot ID</th><th>Sent</th></tr>
+                        <tr><th>Riot ID</th><th>Sent</th><th></th></tr>
                     </thead>
                     <tbody>
                         @foreach (var invite in pendingInvites)
@@ -142,6 +194,45 @@ else
                             <tr>
                                 <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(invite.RiotAccount.GameName)-@Uri.EscapeDataString(invite.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link"><strong>@invite.RiotAccount.GameName#@invite.RiotAccount.TagLine</strong></a></td>
                                 <td>@invite.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                                <td>
+                                    <form method="post" action="/api/invites/@invite.Id/cancel">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (applications.Count > 0)
+        {
+            <h3 class="mb-3 mt-6 text-base font-semibold text-gray-900">Applications</h3>
+            <div class="overflow-x-auto">
+                <table class="tbl">
+                    <thead>
+                        <tr><th>Riot ID</th><th>Applied</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var application in applications)
+                        {
+                            <tr>
+                                <td><a href="https://u.gg/lol/profile/na1/@Uri.EscapeDataString(application.RiotAccount.GameName)-@Uri.EscapeDataString(application.RiotAccount.TagLine)/overview" target="_blank" rel="noopener noreferrer" class="link"><strong>@application.RiotAccount.GameName#@application.RiotAccount.TagLine</strong></a></td>
+                                <td>@application.DateCreated.ToLocalTime().ToString("MMMM d, yyyy")</td>
+                                <td>
+                                    <div class="flex items-center justify-end gap-2">
+                                        <form method="post" action="/api/invites/@application.Id/accept">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="btn btn-primary btn-sm">Accept</button>
+                                        </form>
+                                        <form method="post" action="/api/invites/@application.Id/decline">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="btn btn-secondary btn-sm">Decline</button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -327,8 +418,20 @@ else
 @code {
     [Parameter] public long Id { get; set; }
 
+    private static readonly TeamRecruitmentLanes[] laneOrder =
+    [
+        TeamRecruitmentLanes.Top,
+        TeamRecruitmentLanes.Jungle,
+        TeamRecruitmentLanes.Middle,
+        TeamRecruitmentLanes.Bottom,
+        TeamRecruitmentLanes.Support,
+    ];
+
     private Bloodsport.Entity.Database.Team? team;
+    private bool IsRecruiting => team?.TeamRecruitment?.IsLookingForUser == true;
+    private HashSet<TeamRecruitmentLanes> selectedLanes = [];
     private List<TeamInvite> pendingInvites = [];
+    private List<TeamInvite> applications = [];
     private List<SeasonWeekMatchup> matchups = [];
     private Dictionary<long, TeamSeasonResult> seasonResults = [];
     private List<PlayoffTeam> playoffEntries = [];
@@ -339,6 +442,7 @@ else
     private List<RiotAccount> joinableRiotAccounts = [];
     private string? inviteError;
     private bool inviteSent;
+    private bool applicationAccepted;
     private string? memberError;
 
     protected override async Task OnInitializedAsync()
@@ -348,6 +452,9 @@ else
 
         if (query.TryGetValue("invite_sent", out _))
             inviteSent = true;
+
+        if (query.TryGetValue("application_accepted", out _))
+            applicationAccepted = true;
 
         if (query.TryGetValue("member_error", out var memberErrorCode))
         {
@@ -374,6 +481,7 @@ else
 
         team = await db.Teams
             .Include(t => t.Manager)
+            .Include(t => t.TeamRecruitment)
             .Include(t => t.TeamMemberships)
                 .ThenInclude(m => m.RiotAccount)
                     .ThenInclude(r => r.User)
@@ -383,6 +491,8 @@ else
 
         if (team is not null)
         {
+            selectedLanes = team.TeamRecruitment?.Lanes.ToHashSet() ?? [];
+
             seasonResults = await db.TeamSeasonResults
                 .Where(r => r.TeamId == Id)
                 .ToDictionaryAsync(r => r.SeasonId);
@@ -426,7 +536,13 @@ else
             {
                 pendingInvites = await db.TeamInvites
                     .Include(i => i.RiotAccount)
-                    .Where(i => i.TeamId == Id && i.Status == TeamInviteStatus.Pending)
+                    .Where(i => i.TeamId == Id && i.Status == TeamInviteStatus.Pending && i.Type == TeamInviteType.Invite)
+                    .OrderByDescending(i => i.DateCreated)
+                    .ToListAsync();
+
+                applications = await db.TeamInvites
+                    .Include(i => i.RiotAccount)
+                    .Where(i => i.TeamId == Id && i.Status == TeamInviteStatus.Pending && i.Type == TeamInviteType.Application)
                     .OrderByDescending(i => i.DateCreated)
                     .ToListAsync();
 

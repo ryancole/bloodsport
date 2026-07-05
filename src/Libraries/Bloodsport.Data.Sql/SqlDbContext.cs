@@ -20,9 +20,9 @@ namespace Bloodsport.Data.Sql
             base.OnModelCreating(modelBuilder);
 
             new TeamEntityConfiguration().Configure(modelBuilder.Entity<Team>());
-            new UserEntityConfiguration().Configure(modelBuilder.Entity<User>());
-            new TeamMembershipEntityConfiguration().Configure(modelBuilder.Entity<TeamMembership>());
             new TeamInviteEntityConfiguration().Configure(modelBuilder.Entity<TeamInvite>());
+            new TeamMembershipEntityConfiguration().Configure(modelBuilder.Entity<TeamMembership>());
+            new TeamRecruitmentEntityConfiguration().Configure(modelBuilder.Entity<TeamRecruitment>());
 
             new SeasonEntityConfiguration().Configure(modelBuilder.Entity<Season>());
             new SeasonRegistrationEntityConfiguration().Configure(modelBuilder.Entity<SeasonRegistration>());
@@ -44,10 +44,14 @@ namespace Bloodsport.Data.Sql
             new TeamPlayoffRosterEntityConfiguration().Configure(modelBuilder.Entity<TeamPlayoffRoster>());
 
             new RiotAccountEntityConfiguration().Configure(modelBuilder.Entity<RiotAccount>());
+            new RiotAccountRecruitmentEntityConfiguration().Configure(modelBuilder.Entity<RiotAccountRecruitment>());
+
             new RiotLobbyEventEntityConfiguration().Configure(modelBuilder.Entity<RiotLobbyEvent>());
 
             new PostEntityConfiguration().Configure(modelBuilder.Entity<Post>());
             new PostCommentEntityConfiguration().Configure(modelBuilder.Entity<PostComment>());
+
+            new UserEntityConfiguration().Configure(modelBuilder.Entity<User>());
         }
 
         #endregion
@@ -97,6 +101,10 @@ namespace Bloodsport.Data.Sql
         public DbSet<PostComment> PostComments { get; set; }
 
         public DbSet<SeasonMatchupParameters> SeasonMatchupParameters { get; set; }
+
+        public DbSet<RiotAccountRecruitment> RiotAccountRecruitments { get; set; }
+
+        public DbSet<TeamRecruitment> TeamRecruitments { get; set; }
 
         #endregion
     }
