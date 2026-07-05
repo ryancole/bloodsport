@@ -96,6 +96,10 @@ namespace BloodsportSite.Api
         private static async Task<IResult> ApplyAsync(
             HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
+            EmailClient emailClient,
+            EmailTemplateRenderer templateRenderer,
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory,
             long teamId,
             [Microsoft.AspNetCore.Mvc.FromForm] TeamApplyForm form)
         {
@@ -104,7 +108,10 @@ namespace BloodsportSite.Api
             if (user is null)
                 return Results.Unauthorized();
 
-            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
+            var team = await db.Teams
+                .Include(t => t.Manager)
+                .FirstOrDefaultAsync(t => t.Id == teamId);
+
             if (team is null)
                 return Results.NotFound();
 
@@ -141,7 +148,39 @@ namespace BloodsportSite.Api
 
             await db.SaveChangesAsync();
 
+            var applicantUrl = $"{context.Request.Scheme}://{context.Request.Host}/users/{user.Id}";
+            await TrySendApplicationEmailAsync(emailClient, templateRenderer, configuration, loggerFactory.CreateLogger(nameof(TeamInviteEndpoints)), team.Manager, user, team, applicantUrl);
+
             return Results.Ok();
+        }
+
+        private static async Task TrySendApplicationEmailAsync(EmailClient emailClient, EmailTemplateRenderer templateRenderer, IConfiguration configuration, ILogger logger, User manager, User applicant, Team team, string applicantUrl)
+        {
+            var senderAddress = configuration["Email:SenderAddress"];
+            if (senderAddress is null || string.IsNullOrEmpty(manager.Email))
+                return;
+
+            var html = await templateRenderer.RenderAsync("TeamApplication.html", new { applicant_name = applicant.DisplayName, team_name = team.Name, applicant_url = applicantUrl });
+
+            var content = new EmailContent($"{applicant.DisplayName} applied to join {team.Name}")
+            {
+                PlainText = $"{applicant.DisplayName} wants to join {team.Name}. View their profile at {applicantUrl}, then head to your team's page to accept or decline.",
+                Html = html
+            };
+
+            var message = new EmailMessage(
+                senderAddress: senderAddress,
+                recipients: new EmailRecipients([new EmailAddress(manager.Email)]),
+                content: content);
+
+            try
+            {
+                await emailClient.SendAsync(Azure.WaitUntil.Started, message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to send team application email to manager {UserId}.", manager.Id);
+            }
         }
 
         private static async Task TrySendInviteEmailAsync(EmailClient emailClient, EmailTemplateRenderer templateRenderer, IConfiguration configuration, ILogger logger, User invitee, Team team, User manager)
