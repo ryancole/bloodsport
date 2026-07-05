@@ -27,16 +27,25 @@ namespace BloodsportSite
             // Add services to the container.
             builder
                 .Services
-                .AddApplicationInsightsTelemetry(options =>
-                    options.ConnectionString = builder.Configuration.GetConnectionString("ApplicationInsights"));
-
-            builder
-                .Services
                 .AddHttpContextAccessor();
 
-            builder
-                .Services
-                .AddSingleton<ITelemetryInitializer, AuthenticatedUserTelemetryInitializer>();
+            // Only wire up Application Insights when a connection string is configured.
+            // Locally the connection string is left blank so the site doesn't attempt
+            // to connect to App Insights.
+            var appInsightsConnectionString =
+                builder.Configuration.GetConnectionString("ApplicationInsights");
+
+            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+            {
+                builder
+                    .Services
+                    .AddApplicationInsightsTelemetry(options =>
+                        options.ConnectionString = appInsightsConnectionString);
+
+                builder
+                    .Services
+                    .AddSingleton<ITelemetryInitializer, AuthenticatedUserTelemetryInitializer>();
+            }
 
             builder
                 .Services

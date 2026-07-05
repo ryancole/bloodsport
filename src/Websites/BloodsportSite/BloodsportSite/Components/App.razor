@@ -12,17 +12,23 @@
 	<ImportMap />
 	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 	<HeadOutlet />
-	<script src="https://js.monitor.azure.com/scripts/b/ai.3.gbl.min.js"></script>
-	<script>
-		var appInsights = new Microsoft.ApplicationInsights.ApplicationInsights({
-			config: {
-				connectionString: "@Configuration.GetConnectionString("ApplicationInsights")",
-				enableAutoRouteTracking: true
-			}
-		});
-		appInsights.loadAppInsights();
-		appInsights.trackPageView();
-	</script>
+	@{
+		var appInsightsConnectionString = Configuration.GetConnectionString("ApplicationInsights");
+	}
+	@if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+	{
+		<script src="https://js.monitor.azure.com/scripts/b/ai.3.gbl.min.js"></script>
+		<script>
+			var appInsights = new Microsoft.ApplicationInsights.ApplicationInsights({
+				config: {
+					connectionString: "@appInsightsConnectionString",
+					enableAutoRouteTracking: true
+				}
+			});
+			appInsights.loadAppInsights();
+			appInsights.trackPageView();
+		</script>
+	}
 </head>
 
 <body>

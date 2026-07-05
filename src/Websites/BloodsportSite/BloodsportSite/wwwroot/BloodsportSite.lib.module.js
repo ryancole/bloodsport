@@ -43,22 +43,29 @@ function initNavProgress(blazor) {
     bar.className = 'nav-progress';
     document.body.appendChild(bar);
 
-    let hideTimer, trickle, width = 0;
+    let showTimer, hideTimer, trickle, width = 0;
 
     function start() {
         clearTimeout(hideTimer);
-        width = 8;
-        bar.classList.add('nav-progress--active');
-        bar.style.width = width + '%';
-        clearInterval(trickle);
-        // Creep toward 90% while we wait on the server, easing as it goes.
-        trickle = setInterval(() => {
-            width = Math.min(width + (90 - width) * 0.1, 90);
+        clearTimeout(showTimer);
+        // Only reveal the bar if the navigation is slow enough to notice.
+        // Fast navigations (cached pages, local dev) complete within this
+        // window and never flash the bar; slow ones (prod DB round-trips) do.
+        showTimer = setTimeout(() => {
+            width = 8;
+            bar.classList.add('nav-progress--active');
             bar.style.width = width + '%';
-        }, 200);
+            clearInterval(trickle);
+            // Creep toward 90% while we wait on the server, easing as it goes.
+            trickle = setInterval(() => {
+                width = Math.min(width + (90 - width) * 0.1, 90);
+                bar.style.width = width + '%';
+            }, 200);
+        }, 150);
     }
 
     function done() {
+        clearTimeout(showTimer);
         clearInterval(trickle);
         if (!bar.classList.contains('nav-progress--active')) return;
         bar.style.width = '100%';
