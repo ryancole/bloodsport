@@ -7,5 +7,6 @@ public record RecruitmentTeamListItem(
     string Name,
     DateTime DateCreated,
     string? FlagUrl,
-    List<TeamRecruitmentLanes> Lanes
+    List<TeamRecruitmentLanes> Lanes,
+    bool Pending
 );

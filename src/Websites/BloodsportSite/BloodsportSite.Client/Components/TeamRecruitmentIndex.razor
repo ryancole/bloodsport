@@ -28,18 +28,6 @@ else
                     }
                 </div>
             </div>
-            @if (RiotAccounts.Count > 1)
-            {
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-500">Apply as:</span>
-                    <select class="input" @bind="applyAccountId">
-                        @foreach (var a in RiotAccounts)
-                        {
-                            <option value="@a.Id">@a.GameName#@a.TagLine</option>
-                        }
-                    </select>
-                </div>
-            }
         </div>
         <Pager CurrentPage="result.Page" TotalPages="result.TotalPages" OnPageChanged="GoToPage" />
     </div>
@@ -53,7 +41,7 @@ else
         <div class="overflow-x-auto">
             <table class="tbl">
                 <thead>
-                    <tr><th>Team</th><th>Lanes Needed</th>@if (RiotAccounts.Count > 0) { <th class="w-32"></th> }</tr>
+                    <tr><th>Team</th><th>Lanes Needed</th>@if (RiotAccounts.Count > 0) { <th class="@(RiotAccounts.Count > 1 ? "w-72" : "w-40")"></th> }</tr>
                 </thead>
                 <tbody>
                     @foreach (var team in result.Items)
@@ -77,12 +65,27 @@ else
                             </td>
                             @if (RiotAccounts.Count > 0)
                             {
-                                <td>
-                                    <form method="post" action="@($"/api/teams/{team.Id}/apply")">
-                                        <input type="hidden" name="__RequestVerificationToken" value="@AntiforgeryToken" />
-                                        <input type="hidden" name="riotAccountId" value="@applyAccountId" />
-                                        <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-                                    </form>
+                                <td class="whitespace-normal">
+                                    @if (team.Pending || appliedTeamIds.Contains(team.Id))
+                                    {
+                                        <button type="button" class="btn btn-secondary btn-sm whitespace-nowrap" disabled>Already applied</button>
+                                    }
+                                    else
+                                    {
+                                        <div class="flex items-center justify-end gap-2">
+                                            @if (RiotAccounts.Count > 1)
+                                            {
+                                                <select class="input w-40" aria-label="Apply as"
+                                                        value="@SelectedAccount(team.Id)" @onchange="e => SetSelectedAccount(team.Id, e)">
+                                                    @foreach (var a in RiotAccounts)
+                                                    {
+                                                        <option value="@a.Id">@a.GameName#@a.TagLine</option>
+                                                    }
+                                                </select>
+                                            }
+                                            <button type="button" class="btn btn-primary btn-sm" @onclick="() => ApplyAsync(team.Id)">Apply</button>
+                                        </div>
+                                    }
                                 </td>
                             }
                         </tr>
@@ -108,25 +111,25 @@ else
     // The current user's Riot accounts; empty when logged out or unlinked. Drives the apply column.
     [Parameter] public List<UserRiotAccount> RiotAccounts { get; set; } = [];
 
-    // Antiforgery request token supplied by the (server-rendered) page, so the apply form posts validate.
+    // Antiforgery request token supplied by the (server-rendered) page, sent with the apply request.
     [Parameter] public string? AntiforgeryToken { get; set; }
+
+    // Teams applied to in this session, tracked locally so the row updates in place without a reload.
+    private readonly HashSet<long> appliedTeamIds = [];
+
+    // The Riot account chosen per team (for users with more than one); defaults to the first.
+    private readonly Dictionary<long, long> selectedAccountByTeam = [];
 
     private PagedResult<RecruitmentTeamListItem>? result;
     private string? search;
     private string searchInput = "";
     private TeamRecruitmentLanes? laneFilter;
     private int currentPage = 1;
-    private long applyAccountId;
 
     protected override async Task OnInitializedAsync()
     {
         if (OperatingSystem.IsBrowser())
         {
-            if (applyAccountId == 0 && RiotAccounts.Count > 0)
-            {
-                applyAccountId = RiotAccounts[0].Id;
-            }
-
             await LoadAsync();
         }
     }
@@ -173,5 +176,29 @@ else
     {
         currentPage = page;
         await LoadAsync();
+    }
+
+    private long SelectedAccount(long teamId) =>
+        selectedAccountByTeam.TryGetValue(teamId, out var id) ? id : RiotAccounts[0].Id;
+
+    private void SetSelectedAccount(long teamId, ChangeEventArgs e)
+    {
+        if (long.TryParse(e.Value?.ToString(), out var id))
+            selectedAccountByTeam[teamId] = id;
+    }
+
+    private async Task ApplyAsync(long teamId)
+    {
+        var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = AntiforgeryToken ?? "",
+            ["riotAccountId"] = SelectedAccount(teamId).ToString(),
+        });
+
+        var response = await Http.PostAsync($"/api/teams/{teamId}/apply", content);
+        if (response.IsSuccessStatusCode)
+        {
+            appliedTeamIds.Add(teamId);
+        }
     }
 }

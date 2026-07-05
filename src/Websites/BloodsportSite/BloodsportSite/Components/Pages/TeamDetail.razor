@@ -168,17 +168,9 @@ else
         </div>
     }
 
-    @if (applied)
-    {
-        <div class="alert alert-success mb-4">Your application has been submitted. The team manager will review it.</div>
-    }
     @if (applicationAccepted)
     {
         <div class="alert alert-success mb-4">Application accepted — the player has joined the team.</div>
-    }
-    @if (applyError is not null)
-    {
-        <div class="alert alert-danger mb-4">@applyError</div>
     }
 
     @if (isManager)
@@ -454,9 +446,7 @@ else
     private List<RiotAccount> joinableRiotAccounts = [];
     private string? inviteError;
     private bool inviteSent;
-    private bool applied;
     private bool applicationAccepted;
-    private string? applyError;
     private string? memberError;
 
     protected override async Task OnInitializedAsync()
@@ -467,21 +457,8 @@ else
         if (query.TryGetValue("invite_sent", out _))
             inviteSent = true;
 
-        if (query.TryGetValue("applied", out _))
-            applied = true;
-
         if (query.TryGetValue("application_accepted", out _))
             applicationAccepted = true;
-
-        if (query.TryGetValue("apply_error", out var applyErrorCode))
-        {
-            applyError = (string?)applyErrorCode switch
-            {
-                "already_member"  => "You are already a member of this team.",
-                "already_pending" => "You already have a pending invite or application with this team.",
-                _                 => "An unknown error occurred. Please try again.",
-            };
-        }
 
         if (query.TryGetValue("member_error", out var memberErrorCode))
         {

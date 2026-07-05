@@ -99,6 +99,7 @@ namespace BloodsportSite.Api
         }
 
         private static async Task<IResult> ListRecruitingTeamsAsync(
+            HttpContext context,
             IDbContextFactory<SqlDbContext> dbFactory,
             BlobSasService blobSasService,
             int page = 1,
@@ -136,6 +137,24 @@ namespace BloodsportSite.Api
                 .Include(t => t.TeamRecruitment)
                 .ToListAsync();
 
+            // Flag teams the current user already has a pending invite or application with,
+            // so the client can show "Application pending" instead of an apply button.
+            var pendingTeamIds = new HashSet<long>();
+            var oid = context.User.FindFirst("oid")?.Value
+                   ?? context.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+            if (oid is not null)
+            {
+                var teamIds = teams.Select(t => t.Id).ToList();
+                pendingTeamIds = (await db.TeamInvites
+                    .Where(i => teamIds.Contains(i.TeamId)
+                             && i.Status == TeamInviteStatus.Pending
+                             && i.RiotAccount.User.EntraObjectId == oid)
+                    .Select(i => i.TeamId)
+                    .Distinct()
+                    .ToListAsync()).ToHashSet();
+            }
+
             var items = teams.Select(t => new
             {
                 t.Id,
@@ -143,6 +162,7 @@ namespace BloodsportSite.Api
                 t.DateCreated,
                 FlagUrl = blobSasService.GetSasUrl(t.LogoUrl?.Replace("/original.", "/flag.")),
                 Lanes = t.TeamRecruitment!.Lanes.ToList(),
+                Pending = pendingTeamIds.Contains(t.Id),
             });
 
             return Results.Ok(new

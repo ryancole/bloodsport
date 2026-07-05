@@ -102,30 +102,32 @@ namespace BloodsportSite.Api
             await using var db = dbFactory.CreateDbContext();
             var user = await GetCurrentUserAsync(context, db);
             if (user is null)
-                return Results.Redirect("/recruitment");
+                return Results.Unauthorized();
 
             var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
             if (team is null)
-                return Results.Redirect("/recruitment");
+                return Results.NotFound();
 
             // The Riot account must belong to the current user.
             var riotAccount = await db.RiotAccounts
                 .FirstOrDefaultAsync(r => r.Id == form.RiotAccountId && r.UserId == user.Id);
 
             if (riotAccount is null)
-                return Results.Redirect("/recruitment");
+                return Results.BadRequest();
 
             var alreadyMember = await db.TeamMemberships
                 .AnyAsync(m => m.TeamId == teamId && m.RiotAccountId == riotAccount.Id);
 
             if (alreadyMember)
-                return Results.Redirect($"/teams/{teamId}?apply_error=already_member");
+                return Results.Conflict();
 
             var alreadyPending = await db.TeamInvites
                 .AnyAsync(i => i.TeamId == teamId && i.RiotAccountId == riotAccount.Id && i.Status == TeamInviteStatus.Pending);
 
+            // Idempotent: a pending invite/application already exists, so the client can
+            // safely show it as pending.
             if (alreadyPending)
-                return Results.Redirect($"/teams/{teamId}?apply_error=already_pending");
+                return Results.Ok();
 
             db.TeamInvites.Add(new TeamInvite
             {
@@ -139,7 +141,7 @@ namespace BloodsportSite.Api
 
             await db.SaveChangesAsync();
 
-            return Results.Redirect($"/teams/{teamId}?applied=1");
+            return Results.Ok();
         }
 
         private static async Task TrySendInviteEmailAsync(EmailClient emailClient, EmailTemplateRenderer templateRenderer, IConfiguration configuration, ILogger logger, User invitee, Team team, User manager)
