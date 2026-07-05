@@ -39,6 +39,35 @@ else
             <div class="flex items-center gap-2">
                 @if (isManager)
                 {
+                    <details class="relative">
+                        <summary class="btn btn-secondary cursor-pointer list-none [&::-webkit-details-marker]:hidden">@(IsRecruiting ? "Recruiting" : "Enable Recruitment")</summary>
+                        <div class="absolute right-0 z-20 mt-2 w-72 rounded-lg border border-gray-200 bg-white p-4 text-left shadow-lg">
+                            <div class="mb-2 text-sm font-medium text-gray-700">Lanes needed</div>
+                            <form method="post" action="/api/teams/@team.Id/update-recruitment">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="isLookingForUser" value="true" />
+                                <div class="mb-3 flex flex-wrap gap-2" role="group" aria-label="Lanes needed">
+                                    @foreach (var lane in laneOrder)
+                                    {
+                                        <label class="cursor-pointer" title="@lane">
+                                            <input type="checkbox" name="lanes" value="@lane" checked="@selectedLanes.Contains(lane)" class="peer sr-only" />
+                                            <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="32" height="32" alt="@lane"
+                                                 class="rounded-md bg-[#0e1a2b] p-1 opacity-40 ring-2 ring-transparent transition hover:opacity-70 peer-checked:opacity-100 peer-checked:ring-brand-500" />
+                                        </label>
+                                    }
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">@(IsRecruiting ? "Save" : "Start recruiting")</button>
+                            </form>
+                            @if (IsRecruiting)
+                            {
+                                <form method="post" action="/api/teams/@team.Id/update-recruitment" class="mt-2 text-center">
+                                    <AntiforgeryToken />
+                                    <input type="hidden" name="isLookingForUser" value="false" />
+                                    <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 hover:underline">Stop recruiting</button>
+                                </form>
+                            }
+                        </div>
+                    </details>
                     <a href="/teams/@team.Id/edit" class="btn btn-secondary">Edit</a>
                     <form method="post" action="/api/teams/@team.Id/delete">
                         <AntiforgeryToken />
@@ -81,40 +110,6 @@ else
             }
         </dd>
     </dl>
-
-    @if (isManager)
-    {
-        <div class="mb-8">
-            <h2 class="mb-3 section-title">Recruiting</h2>
-
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <form method="post" action="/api/teams/@team.Id/update-recruitment" class="flex flex-wrap items-center gap-3">
-                    <AntiforgeryToken />
-                    <input type="hidden" name="isLookingForUser" value="true" />
-                    <div class="flex flex-wrap gap-2" role="group" aria-label="Lanes needed">
-                        @foreach (var lane in laneOrder)
-                        {
-                            <label class="cursor-pointer" title="@lane">
-                                <input type="checkbox" name="lanes" value="@lane" checked="@selectedLanes.Contains(lane)" class="peer sr-only" />
-                                <img src="/image/lanes/@(lane.ToString().ToLowerInvariant()).svg" width="32" height="32" alt="@lane"
-                                     class="rounded-md bg-[#0e1a2b] p-1 opacity-40 ring-2 ring-transparent transition hover:opacity-70 peer-checked:opacity-100 peer-checked:ring-brand-500" />
-                            </label>
-                        }
-                    </div>
-                    <button type="submit" class="btn btn-primary">@(IsRecruiting ? "Save" : "Mark as recruiting")</button>
-                </form>
-
-                @if (IsRecruiting)
-                {
-                    <form method="post" action="/api/teams/@team.Id/update-recruitment">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="isLookingForUser" value="false" />
-                        <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 hover:underline">Stop recruiting</button>
-                    </form>
-                }
-            </div>
-        </div>
-    }
 
     @if (career is not null)
     {
