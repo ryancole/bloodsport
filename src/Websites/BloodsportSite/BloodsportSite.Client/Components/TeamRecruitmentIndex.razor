@@ -28,6 +28,18 @@ else
                     }
                 </div>
             </div>
+            @if (RiotAccounts.Count > 1)
+            {
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">Apply as:</span>
+                    <select class="input" @bind="applyAccountId">
+                        @foreach (var a in RiotAccounts)
+                        {
+                            <option value="@a.Id">@a.GameName#@a.TagLine</option>
+                        }
+                    </select>
+                </div>
+            }
         </div>
         <Pager CurrentPage="result.Page" TotalPages="result.TotalPages" OnPageChanged="GoToPage" />
     </div>
@@ -41,7 +53,7 @@ else
         <div class="overflow-x-auto">
             <table class="tbl">
                 <thead>
-                    <tr><th>Team</th><th>Lanes Needed</th></tr>
+                    <tr><th>Team</th><th>Lanes Needed</th>@if (RiotAccounts.Count > 0) { <th class="w-32"></th> }</tr>
                 </thead>
                 <tbody>
                     @foreach (var team in result.Items)
@@ -63,6 +75,16 @@ else
                                     </div>
                                 }
                             </td>
+                            @if (RiotAccounts.Count > 0)
+                            {
+                                <td>
+                                    <form method="post" action="@($"/api/teams/{team.Id}/apply")">
+                                        <input type="hidden" name="__RequestVerificationToken" value="@AntiforgeryToken" />
+                                        <input type="hidden" name="riotAccountId" value="@applyAccountId" />
+                                        <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+                                    </form>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>
@@ -83,16 +105,28 @@ else
         TeamRecruitmentLanes.Support,
     ];
 
+    // The current user's Riot accounts; empty when logged out or unlinked. Drives the apply column.
+    [Parameter] public List<UserRiotAccount> RiotAccounts { get; set; } = [];
+
+    // Antiforgery request token supplied by the (server-rendered) page, so the apply form posts validate.
+    [Parameter] public string? AntiforgeryToken { get; set; }
+
     private PagedResult<RecruitmentTeamListItem>? result;
     private string? search;
     private string searchInput = "";
     private TeamRecruitmentLanes? laneFilter;
     private int currentPage = 1;
+    private long applyAccountId;
 
     protected override async Task OnInitializedAsync()
     {
         if (OperatingSystem.IsBrowser())
         {
+            if (applyAccountId == 0 && RiotAccounts.Count > 0)
+            {
+                applyAccountId = RiotAccounts[0].Id;
+            }
+
             await LoadAsync();
         }
     }

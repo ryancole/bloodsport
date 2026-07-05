@@ -6,4 +6,9 @@ namespace Bloodsport.Entity.BlazorForm
 
         public string TagLine { get; set; } = string.Empty;
     }
+
+    public class TeamApplyForm
+    {
+        public long RiotAccountId { get; set; }
+    }
 }

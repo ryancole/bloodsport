@@ -12,6 +12,16 @@ namespace Bloodsport.Data.Sql.EntityConfigurations
         public void Configure(EntityTypeBuilder<TeamInvite> builder)
         {
             builder
+                .Property(m => m.Type)
+                .IsRequired()
+                .HasDefaultValue(TeamInviteType.Invite);
+
+            builder
+                .Property(m => m.Status)
+                .IsRequired()
+                .HasDefaultValue(TeamInviteStatus.Pending);
+
+            builder
                 .Property(t => t.DateCreated)
                 .HasDefaultValueSql("GETUTCDATE()");
 

@@ -18,17 +18,18 @@
 
 <h2 class="mb-4 mt-12 section-title">Teams recruiting players</h2>
 
-<BloodsportSite.Client.Components.TeamRecruitmentIndex />
+<BloodsportSite.Client.Components.TeamRecruitmentIndex RiotAccounts="riotAccounts" AntiforgeryToken="@antiforgeryToken" />
 
 @code {
     [CascadingParameter] public HttpContext? HttpContext { get; set; }
 
     private List<ManagedTeam> managedTeams = [];
+    private List<UserRiotAccount> riotAccounts = [];
     private string? antiforgeryToken;
 
     protected override async Task OnInitializedAsync()
     {
-        // Only available during static server rendering; used to authorize the invite form posts.
+        // Only available during static server rendering; used to authorize the invite/apply form posts.
         if (HttpContext is not null)
             antiforgeryToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 
@@ -39,10 +40,17 @@
         if (oid is not null)
         {
             await using var db = await DbFactory.CreateDbContextAsync();
+
             managedTeams = await db.Teams
                 .Where(t => t.Manager.EntraObjectId == oid)
                 .OrderBy(t => t.Name)
                 .Select(t => new ManagedTeam(t.Id, t.Name))
+                .ToListAsync();
+
+            riotAccounts = await db.RiotAccounts
+                .Where(r => r.User.EntraObjectId == oid)
+                .OrderBy(r => r.GameName)
+                .Select(r => new UserRiotAccount(r.Id, r.GameName, r.TagLine))
                 .ToListAsync();
         }
     }

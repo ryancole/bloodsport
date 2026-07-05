@@ -193,7 +193,9 @@ else
                 pendingInvites = await db.TeamInvites
                     .Include(i => i.Team)
                     .Include(i => i.RiotAccount)
-                    .Where(i => riotAccountIds.Contains(i.RiotAccountId) && i.Status == TeamInviteStatus.Pending)
+                    .Where(i => riotAccountIds.Contains(i.RiotAccountId)
+                             && i.Status == TeamInviteStatus.Pending
+                             && i.Type == TeamInviteType.Invite)
                     .OrderByDescending(i => i.DateCreated)
                     .ToListAsync();
             }

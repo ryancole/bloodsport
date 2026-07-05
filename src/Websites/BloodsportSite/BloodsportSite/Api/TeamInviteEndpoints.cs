@@ -16,6 +16,9 @@ namespace BloodsportSite.Api
             endpoints.MapPost("/teams/{teamId}/invite", InviteAsync)
                 .RequireAuthorization();
 
+            endpoints.MapPost("/teams/{teamId}/apply", ApplyAsync)
+                .RequireAuthorization();
+
             endpoints.MapPost("/invites/{id}/accept", AcceptAsync)
                 .RequireAuthorization();
 
@@ -78,6 +81,8 @@ namespace BloodsportSite.Api
                 Team = team,
                 RiotAccountId = riotAccount.Id,
                 RiotAccount = riotAccount,
+                Status = TeamInviteStatus.Pending,
+                Type = TeamInviteType.Invite
             });
 
             await db.SaveChangesAsync();
@@ -85,6 +90,56 @@ namespace BloodsportSite.Api
             await TrySendInviteEmailAsync(emailClient, templateRenderer, configuration, loggerFactory.CreateLogger(nameof(TeamInviteEndpoints)), riotAccount.User, team, user);
 
             return Results.Redirect($"/teams/{teamId}?invite_sent=1");
+        }
+
+        // User: apply to a team (a player-initiated invite) with one of their own Riot accounts.
+        private static async Task<IResult> ApplyAsync(
+            HttpContext context,
+            IDbContextFactory<SqlDbContext> dbFactory,
+            long teamId,
+            [Microsoft.AspNetCore.Mvc.FromForm] TeamApplyForm form)
+        {
+            await using var db = dbFactory.CreateDbContext();
+            var user = await GetCurrentUserAsync(context, db);
+            if (user is null)
+                return Results.Redirect("/recruitment");
+
+            var team = await db.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
+            if (team is null)
+                return Results.Redirect("/recruitment");
+
+            // The Riot account must belong to the current user.
+            var riotAccount = await db.RiotAccounts
+                .FirstOrDefaultAsync(r => r.Id == form.RiotAccountId && r.UserId == user.Id);
+
+            if (riotAccount is null)
+                return Results.Redirect("/recruitment");
+
+            var alreadyMember = await db.TeamMemberships
+                .AnyAsync(m => m.TeamId == teamId && m.RiotAccountId == riotAccount.Id);
+
+            if (alreadyMember)
+                return Results.Redirect($"/teams/{teamId}?apply_error=already_member");
+
+            var alreadyPending = await db.TeamInvites
+                .AnyAsync(i => i.TeamId == teamId && i.RiotAccountId == riotAccount.Id && i.Status == TeamInviteStatus.Pending);
+
+            if (alreadyPending)
+                return Results.Redirect($"/teams/{teamId}?apply_error=already_pending");
+
+            db.TeamInvites.Add(new TeamInvite
+            {
+                TeamId = teamId,
+                Team = team,
+                RiotAccountId = riotAccount.Id,
+                RiotAccount = riotAccount,
+                Status = TeamInviteStatus.Pending,
+                Type = TeamInviteType.Application
+            });
+
+            await db.SaveChangesAsync();
+
+            return Results.Redirect($"/teams/{teamId}?applied=1");
         }
 
         private static async Task TrySendInviteEmailAsync(EmailClient emailClient, EmailTemplateRenderer templateRenderer, IConfiguration configuration, ILogger logger, User invitee, Team team, User manager)
@@ -131,7 +186,7 @@ namespace BloodsportSite.Api
                 .Include(i => i.Team)
                 .FirstOrDefaultAsync(i => i.Id == id && i.Status == TeamInviteStatus.Pending);
 
-            if (invite is null || invite.RiotAccount.UserId != user.Id)
+            if (invite is null || !CanRespond(invite, user))
                 return Results.Redirect("/profile");
 
             invite.Status = TeamInviteStatus.Accepted;
@@ -147,8 +202,19 @@ namespace BloodsportSite.Api
 
             await db.SaveChangesAsync();
 
-            return Results.Redirect("/profile?invite_accepted=1");
+            // Invites are accepted by the invitee (from their profile); applications by the
+            // team manager (from the team page).
+            return invite.Type == TeamInviteType.Invite
+                ? Results.Redirect("/profile?invite_accepted=1")
+                : Results.Redirect($"/teams/{invite.TeamId}?application_accepted=1");
         }
+
+        // An invite is answered by the invitee (the Riot account's owner); an application is
+        // answered by the manager of the team it was sent to.
+        private static bool CanRespond(TeamInvite invite, User user) =>
+            invite.Type == TeamInviteType.Invite
+                ? invite.RiotAccount.UserId == user.Id
+                : invite.Team.ManagerId == user.Id;
 
         private static async Task<IResult> DeclineAsync(
             HttpContext context,
@@ -162,15 +228,18 @@ namespace BloodsportSite.Api
 
             var invite = await db.TeamInvites
                 .Include(i => i.RiotAccount)
+                .Include(i => i.Team)
                 .FirstOrDefaultAsync(i => i.Id == id && i.Status == TeamInviteStatus.Pending);
 
-            if (invite is null || invite.RiotAccount.UserId != user.Id)
+            if (invite is null || !CanRespond(invite, user))
                 return Results.Redirect("/profile");
 
             invite.Status = TeamInviteStatus.Declined;
             await db.SaveChangesAsync();
 
-            return Results.Redirect("/profile");
+            return invite.Type == TeamInviteType.Invite
+                ? Results.Redirect("/profile")
+                : Results.Redirect($"/teams/{invite.TeamId}");
         }
 
         // Manager: abort a pending invite their team has sent.
