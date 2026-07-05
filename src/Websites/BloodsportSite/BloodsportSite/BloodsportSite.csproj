@@ -10,6 +10,12 @@
 
     <ItemGroup>
         <PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
+        <!-- Azure.Identity 1.17.2 (pulled in transitively by Microsoft.Identity.Web) and
+             Azure.Core 1.55 both define Azure.Identity.DefaultAzureCredential, which collides.
+             Alias the Azure.Identity assembly out of the global namespace so DefaultAzureCredential
+             resolves unambiguously to the copy in Azure.Core. Removing this line brings the
+             CS0433 "exists in both" build error back. -->
+        <PackageReference Include="Azure.Identity" Version="1.17.2" Aliases="AzureIdentity" />
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
         <PackageReference Include="Azure.Storage.Blobs" Version="12.29.0" />
         <PackageReference Include="Camille.RiotGames" Version="3.0.0-nightly-2025-06-24-d2b94715b7" />

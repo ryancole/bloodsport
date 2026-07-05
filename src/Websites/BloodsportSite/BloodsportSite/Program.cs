@@ -1,4 +1,5 @@
 using Azure.Communication.Email;
+using Azure.Core;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using Bloodsport.Data.Sql;
@@ -112,6 +113,20 @@ namespace BloodsportSite
 
             builder
                 .Services
+                .AddMemoryCache();
+
+            // Shared credential for calling ARM (Cost Management). Uses the app's
+            // managed identity in Azure and the local dev sign-in (az/VS) otherwise.
+            builder
+                .Services
+                .AddSingleton<TokenCredential>(new Azure.Identity.DefaultAzureCredential());
+
+            builder
+                .Services
+                .AddHttpClient<CostService>();
+
+            builder
+                .Services
                 .AddDbContextFactory<SqlDbContext>(ConfigureSqlDbContext);
 
             var app = builder.Build();
@@ -150,6 +165,7 @@ namespace BloodsportSite
             app.MapGroup("/api").MapMatchups();
             app.MapGroup("/api").MapPlayoffs();
             app.MapGroup("/api").MapPosts();
+            app.MapGroup("/api").MapCost();
 
             app.Run();
         }

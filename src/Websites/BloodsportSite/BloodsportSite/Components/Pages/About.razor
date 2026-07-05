@@ -1,4 +1,7 @@
 @page "/about"
+@using System.Globalization
+@using BloodsportSite.Services
+@inject CostService CostService
 
 <PageTitle>About | BSAL</PageTitle>
 
@@ -56,6 +59,16 @@
         appreciated and go directly toward those hosting costs — nothing more. There's no
         obligation; playing and spreading the word helps just as much.
     </p>
+    @if (m_cost is not null)
+    {
+        <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-5 py-4">
+            <div class="text-sm text-gray-500">Hosting costs (last @m_cost.Days days)</div>
+            <div class="text-2xl font-semibold text-gray-900">@FormatAmount(m_cost)</div>
+            <div class="mt-1 text-xs text-gray-400">
+                As of @m_cost.AsOf.ToLocalTime().ToString("MMM d, yyyy h:mm tt") · updates a few times a day
+            </div>
+        </div>
+    }
     @* TODO: replace href with the Stripe payment/donation link once the account is set up. *@
     <a href="#" class="mt-2 inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2 font-medium text-white no-underline transition-opacity hover:opacity-80">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" fill="currentColor" aria-hidden="true">
@@ -106,3 +119,23 @@
     </ul>
 </section>
 </div>
+
+@code {
+    private RecentCost? m_cost;
+
+    protected override async Task OnInitializedAsync()
+    {
+        m_cost = await CostService.GetRecentAsync();
+    }
+
+    private static string FormatAmount(RecentCost cost)
+    {
+        // Render USD with the familiar symbol; fall back to "<code> <amount>" otherwise.
+        if (string.Equals(cost.Currency, "USD", StringComparison.OrdinalIgnoreCase))
+        {
+            return cost.Amount.ToString("C2", CultureInfo.GetCultureInfo("en-US"));
+        }
+
+        return $"{cost.Currency} {cost.Amount.ToString("N2", CultureInfo.InvariantCulture)}";
+    }
+}
