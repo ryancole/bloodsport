@@ -91,3 +91,21 @@
     /* Mirror the same hierarchy in the table of contents. */
     .doc nav ul ul { @apply pl-5; }
 }
+
+/* Top-of-page navigation progress bar. Driven by Blazor's enhanced-navigation
+   events in BloodsportSite.lib.module.js. Kept outside @layer so it isn't
+   reordered by Tailwind and always paints above page content. */
+.nav-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 5px;
+    width: 0;
+    background: var(--color-gold-600);
+    box-shadow: 0 0 8px var(--color-gold-500);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: width 0.2s ease, opacity 0.25s ease;
+}
+.nav-progress--active { opacity: 1; }
