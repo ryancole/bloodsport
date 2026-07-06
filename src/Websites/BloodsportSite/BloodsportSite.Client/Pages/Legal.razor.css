@@ -1,0 +1,13 @@
+/* Riot-required disclaimer callout. Kept as isolated CSS (rather than utility
+   classes) so this legally mandated block has a stable, distinct treatment.
+   Colors reference the brand tokens defined in Styles/app.css (@theme). */
+.riot-disclaimer {
+    margin-left: 0;
+    padding: 1rem 1.25rem;
+    border-left: 3px solid var(--color-brand-500);
+    border-radius: 0.5rem;
+    background: var(--color-brand-50);
+    color: var(--color-gray-700, #374151);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
