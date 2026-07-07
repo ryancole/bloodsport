@@ -2,6 +2,8 @@
 @using Bloodsport.Data.Sql
 @using Bloodsport.Entity.Database
 @using Markdig
+@using Markdig.Syntax
+@using Markdig.Syntax.Inlines
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.WebUtilities
@@ -10,7 +12,7 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>@(post?.Title ?? "Post") | BSAL</PageTitle>
+<PageTitle>@(post?.Title ?? "Post") | CAL</PageTitle>
 
 @if (notFound)
 {
@@ -22,6 +24,20 @@ else if (post is null)
 }
 else
 {
+    <HeadContent>
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="Champions Amateur League" />
+        <meta property="og:title" content="@post.Title" />
+        <meta property="og:description" content="@description" />
+        <meta property="og:url" content="@NavigationManager.Uri" />
+        <meta property="og:image" content="@imageUrl" />
+        <meta property="article:published_time" content="@post.DateCreated.ToString("o")" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="@post.Title" />
+        <meta name="twitter:description" content="@description" />
+        <meta name="twitter:image" content="@imageUrl" />
+    </HeadContent>
+
     <SectionContent SectionName="breadcrumbs">
         <nav><a href="/news" class="link">News</a> / @post.Title</nav>
     </SectionContent>
@@ -103,6 +119,8 @@ else
     private Post? post;
     private List<PostComment> comments = [];
     private MarkupString renderedHtml;
+    private string description = "";
+    private string imageUrl = "";
     private bool notFound;
     private string? commentError;
     private long? currentUserId;
@@ -146,12 +164,36 @@ else
         }
 
         var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-        renderedHtml = new MarkupString(Markdown.ToHtml(post.Markdown, pipeline));
+        var document = Markdown.Parse(post.Markdown, pipeline);
+        renderedHtml = new MarkupString(document.ToHtml(pipeline));
+
+        // Open Graph / Twitter Card metadata for link previews.
+        var plain = Markdown.ToPlainText(post.Markdown, pipeline).Trim();
+        plain = string.Join(" ", plain.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+        description = plain.Length > 200 ? plain[..197].TrimEnd() + "…" : plain;
+
+        var firstImage = document
+            .Descendants<LinkInline>()
+            .FirstOrDefault(l => l.IsImage && !string.IsNullOrWhiteSpace(l.Url))?
+            .Url;
+        imageUrl = ToAbsoluteUrl(firstImage) ?? ToAbsoluteUrl("og-default.png")!;
 
         comments = await db.PostComments
             .Include(c => c.User)
             .Where(c => c.PostId == Id)
             .OrderBy(c => c.DateCreated)
             .ToListAsync();
+    }
+
+    private string? ToAbsoluteUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return null;
+        }
+
+        return Uri.TryCreate(url, UriKind.Absolute, out var absolute)
+            ? absolute.ToString()
+            : new Uri(new Uri(NavigationManager.BaseUri), url).ToString();
     }
 }
