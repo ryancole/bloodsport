@@ -1,5 +1,7 @@
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Bloodsport.Entity.RiotApi;
 using Bloodsport.Entity.ServiceBus;
 using BloodsportFunctions.Services;
@@ -13,20 +15,25 @@ namespace BloodsportFunctions.Functions;
 
 public class DownloadReplay
 {
+    private const string Container = "match-replay";
+
     private readonly ILogger<DownloadReplay> _logger;
     private readonly RiotGamesApi _riotApi;
     private readonly RiotReplayService _replayService;
+    private readonly BlobServiceClient _blobServiceClient;
     private readonly IConfiguration _config;
 
     public DownloadReplay(
         ILogger<DownloadReplay> logger,
         RiotGamesApi riotApi,
         RiotReplayService replayService,
+        BlobServiceClient blobServiceClient,
         IConfiguration config)
     {
         _logger = logger;
         _riotApi = riotApi;
         _replayService = replayService;
+        _blobServiceClient = blobServiceClient;
         _config = config;
     }
 
@@ -119,15 +126,20 @@ public class DownloadReplay
             }
 
             using var response = await _replayService.DownloadAsync(fileUrl);
+            await using var replayStream = await response.Content.ReadAsStreamAsync();
 
-            // TODO: upload straight to blob storage instead of buffering. Buffering only exists so
-            // the log below proves the download works end to end.
-            using var buffer = new MemoryStream();
-            await response.Content.CopyToAsync(buffer);
+            var blobName = $"{matchId}.rofl";
+            var container = _blobServiceClient.GetBlobContainerClient(Container);
+            var blob = container.GetBlobClient(blobName);
+
+            await blob.UploadAsync(replayStream, new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders { ContentType = "application/octet-stream" }
+            });
 
             _logger.LogInformation(
-                "Downloaded {Bytes} byte replay for match {MatchId}. Storage upload is not implemented yet.",
-                buffer.Length, matchId);
+                "Saved {Bytes} byte replay for match {MatchId} to {Container}/{BlobName}.",
+                response.Content.Headers.ContentLength, matchId, Container, blobName);
         }
         catch (Exception ex)
         {
