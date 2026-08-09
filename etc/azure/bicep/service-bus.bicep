@@ -55,4 +55,13 @@ resource fetchRiotLobbyEventsQueue 'Microsoft.ServiceBus/namespaces/queues@2022-
   }
 }
 
+resource downloadReplayQueue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = {
+  parent: namespace
+  name: 'download-replay'
+  properties: {
+    lockDuration: 'PT5M'
+    maxDeliveryCount: 3
+  }
+}
+
 output namespaceName string = namespace.name

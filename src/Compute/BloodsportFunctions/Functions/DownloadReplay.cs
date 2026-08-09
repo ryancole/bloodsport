@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Bloodsport.Entity.RiotApi;
+using Bloodsport.Entity.ServiceBus;
 using BloodsportFunctions.Services;
 using Camille.Enums;
 using Camille.RiotGames;
@@ -37,12 +39,32 @@ public class DownloadReplay
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
-        var matchId = message.Body.ToString().Trim().Trim('"');
+        DownloadReplayMessage? payload;
 
-        if (string.IsNullOrEmpty(matchId))
+        try
         {
-            _logger.LogError("Message {MessageId} had an empty match ID body.", message.MessageId);
-            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "EmptyMatchId");
+            payload = JsonSerializer.Deserialize<DownloadReplayMessage>(message.Body.ToString());
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize message body: {body}", message.Body);
+            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InvalidPayload", deadLetterErrorDescription: "Message body could not be deserialized as DownloadReplayMessage.");
+            return;
+        }
+
+        if (payload is null)
+        {
+            _logger.LogError("Deserialized message payload was null.");
+            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InvalidPayload", deadLetterErrorDescription: "Message body deserialized to null.");
+            return;
+        }
+
+        var matchId = payload.MatchId;
+
+        if (string.IsNullOrWhiteSpace(matchId))
+        {
+            _logger.LogError("Message {MessageId} did not contain a match ID.", message.MessageId);
+            await messageActions.DeadLetterMessageAsync(message, deadLetterReason: "InvalidPayload", deadLetterErrorDescription: "MatchId was missing or empty.");
             return;
         }
 
