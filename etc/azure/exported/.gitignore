@@ -1,0 +1,4 @@
+# These dumps contain live secrets (client secrets, account keys, connection strings).
+# Keep them local / in a password manager — never commit them.
+*.appsettings.json
+*.connstrings.json

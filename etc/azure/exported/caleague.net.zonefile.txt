@@ -1,0 +1,37 @@
+
+; Exported zone file from Azure DNS
+;      Zone name: caleague.net
+;      Resource Group Name: Champions
+;      Date and time (UTC): Wed, 26 Aug 2026 19:11:23 -0500
+
+$TTL 300
+$ORIGIN caleague.net.
+    
+@ 3600 IN SOA ns1-09.azure-dns.com. azuredns-hostmaster.microsoft.com. (
+              1 ; serial
+              3600 ; refresh
+              300 ; retry
+              2419200 ; expire
+              300 ; minimum
+              )
+
+  3600 IN A 40.119.12.21
+
+  172800 IN NS ns1-09.azure-dns.com.
+  172800 IN NS ns2-09.azure-dns.net.
+  172800 IN NS ns3-09.azure-dns.org.
+  172800 IN NS ns4-09.azure-dns.info.
+
+  3600 IN TXT "v=spf1 include:spf.protection.outlook.com -all"
+
+selector1-azurecomm-prod-net._domainkey 3600 IN CNAME selector1-azurecomm-prod-net._domainkey.azurecomm.net.
+
+selector2-azurecomm-prod-net._domainkey 3600 IN CNAME selector2-azurecomm-prod-net._domainkey.azurecomm.net.
+
+asuid 3600 IN TXT "88A2B5DD803EA97E5D0E71186E472C722217A6978ACCF3CB70886047C2C31E7E"
+
+func 3600 IN CNAME champions-func.azurewebsites.net.
+
+asuid.func 3600 IN TXT "88A2B5DD803EA97E5D0E71186E472C722217A6978ACCF3CB70886047C2C31E7E"
+
+
