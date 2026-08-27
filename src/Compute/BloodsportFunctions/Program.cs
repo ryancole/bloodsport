@@ -63,6 +63,10 @@ public class Program
                 builder.Configuration["RiotApi:ApiKey"]
                     ?? throw new InvalidOperationException("RiotApi:ApiKey is not configured.")));
 
+        builder
+            .Services
+            .AddHttpClient<RiotReplayService>();
+
         builder.Build().Run();
     }
 }
